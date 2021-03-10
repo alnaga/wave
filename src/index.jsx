@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './components/App';
+import App from './components/App/App';
 import 'regenerator-runtime';  // Enables utilisation of async/await
 
 const Index = () => <App />
