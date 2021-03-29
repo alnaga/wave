@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 
-import { getAuthTokens, refreshAuthToken } from '../../actions/actions';
+import { getAuthTokens, refreshAuthToken } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
 
 const SpotifyAuthorise = () => {

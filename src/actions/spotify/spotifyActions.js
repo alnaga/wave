@@ -3,7 +3,7 @@ import axios from 'axios';
 import {
   SET_ACCESS_TOKEN,
   SET_REFRESH_TOKEN
-} from '../constants';
+} from '../../constants';
 
 /**
  * Queries the Wave API to communicate with Spotify's API to fetch access and refresh tokens
