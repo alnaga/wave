@@ -1,13 +1,19 @@
 import React, { useState } from 'react';
 
+import { registerAccount } from '../../actions/account/accountActions';
+import { useAppDispatch, useAppState } from '../../context/context';
+
 const Register = () => {
   const [ data, setData ] = useState({
+    email: '',
     username: '',
     password: ''
   });
 
-  const handleSubmit = () => {
-    console.log('Submitting', data);
+  const dispatch = useAppDispatch();
+
+  const handleSubmit = async () => {
+    await registerAccount(dispatch, data);
   };
 
   const handleTextChange = (field) => (event) => {
