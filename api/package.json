@@ -6,6 +6,7 @@
   "scripts": {
     "build": "npm run clean && babel ./src --out-dir build/ --ignore ./node_modules",
     "clean": "rimraf build",
+    "start:db": "mongod --dbpath=./data/db --port 8082",
     "start": "nodemon --exec babel-node src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -15,6 +16,7 @@
     "axios": "^0.21.1",
     "cors": "^2.8.5",
     "express": "^4.17.1",
+    "mongodb": "^3.6.5",
     "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
