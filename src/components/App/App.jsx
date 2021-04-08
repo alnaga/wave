@@ -1,5 +1,5 @@
-import React from 'react';
-import { getSongSearchResults } from '../../actions/spotify/spotifyActions';
+import React, { useEffect } from 'react';
+import { getSongSearchResults, getVenue } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
 
 import CurrentlyPlaying from '../CurrentlyPlaying/CurrentlyPlaying';
@@ -11,7 +11,17 @@ import SpotifyAuthorise from '../SpotifyAuthorise/SpotifyAuthorise';
 
 const App = () => {
   const dispatch = useAppDispatch();
-  const { accessToken } = useAppState();
+  const { accessToken, venue } = useAppState();
+
+  console.log(useAppState());
+
+  useEffect(() => {
+    (async () => {
+      if (accessToken && !venue) {
+        await getVenue(dispatch, accessToken);
+      }
+    })();
+  }, []);
 
   return (
     <div>

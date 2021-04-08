@@ -2,20 +2,24 @@ import React, {useEffect} from 'react';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getCurrentlyPlaying } from '../../actions/spotify/spotifyActions';
 
+import Vote from '../Vote/Vote';
+
 const CurrentlyPlaying = () => {
   const dispatch = useAppDispatch();
-  const { accessToken, currentlyPlaying } = useAppState();
+  const { accessToken, currentlyPlaying, device } = useAppState();
 
   useEffect(() => {
-    getCurrentlyPlaying(dispatch, accessToken);
-  }, []);
+    (async () => {
+      await getCurrentlyPlaying(dispatch, accessToken);
+    })();
+  }, [ , device]);
 
   return (
     <div>
       {
-        currentlyPlaying
+        (currentlyPlaying && currentlyPlaying.item)
           && (
-            <div className="flex-column">
+            <div className="flex-column border-dark">
               <div>
                 Currently Playing:
               </div>
@@ -29,6 +33,8 @@ const CurrentlyPlaying = () => {
                   currentlyPlaying.item.name
                 }
               </div>
+
+              <Vote />
             </div>
           )
       }

@@ -5,7 +5,8 @@ import {
   SET_CURRENTLY_PLAYING,
   SET_DEVICES,
   SET_REFRESH_TOKEN,
-  SET_SEARCH_RESULTS
+  SET_SEARCH_RESULTS,
+  SET_VENUE
 } from '../constants';
 
 const DispatchContext = createContext();
@@ -16,7 +17,8 @@ export const initialState = {
   currentlyPlaying: undefined,
   devices: [],
   refreshToken: sessionStorage.getItem('refreshToken'),
-  searchResults: []
+  searchResults: [],
+  venue: undefined
 };
 
 const appReducer = (state, action) => {
@@ -45,6 +47,11 @@ const appReducer = (state, action) => {
       return {
         ...state,
         searchResults: action.payload
+      };
+    case SET_VENUE:
+      return {
+        ...state,
+        venue: action.payload
       };
     default:
       return state;

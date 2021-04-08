@@ -5,7 +5,8 @@ import {
   SET_CURRENTLY_PLAYING,
   SET_DEVICES,
   SET_REFRESH_TOKEN,
-  SET_SEARCH_RESULTS
+  SET_SEARCH_RESULTS,
+  SET_VENUE
 } from '../../constants';
 
 /**
@@ -150,9 +151,56 @@ export const getCurrentlyPlaying = async (dispatch, accessToken) => {
 export const queueSong = async (dispatch, accessToken, songUri) => {
   try {
     const response = await axios.post(`http://localhost:8081/spotify/song?accessToken=${accessToken}&uri=${songUri}`);
-    console.log(response);
 
     return 1;
+  } catch (error) {
+    return 0;
+  }
+};
+
+export const voteSong = async (dispatch, accessToken, venue, vote) => {
+  try {
+    const response = await axios.post(`http://localhost:8081/spotify/vote?accessToken=${accessToken}`, {
+      venue,
+      vote
+    });
+
+    if (response.status === 200) {
+      const data = {
+        ...response.data
+      }
+      delete data.skipped;
+
+      dispatch({
+        type: SET_VENUE,
+        payload: data
+      });
+
+      if (response.data.skipped) {
+        return 2;
+      } else {
+        return 1;
+      }
+    }
+  } catch (error) {
+    return 0;
+  }
+};
+
+export const getVenue = async (dispatch, accessToken) => {
+  try {
+    const response = await axios.get(`http://localhost:8081/spotify/venue?accessToken=${accessToken}`);
+
+    if (response.status === 200) {
+      dispatch({
+        type: SET_VENUE,
+        payload: response.data
+      });
+
+      return 1;
+    } else {
+      return 0;
+    }
   } catch (error) {
     return 0;
   }

@@ -13,7 +13,7 @@ const SearchResults = () => {
   return (
     <div>
       {
-        searchResults.map((result) => {
+        searchResults.length > 1 &&  searchResults.map((result) => {
           console.log(result);
           return (
             <div className="flex pointer" onClick={handleQueueSong(result)}>

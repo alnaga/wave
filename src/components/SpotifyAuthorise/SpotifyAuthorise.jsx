@@ -32,12 +32,8 @@ const SpotifyAuthorise = () => {
   return (
     <div>
       {
-        accessToken
-          ? (
-            <div>
-              Authorised with Spotify!
-            </div>
-          ) : (
+        !accessToken
+          && (
             <button onClick={handleAuthorise}>
               Link your account with Spotify.
             </button>
