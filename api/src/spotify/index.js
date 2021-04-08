@@ -13,7 +13,7 @@ const authorisation = new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString(
 // Sends the user to the Spotify app authorisation page to get their permission to link their account with Wave.
 // Returns an authorisation code which can be exchanged with an access token later on in the app flow.
 router.get('/authorise', (req, res) => {
-  const spotifyScopes = 'user-follow-read user-follow-modify user-top-read';
+  const spotifyScopes = 'user-follow-read user-follow-modify user-top-read app-remote-control streaming user-read-playback-state user-modify-playback-state user-read-currently-playing';
   const redirectUri = 'http://localhost:8080';
   res.redirect('https://accounts.spotify.com/authorize' +
     '?response_type=code' +
@@ -21,6 +21,33 @@ router.get('/authorise', (req, res) => {
     (spotifyScopes ? `&scope=${encodeURIComponent(spotifyScopes)}` : '') +
     `&redirect_uri=${redirectUri}`
   );
+});
+
+router.get('/devices', async (req, res) => {
+  const { accessToken } = req.query;
+
+  const spotifyResponse = await axios.get('https://api.spotify.com/v1/me/player/devices', {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
+    }
+  });
+
+  res.status(spotifyResponse.status).send(spotifyResponse.data);
+});
+
+router.put('/devices', async (req, res) => {
+  const { device } = req.body;
+  const { accessToken } = req.query;
+
+  const spotifyResponse = await axios.put('https://api.spotify.com/v1/me/player', {
+    device_ids: [ device.id ]
+  }, {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
+    }
+  });
+
+  res.status(spotifyResponse.status).send();
 });
 
 // Exchanges the authorisation code acquired previously for an access and refresh token.
@@ -58,6 +85,25 @@ router.post('/refresh', async (req, res) => {
   });
 
   res.status(spotifyResponse.status).send(spotifyResponse.data);
+});
+
+router.get('/search', async (req, res) => {
+  const { accessToken, query } = req.query;
+
+  // The application is currently only concerned with results for the UK.
+  const resultMarket = 'GB';
+
+  const spotifyResponse = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&market=${resultMarket}`, {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    }
+  });
+
+  res.status(spotifyResponse.status).send({
+    query,
+    ...spotifyResponse.data
+  });
 });
 
 module.exports = router;

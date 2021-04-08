@@ -6,9 +6,35 @@ import { useMongoClient } from '../util';
 const router = Router();
 
 router.post('/login', async (req, res) => {
-  // Compare the password with the stored hash in the database.
-  // const result = await bcrypt.compare(password, hash);
-  // console.log(result);
+  const { username, password } = req.body;
+
+  const client = await useMongoClient().connect();
+
+  const user = await client.db('wave').collection('users').findOne({ 'username': username });
+
+  if (!user) {
+    // User wasn't found
+    res.status(400).send({
+      message: 'Invalid login credentials.'
+    });
+  } else {
+    // Compare the password with the stored hash in the database.
+    const match = await bcrypt.compare(password, user.passwordHash);
+
+    if (match) {
+      // Do login stuff.
+      // return session token
+      res.status(200).send({
+        message: 'Login successful.'
+      });
+    } else {
+      res.status(400).send({
+        message: 'Invalid login credentials.'
+      });
+    }
+
+    client.close();
+  }
 });
 
 router.post('/register', async (req, res) => {
@@ -17,11 +43,13 @@ router.post('/register', async (req, res) => {
   // Generate a hash of the user's password. This is what will be stored in the database.
   const passwordHash = await bcrypt.hash(password, 10);
 
+  // Open a connection with the database.
   const client = await useMongoClient().connect();
 
   // Check to see whether the entered username already exists.
   const userExists = await client.db('wave').collection('users').findOne({ 'username': username });
 
+  // Check to see whether the username already exists and creates one if it doesn't.
   if (userExists) {
     res.status(400).send({
       message: 'That username is already taken. Please enter a different one.'

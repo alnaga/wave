@@ -2,7 +2,9 @@ import axios from 'axios';
 
 import {
   SET_ACCESS_TOKEN,
-  SET_REFRESH_TOKEN
+  SET_DEVICES,
+  SET_REFRESH_TOKEN,
+  SET_SEARCH_RESULTS
 } from '../../constants';
 
 /**
@@ -74,6 +76,58 @@ export const refreshAuthToken = async (dispatch, refreshToken) => {
 
       return 1;
     } else return 0;
+  } catch (error) {
+    return 0;
+  }
+};
+
+export const getUserDevices = async (dispatch, accessToken) => {
+  try {
+    const response = await axios.get(`http://localhost:8081/spotify/devices?accessToken=${accessToken}`);
+
+    dispatch({
+      type: SET_DEVICES,
+      payload: response.data.devices
+    });
+
+    return 1;
+  } catch (error) {
+    return 0;
+  }
+};
+
+export const selectUserDevice = async (dispatch, accessToken, device) => {
+  try {
+    const response = await axios.put(`http://localhost:8081/spotify/devices?accessToken=${accessToken}`, {
+      device
+    });
+
+    dispatch({
+      type: SET_DEVICES,
+      payload: []
+    });
+
+  } catch (error) {
+    return 0;
+  }
+};
+
+export const getSongSearchResults = (dispatch, accessToken) => async (query) => {
+  try {
+    // If the user has not input a query, the request to the API is not made.
+    if (!query) {
+      return 0;
+    }
+
+    const response = await axios.get(`http://localhost:8081/spotify/search?accessToken=${accessToken}&query=${query}`);
+    const results = response.data;
+
+    dispatch({
+      type: SET_SEARCH_RESULTS,
+      payload: response.data.tracks.items
+    });
+
+    return 1;
   } catch (error) {
     return 0;
   }
