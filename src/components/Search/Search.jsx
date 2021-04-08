@@ -9,15 +9,16 @@ const Search = (props) => {
     setQuery(value);
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = (event) => {
+    event.preventDefault();
     onSubmit(query);
   };
 
   return (
-    <div>
+    <form>
       <input type="text" onChange={handleChangeQuery} placeholder="Enter a song or artist name" />
-      <button onClick={handleSubmit}> Search </button>
-    </div>
+      <button onClick={handleSubmit} type="submit"> Search </button>
+    </form>
   );
 };
 

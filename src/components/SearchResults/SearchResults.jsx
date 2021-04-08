@@ -1,8 +1,14 @@
 import React from 'react';
-import { useAppState } from '../../context/context';
+import { useAppDispatch, useAppState } from '../../context/context';
+import { queueSong } from '../../actions/spotify/spotifyActions';
 
 const SearchResults = () => {
-  const { searchResults } = useAppState();
+  const dispatch = useAppDispatch();
+  const { accessToken, searchResults } = useAppState();
+
+  const handleQueueSong = (song) => async () => {
+    await queueSong(dispatch, accessToken, song.uri);
+  };
 
   return (
     <div>
@@ -10,7 +16,7 @@ const SearchResults = () => {
         searchResults.map((result) => {
           console.log(result);
           return (
-            <div className="flex">
+            <div className="flex pointer" onClick={handleQueueSong(result)}>
               <img src={result.album.images[0].url} width="60" />
               <span> {result.artists[0].name} - { result.name } </span>
             </div>

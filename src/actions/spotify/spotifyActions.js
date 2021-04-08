@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import {
   SET_ACCESS_TOKEN,
+  SET_CURRENTLY_PLAYING,
   SET_DEVICES,
   SET_REFRESH_TOKEN,
   SET_SEARCH_RESULTS
@@ -126,6 +127,30 @@ export const getSongSearchResults = (dispatch, accessToken) => async (query) => 
       type: SET_SEARCH_RESULTS,
       payload: response.data.tracks.items
     });
+
+    return 1;
+  } catch (error) {
+    return 0;
+  }
+};
+
+export const getCurrentlyPlaying = async (dispatch, accessToken) => {
+  try {
+    const response = await axios.get(`http://localhost:8081/spotify/song?accessToken=${accessToken}`);
+
+    dispatch({
+      type: SET_CURRENTLY_PLAYING,
+      payload: response.data
+    });
+  } catch (error) {
+    return 0;
+  }
+};
+
+export const queueSong = async (dispatch, accessToken, songUri) => {
+  try {
+    const response = await axios.post(`http://localhost:8081/spotify/song?accessToken=${accessToken}&uri=${songUri}`);
+    console.log(response);
 
     return 1;
   } catch (error) {

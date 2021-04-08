@@ -19,8 +19,8 @@ const DeviceSelection = () => {
     <div>
       <button onClick={handleGetDevices}> Get Devices </button>
       {
-        devices.length
-          ? (
+        devices.length > 0
+          && (
             <div className="flex-column">
               {
                 devices.map((device) => {
@@ -38,9 +38,6 @@ const DeviceSelection = () => {
                 })
               }
             </div>
-          ) : (
-            <>
-            </>
           )
       }
     </div>

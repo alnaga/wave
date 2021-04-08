@@ -10,6 +10,9 @@ const router = Router();
 // on Spotify for Developers.
 const authorisation = new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
 
+// The application is currently only concerned with the UK.
+const resultMarket = 'GB';
+
 // Sends the user to the Spotify app authorisation page to get their permission to link their account with Wave.
 // Returns an authorisation code which can be exchanged with an access token later on in the app flow.
 router.get('/authorise', (req, res) => {
@@ -90,9 +93,6 @@ router.post('/refresh', async (req, res) => {
 router.get('/search', async (req, res) => {
   const { accessToken, query } = req.query;
 
-  // The application is currently only concerned with results for the UK.
-  const resultMarket = 'GB';
-
   const spotifyResponse = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&market=${resultMarket}`, {
     headers: {
       "Authorization": `Bearer ${accessToken}`,
@@ -104,6 +104,30 @@ router.get('/search', async (req, res) => {
     query,
     ...spotifyResponse.data
   });
+});
+
+router.get('/song', async (req, res) => {
+  const { accessToken } = req.query;
+  
+  const spotifyResponse = await axios.get(`https://api.spotify.com/v1/me/player?market=${resultMarket}`, {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
+    }
+  });
+  
+  res.status(spotifyResponse.status).send(spotifyResponse.data);
+});
+
+router.post('/song', async (req, res) => {
+  const { accessToken, uri } = req.query;
+
+  const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${uri}`, null, {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
+    }
+  });
+
+  res.status(spotifyResponse.status).send();
 });
 
 module.exports = router;

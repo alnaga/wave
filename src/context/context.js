@@ -2,6 +2,7 @@ import React, {createContext, useContext, useReducer} from 'react';
 
 import {
   SET_ACCESS_TOKEN,
+  SET_CURRENTLY_PLAYING,
   SET_DEVICES,
   SET_REFRESH_TOKEN,
   SET_SEARCH_RESULTS
@@ -12,6 +13,7 @@ const StateContext = createContext();
 
 export const initialState = {
   accessToken: sessionStorage.getItem('accessToken'),
+  currentlyPlaying: undefined,
   devices: [],
   refreshToken: sessionStorage.getItem('refreshToken'),
   searchResults: []
@@ -23,6 +25,11 @@ const appReducer = (state, action) => {
       return {
         ...state,
         accessToken: action.payload
+      };
+    case SET_CURRENTLY_PLAYING:
+      return {
+        ...state,
+        currentlyPlaying: action.payload
       };
     case SET_DEVICES:
       return {

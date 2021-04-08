@@ -1,3 +1,7 @@
 #root {
 
 }
+
+.pointer {
+    cursor: pointer;
+}
