@@ -13,6 +13,7 @@ module.exports = {
     hot: true,
     port: 8080
   },
+  devtool: !isProd ? 'source-map' : undefined,
   module: {
     rules: [
       {

@@ -6,13 +6,18 @@ import Vote from '../Vote/Vote';
 
 const CurrentlyPlaying = () => {
   const dispatch = useAppDispatch();
-  const { accessToken, currentlyPlaying, device } = useAppState();
+  const {
+    currentlyPlaying,
+    devices,
+    tokens
+  } = useAppState();
+  const { spotify } = tokens;
 
   useEffect(() => {
     (async () => {
-      await getCurrentlyPlaying(dispatch, accessToken);
+      await getCurrentlyPlaying(dispatch, spotify.accessToken);
     })();
-  }, [ , device]);
+  }, [ , devices]);
 
   return (
     <div>
@@ -21,7 +26,7 @@ const CurrentlyPlaying = () => {
           && (
             <div className="flex-column border-dark">
               <div>
-                Currently Playing:
+                Currently Playing on { devices[0].name }:
               </div>
 
               <div>
@@ -39,7 +44,7 @@ const CurrentlyPlaying = () => {
           )
       }
     </div>
-  )
+  );
 };
 
 export default CurrentlyPlaying;

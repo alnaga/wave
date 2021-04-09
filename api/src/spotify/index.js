@@ -1,19 +1,16 @@
 import axios from 'axios';
 import { Router } from 'express';
-import { Buffer } from 'buffer';
 
+import { authenticate } from '../util';
 import { useMongoClient } from '../util';
 import {
+  AUTHORISATION,
   CLIENT_ID,
-  CLIENT_SECRET, VOTE_DOWN,
+  VOTE_DOWN,
   VOTE_UP
 } from '../constants';
 
 const router = Router();
-
-// Used for several Spotify API calls. Makes use of the client ID and client secret from the application dashboard
-// on Spotify for Developers.
-const authorisation = new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
 
 // The application is currently only concerned with the UK.
 const resultMarket = 'GB';
@@ -50,7 +47,7 @@ router.get('/authorise', (req, res) => {
 });
 
 // Fetches the available playback devices from Spotify.
-router.get('/devices', async (req, res) => {
+router.get('/devices', authenticate, async (req, res) => {
   const { accessToken } = req.query;
 
   const spotifyResponse = await axios.get('https://api.spotify.com/v1/me/player/devices', {
@@ -63,7 +60,7 @@ router.get('/devices', async (req, res) => {
 });
 
 // Selects a device for playback through Spotify.
-router.put('/devices', async (req, res) => {
+router.put('/devices', authenticate, async (req, res) => {
   const { device } = req.body;
   const { accessToken } = req.query;
 
@@ -84,7 +81,7 @@ router.post('/tokens', async (req, res) => {
 
   const spotifyResponse = await axios.post('https://accounts.spotify.com/api/token', null, {
     headers: {
-      "Authorization": `Basic ${authorisation}`,
+      "Authorization": `Basic ${AUTHORISATION}`,
       "Content-Type": "application/x-www-form-urlencoded"
     },
     params: {
@@ -103,7 +100,7 @@ router.post('/refresh', async (req, res) => {
 
   const spotifyResponse = await axios.post('https://accounts.spotify.com/api/token', null, {
     headers: {
-      "Authorization": `Basic ${authorisation}`,
+      "Authorization": `Basic ${AUTHORISATION}`,
       "Content-Type": 'application/x-www-form-urlencoded'
     },
     params: {

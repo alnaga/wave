@@ -6,11 +6,12 @@ import { getCurrentlyPlaying, voteSong } from '../../actions/spotify/spotifyActi
 
 const Vote = () => {
   const dispatch = useAppDispatch();
-  const { accessToken, venue } = useAppState();
+  const { tokens, venue } = useAppState();
+  const { spotify } = tokens;
 
   const handleVote = (vote) => async () => {
-    if (await voteSong(dispatch, accessToken, venue.uri, vote) === 2) {
-      await getCurrentlyPlaying(dispatch, accessToken);
+    if (await voteSong(dispatch, spotify.accessToken, venue.uri, vote) === 2) {
+      await getCurrentlyPlaying(dispatch, spotify.accessToken);
     }
   };
 
@@ -20,13 +21,13 @@ const Vote = () => {
         venue
           && (
             <div className="flex">
-              <button onClick={handleVote(VOTE_UP)}> + </button>
+              <button onClick={handleVote(VOTE_DOWN)}> - </button>
 
               <span>
                 { venue.votes }
               </span>
 
-              <button onClick={handleVote(VOTE_DOWN)}> - </button>
+              <button onClick={handleVote(VOTE_UP)}> + </button>
             </div>
           )
       }

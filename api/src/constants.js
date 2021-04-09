@@ -1,5 +1,13 @@
+import {Buffer} from 'buffer';
+
 export const CLIENT_ID = 'a7203aa64b924db48cc484745961043b';
 export const CLIENT_SECRET = 'ddb1a4848fa546c3a12d13b91ba946ff';
 
+export const MONGO_URI = 'mongodb://localhost:8082/wave';
+
 export const VOTE_DOWN = 'VOTE_DOWN';
 export const VOTE_UP = 'VOTE_UP';
+
+// Used for several Spotify API calls, as well as some internal authorisation requests. Makes use of the client ID
+// and client secret from the application dashboard on Spotify for Developers.
+export const AUTHORISATION = new Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');

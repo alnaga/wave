@@ -1,39 +1,80 @@
 import { Router } from 'express';
+import axios from 'axios';
 import bcrypt from 'bcrypt';
+import { User } from '../models/user';
 
-import { useMongoClient } from '../util';
+import { AUTHORISATION } from '../constants';
 
 const router = Router();
 
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
-  const client = await useMongoClient().connect();
-
-  const user = await client.db('wave').collection('users').findOne({ 'username': username });
-
-  if (!user) {
-    // User wasn't found
-    res.status(400).send({
-      message: 'Invalid login credentials.'
-    });
-  } else {
-    // Compare the password with the stored hash in the database.
-    const match = await bcrypt.compare(password, user.passwordHash);
-
-    if (match) {
-      // Do login stuff.
-      // return session token
-      res.status(200).send({
-        message: 'Login successful.'
+  User.findOne({ username }, async (error, user) => {
+    if (error) {
+      res.status(500).send({
+        message: 'Internal server error.'
       });
     } else {
-      res.status(400).send({
-        message: 'Invalid login credentials.'
-      });
-    }
+      if (user) {
+        const match = await bcrypt.compare(password, user.password);
 
-    client.close();
+        if (match) {
+          const tokenResponse = await axios.post('http://localhost:8081/oauth/token', null, {
+            headers: {
+              'Authorization': `Basic ${AUTHORISATION}`,
+              'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            params: {
+              grant_type: 'password',
+              username,
+              password: user.password
+            }
+          });
+
+          if (tokenResponse.status === 200) {
+            res.status(200).send(tokenResponse.data);
+          } else {
+            res.status(500).send({
+              message: 'An error occurred while logging in. Please try again later.'
+            });
+          }
+        } else {
+          res.status(400).send({
+            message: 'Invalid account credentials.'
+          });
+        }
+      } else {
+        res.status(400).send({
+          message: 'Invalid account credentials.'
+        });
+      }
+    }
+  });
+});
+
+router.post('/refresh', async (req, res) => {
+  const { refresh_token } = req.query;
+
+  const refreshResponse = await axios.post('http://localhost:8081/oauth/token', null, {
+    headers: {
+      'Authorization': `Basic ${AUTHORISATION}`,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    params: {
+      grant_type: 'refresh_token',
+      refresh_token
+    }
+  }).catch((error) => {
+    console.log(error.message);
+  });
+  
+  if (refreshResponse && refreshResponse.status === 200) {
+    res.status(200).send(refreshResponse.data);
+  } else {
+    res.status(500).send({
+      message: 'An error occurred while fetching a new access token. Please try again later.'
+    });
   }
 });
 
@@ -43,38 +84,36 @@ router.post('/register', async (req, res) => {
   // Generate a hash of the user's password. This is what will be stored in the database.
   const passwordHash = await bcrypt.hash(password, 10);
 
-  // Open a connection with the database.
-  const client = await useMongoClient().connect();
-
-  // Check to see whether the entered username already exists.
-  const userExists = await client.db('wave').collection('users').findOne({ 'username': username });
-
-  // Check to see whether the username already exists and creates one if it doesn't.
-  if (userExists) {
-    res.status(400).send({
-      message: 'That username is already taken. Please enter a different one.'
-    });
-  } else {
-    const newUser = {
-      username,
-      passwordHash
-    };
-
-    await client.db('wave').collection('users').insertOne(newUser, (err, result) => {
-      if (err) {
-        res.status(500).send({
-          'message': 'Something went wrong during registration. Please try again later.'
+  // Check to see whether the username already exists in the database and creates one if it doesn't.
+  User.findOne({ username }, (error, user) => {
+    if (error) {
+      console.log('User not found');
+    } else {
+      if (user) {
+        res.status(400).send({
+          message: 'That username is already taken. Please select a different one.'
         });
       } else {
-        res.status(200).send({
-          'message': 'Registration successful'
+        const newUser = new User({
+          username,
+          password: passwordHash
+        });
+
+        newUser.save((error, user) => {
+          if (error) {
+            res.status(500).send({
+              message: 'Something went wrong during registration. Please try again later.'
+            });
+          } else {
+            console.log('New User:', user);
+            res.status(200).send({
+              message: 'Registration Successful'
+            });
+          }
         });
       }
-
-      // Close the connection to the database.
-      client.close();
-    });
-  }
+    }
+  });
 });
 
 module.exports = router;

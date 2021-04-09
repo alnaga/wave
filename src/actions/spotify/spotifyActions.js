@@ -1,11 +1,10 @@
 import axios from 'axios';
 
 import {
-  SET_ACCESS_TOKEN,
   SET_CURRENTLY_PLAYING,
   SET_DEVICES,
-  SET_REFRESH_TOKEN,
   SET_SEARCH_RESULTS,
+  SET_SPOTIFY_TOKENS,
   SET_VENUE
 } from '../../constants';
 
@@ -16,7 +15,7 @@ import {
  * @param authCode - Spotify API Authorisation Code
  * @returns 1 if successful, 0 if failed
  */
-export const getAuthTokens = async (dispatch, authCode) => {
+export const getSpotifyAuthTokens = async (dispatch, authCode) => {
   try {
     const response = await axios.post('http://localhost:8081/spotify/tokens', {
       authCode
@@ -27,20 +26,19 @@ export const getAuthTokens = async (dispatch, authCode) => {
       const refreshToken = response.data.refresh_token;
 
       const lifespan = response.data.expires_in;
-      const tokenExpirationTime = Date.now() + (lifespan * 1000);
+      const accessTokenExpiresAt = Date.now() + (lifespan * 1000);
 
-      sessionStorage.setItem('accessToken', accessToken);
-      sessionStorage.setItem('tokenExpirationTime', tokenExpirationTime);
-      sessionStorage.setItem('refreshToken', refreshToken);
+      const spotifyTokens = {
+        accessToken,
+        accessTokenExpiresAt,
+        refreshToken
+      };
+
+      sessionStorage.setItem('spotifyTokens', JSON.stringify(spotifyTokens));
 
       dispatch({
-        type: SET_ACCESS_TOKEN,
-        payload: accessToken
-      });
-
-      dispatch({
-        type: SET_REFRESH_TOKEN,
-        payload: refreshToken
+        type: SET_SPOTIFY_TOKENS,
+        payload: spotifyTokens
       });
 
       return 1;
@@ -57,23 +55,28 @@ export const getAuthTokens = async (dispatch, authCode) => {
  * @param refreshToken - Spotify API Refresh Token
  * @returns 1 if successful, 0 if failed
  */
-export const refreshAuthToken = async (dispatch, refreshToken) => {
+export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
   try {
     const response = await axios.post('http://localhost:8081/spotify/refresh', {
       refreshToken
     });
 
     if (response.status === 200) {
-      const newAccessToken = response.data.access_token;
+      const accessToken = response.data.access_token;
       const lifespan = response.data.expires_in;
-      const tokenExpirationTime = Date.now() + (lifespan * 1000);
+      const accessTokenExpiresAt = Date.now() + (lifespan * 1000);
 
-      sessionStorage.setItem('accessToken', newAccessToken);
-      sessionStorage.setItem('tokenExpirationTime', tokenExpirationTime);
+      const newSpotifyTokens = {
+        accessToken,
+        accessTokenExpiresAt,
+        refreshToken
+      };
+
+      sessionStorage.setItem('spotifyTokens', JSON.stringify(newSpotifyTokens));
 
       dispatch({
-        type: SET_ACCESS_TOKEN,
-        payload: newAccessToken
+        type: SET_SPOTIFY_TOKENS,
+        payload: newSpotifyTokens
       });
 
       return 1;
@@ -83,37 +86,69 @@ export const refreshAuthToken = async (dispatch, refreshToken) => {
   }
 };
 
-export const getUserDevices = async (dispatch, accessToken) => {
+/**
+ * Queries the Wave API to fetch the list of available playback devices from the Spotify API.
+ * @param dispatch - Application Dispatch
+ * @param accessToken - Spotify API Access Token
+ * @returns 1 if successful, 0 if failed
+ */
+export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) => {
   try {
-    const response = await axios.get(`http://localhost:8081/spotify/devices?accessToken=${accessToken}`);
-
-    dispatch({
-      type: SET_DEVICES,
-      payload: response.data.devices
+    const response = await axios.get(`http://localhost:8081/spotify/devices?accessToken=${spotifyAccessToken}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
     });
 
-    return 1;
+    if (response.status === 200) {
+      dispatch({
+        type: SET_DEVICES,
+        payload: response.data.devices
+      });
+
+      return 1;
+    } else return 0;
   } catch (error) {
     return 0;
   }
 };
 
-export const selectUserDevice = async (dispatch, accessToken, device) => {
+/**
+ * Updates the chosen playback device in the Spotify API.
+ * @param dispatch - Application Dispatch
+ * @param accessToken - Spotify API Access Token
+ * @param device - The Spotify Device Object
+ * @returns 1 if successful, 0 if failed
+ */
+export const selectUserDevice = async (dispatch, accessToken, spotifyAccessToken, device) => {
   try {
-    const response = await axios.put(`http://localhost:8081/spotify/devices?accessToken=${accessToken}`, {
+    const response = await axios.put(`http://localhost:8081/spotify/devices?accessToken=${spotifyAccessToken}`, {
       device
+    }, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
     });
 
-    dispatch({
-      type: SET_DEVICES,
-      payload: []
-    });
+    if (response.status === 200) {
+      dispatch({
+        type: SET_DEVICES,
+        payload: []
+      });
 
+      return 1;
+    } else return 0;
   } catch (error) {
     return 0;
   }
 };
 
+/**
+ * Carries out a search on the Spotify API for songs matching the user's query and returns the list.
+ * @param dispatch - Application Dispatch
+ * @param accessToken - Spotify API Access Token
+ * @returns 1 if successful, 0 if failed
+ */
 export const getSongSearchResults = (dispatch, accessToken) => async (query) => {
   try {
     // If the user has not input a query, the request to the API is not made.
@@ -122,42 +157,71 @@ export const getSongSearchResults = (dispatch, accessToken) => async (query) => 
     }
 
     const response = await axios.get(`http://localhost:8081/spotify/search?accessToken=${accessToken}&query=${query}`);
-    const results = response.data;
 
-    dispatch({
-      type: SET_SEARCH_RESULTS,
-      payload: response.data.tracks.items
-    });
+    if (response.status === 200) {
+      const results = response.data;
 
-    return 1;
+      dispatch({
+        type: SET_SEARCH_RESULTS,
+        payload: response.data.tracks.items
+      });
+
+      return 1;
+    } else return 0;
   } catch (error) {
     return 0;
   }
 };
 
+/**
+ * Gets the currently playing song within a venue.
+ * @param dispatch - Application Dispatch
+ * @param accessToken - Spotify API Access Token
+ * @returns 1 if successful, 0 if failed
+ */
 export const getCurrentlyPlaying = async (dispatch, accessToken) => {
   try {
     const response = await axios.get(`http://localhost:8081/spotify/song?accessToken=${accessToken}`);
 
-    dispatch({
-      type: SET_CURRENTLY_PLAYING,
-      payload: response.data
-    });
+    if (response.status === 200) {
+      dispatch({
+        type: SET_CURRENTLY_PLAYING,
+        payload: response.data
+      });
+      return 1;
+    } else return 0;
   } catch (error) {
     return 0;
   }
 };
 
+/**
+ * Adds a song to the venue's current queue.
+ * @param dispatch - Application Dispatch
+ * @param accessToken - Spotify API Access Token
+ * @param songUri - The URI of the song to be queued.
+ * @returns 1 if successful, 0 if failed
+ */
 export const queueSong = async (dispatch, accessToken, songUri) => {
   try {
     const response = await axios.post(`http://localhost:8081/spotify/song?accessToken=${accessToken}&uri=${songUri}`);
 
-    return 1;
+    if (response.status === 204) {
+      return 1;
+    } else return 0;
   } catch (error) {
     return 0;
   }
 };
 
+/**
+ * Submits a vote for the currently playing song in a venue.
+ * @param dispatch - Application Dispatch
+ * @param accessToken - Spotify API Access Token
+ * @param venue - The URI of the target venue
+ * @param vote - The vote value (VOTE_UP or VOTE_DOWN).
+ * @returns 1 if successful, 0 if failed
+ */
 export const voteSong = async (dispatch, accessToken, venue, vote) => {
   try {
     const response = await axios.post(`http://localhost:8081/spotify/vote?accessToken=${accessToken}`, {
@@ -181,12 +245,18 @@ export const voteSong = async (dispatch, accessToken, venue, vote) => {
       } else {
         return 1;
       }
-    }
+    } else return 0;
   } catch (error) {
     return 0;
   }
 };
 
+/**
+ * Fetches the data for the current venue.
+ * @param dispatch - Application Dispatch
+ * @param accessToken - Spotify API Access Token
+ * @returns 1 if successful, 0 if failed
+ */
 export const getVenue = async (dispatch, accessToken) => {
   try {
     const response = await axios.get(`http://localhost:8081/spotify/venue?accessToken=${accessToken}`);
@@ -198,9 +268,7 @@ export const getVenue = async (dispatch, accessToken) => {
       });
 
       return 1;
-    } else {
-      return 0;
-    }
+    } else return 0;
   } catch (error) {
     return 0;
   }

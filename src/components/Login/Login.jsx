@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
-import { registerAccount } from '../../actions/account/accountActions';
+import { login } from '../../actions/account/accountActions';
 import { useAppDispatch } from '../../context/context';
 
-const Register = () => {
+const Login = () => {
   const [ data, setData ] = useState({
     username: '',
     password: ''
@@ -13,7 +13,7 @@ const Register = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await registerAccount(dispatch, data);
+    await login(dispatch, data);
   };
 
   const handleTextChange = (field) => (event) => {
@@ -39,15 +39,15 @@ const Register = () => {
       <div>
         <input
           type="password"
+          placeholder="Password"
           onChange={handleTextChange('password')}
-          placeholder={"Password"}
           value={data.password}
         />
       </div>
 
-      <button type="submit" onClick={handleSubmit}> Register </button>
+      <button type="submit" onClick={handleSubmit}> Log In </button>
     </form>
   );
 };
 
-export default Register;
+export default Login;
