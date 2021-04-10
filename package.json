@@ -5,11 +5,11 @@
   "main": "index.js",
   "scripts": {
     "build": "webpack",
-    "build:dev": "cross-env NODE_ENV=development npm run build",
-    "build:prod": "cross-env NODE_ENV=production npm run build",
+    "build:dev": "cross-env NODE_ENV=development npm run build -- --mode=development",
+    "build:prod": "cross-env NODE_ENV=production npm run build -- --mode=production",
     "clean": "rimraf build",
-    "start:dev": "npm run clean && npm run build:dev && webpack serve",
-    "start:prod": "npm run clean && npm run build:prod && webpack serve",
+    "start:dev": "npm run clean && cross-env NODE_ENV=development webpack serve",
+    "start:prod": "npm run clean && cross-env NODE_ENV=production webpack serve",
     "test": "jest"
   },
   "repository": {
@@ -31,6 +31,7 @@
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
     "regenerator-runtime": "^0.13.7",
+    "sass": "^1.32.8",
     "styled-components": "^5.2.1"
   },
   "devDependencies": {
@@ -39,15 +40,22 @@
     "@babel/plugin-transform-runtime": "^7.13.10",
     "@babel/preset-env": "^7.13.10",
     "@babel/preset-react": "^7.12.13",
+    "autoprefixer": "^10.2.5",
     "babel-loader": "^8.2.2",
     "babel-plugin-styled-components": "^1.12.0",
     "cross-env": "^7.0.3",
     "css-loader": "^5.2.0",
+    "fast-sass-loader": "^2.0.0",
     "html-webpack-plugin": "^5.3.1",
     "jest": "^26.6.3",
     "mini-css-extract-plugin": "^1.4.1",
+    "node-sass": "^5.0.0",
     "path": "^0.12.7",
+    "postcss-loader": "^5.2.0",
+    "precss": "^4.0.0",
     "rimraf": "^3.0.2",
+    "sass-loader": "^11.0.1",
+    "style-loader": "^2.0.0",
     "webpack": "^5.24.4",
     "webpack-cli": "^4.5.0",
     "webpack-dev-server": "^3.11.2"

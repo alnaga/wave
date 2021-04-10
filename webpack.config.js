@@ -1,6 +1,7 @@
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const autoprefixer = require('autoprefixer');
+const precss = require('precss');
 
 const environment = process.env.NODE_ENV;
 const isProd = environment === 'production';
@@ -10,22 +11,44 @@ module.exports = {
   mode: environment,
   devServer: {
     contentBase: './build',
-    hot: true,
+    hot: !isProd,
     port: 8080
   },
-  devtool: !isProd ? 'source-map' : undefined,
+  devtool: !isProd ? 'eval' : undefined,
   module: {
     rules: [
       {
-        test: /.(js|jsx)$/,
-        use: ['babel-loader'],
+        test: /\.(js|jsx)$/,
+        use: [{
+          loader: 'babel-loader',
+          options: {
+            compact: false
+          }
+        }],
         exclude: /(node_modules|api)$/
       },
       {
-        test: /.css$/,
+        test: /\.scss$/,
         use: [
-           MiniCssExtractPlugin.loader,
-          'css-loader'
+          'style-loader',
+          'css-loader',
+          {
+            loader: 'postcss-loader',
+            options: {
+              postcssOptions: {
+                plugins: [
+                  autoprefixer,
+                  precss
+                ]
+              }
+            }
+          },
+          {
+            loader: 'fast-sass-loader',
+            options: {
+              implementation: require('node-sass')
+            }
+          }
         ]
       }
     ]
@@ -37,9 +60,6 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src', 'index.html')
-    }),
-    new MiniCssExtractPlugin({
-      filename: '[name].css'
     })
   ],
   resolve: {

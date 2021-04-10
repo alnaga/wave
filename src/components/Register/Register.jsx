@@ -6,7 +6,8 @@ import { useAppDispatch } from '../../context/context';
 const Register = () => {
   const [ data, setData ] = useState({
     username: '',
-    password: ''
+    password: '',
+    passwordConfirmation: ''
   });
 
   const dispatch = useAppDispatch();
@@ -26,27 +27,51 @@ const Register = () => {
   };
 
   return (
-    <form className="flex-column">
-      <div>
-        <input
-          type="text"
-          onChange={handleTextChange('username')}
-          placeholder="Username"
-          value={data.username}
-        />
-      </div>
+    <div id="registration" className="container-sm d-flex justify-content-center">
+      <form className="account-form card d-flex flex-column justify-content-center">
+        <div className="card-header"> Registration </div>
 
-      <div>
-        <input
-          type="password"
-          onChange={handleTextChange('password')}
-          placeholder={"Password"}
-          value={data.password}
-        />
-      </div>
+        <div className="card-body d-flex flex-column justify-content-center">
+          <div className="form-group">
+            <label htmlFor="username"> Username </label>
+            <input
+              id="username"
+              className="form-control"
+              type="text"
+              onChange={handleTextChange('username')}
+              placeholder="Username"
+              value={data.username}
+            />
+          </div>
 
-      <button type="submit" onClick={handleSubmit}> Register </button>
-    </form>
+          <div className="form-group">
+            <label htmlFor="password"> Password </label>
+            <input
+              id="password"
+              className="form-control"
+              type="password"
+              onChange={handleTextChange('password')}
+              placeholder={"Password"}
+              value={data.password}
+            />
+          </div>
+
+          <div className="form-group">
+            <label htmlFor="passwordConfirmation"> Confirm Password </label>
+            <input
+              className="form-control"
+              id="passwordConfirmation"
+              type="password"
+              onChange={handleTextChange('passwordConfirmation')}
+              placeholder={"Confirm Password"}
+              value={data.passwordConfirmation}
+            />
+          </div>
+
+          <button className="btn btn-primary" type="submit" onClick={handleSubmit}> Register </button>
+        </div>
+      </form>
+    </div>
   );
 };
 

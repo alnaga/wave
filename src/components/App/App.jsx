@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import CurrentlyPlaying from '../CurrentlyPlaying/CurrentlyPlaying';
 import DeviceSelection from '../DeviceSelection/DeviceSelection';
+import Header from '../Header/Header';
 import Login from '../Login/Login';
 import Register from '../Register/Register';
 import Search from '../Search/Search';
@@ -28,6 +29,8 @@ const App = () => {
     tokens,
     venue
   } = useAppState();
+
+  const [ showLogin, setShowLogin ] = useState(false);
 
   // We need to maintain a reference to the context tokens value as setInterval can't access it normally.
   const tokensRef = useRef(null);
@@ -86,41 +89,66 @@ const App = () => {
   }, []);
 
   return (
-    <div>
-      {
-        !spotify.accessToken
-          && (
-            <SpotifyAuthorise />
-          )
-      }
-      {
-        (wave.accessToken && !accessTokenExpired(wave.accessTokenExpiresAt))
-          ? (
-            <>
-              {
-                (spotify.accessToken && !spotifyTokenExpired(spotify.accessTokenExpiresAt))
-                  && (
-                    <>
-                      {
-                        devices.length > 0
-                          && (
-                            <CurrentlyPlaying />
-                          )
-                      }
-                      <Search onSubmit={getSongSearchResults(dispatch, spotify.accessToken)}/>
-                      <SearchResults />
-                      <DeviceSelection />
-                    </>
-                  )
-              }
-            </>
-          ) : (
-            <>
-              <Login />
-              <Register />
-            </>
-          )
-      }
+    <div id="app">
+      <Header />
+
+      <div id="app-content" className="container-fluid-sm d-flex justify-content-center">
+        {
+          wave.accessToken
+            ? (
+              <>
+                Dashboard placeholder.
+              </>
+            ) : (
+              <>
+                {
+                  showLogin
+                    ? (
+                      <Login />
+                    ) : (
+                      <Register />
+                    )
+                }
+              </>
+            )
+        }
+      </div>
+
+      {/*{*/}
+      {/*  !spotify.accessToken*/}
+      {/*    && (*/}
+      {/*      <SpotifyAuthorise />*/}
+      {/*    )*/}
+      {/*}*/}
+      {/*{*/}
+      {/*  (wave.accessToken && !accessTokenExpired(wave.accessTokenExpiresAt))*/}
+      {/*    ? (*/}
+      {/*      <>*/}
+      {/*        {*/}
+      {/*          (spotify.accessToken && !spotifyTokenExpired(spotify.accessTokenExpiresAt))*/}
+      {/*            && (*/}
+      {/*              <>*/}
+      {/*                {*/}
+      {/*                  devices.length > 0*/}
+      {/*                    && (*/}
+      {/*                      <CurrentlyPlaying />*/}
+      {/*                    )*/}
+      {/*                }*/}
+      {/*                <Search onSubmit={getSongSearchResults(dispatch, spotify.accessToken)}/>*/}
+      {/*                <SearchResults />*/}
+      {/*                <DeviceSelection />*/}
+      {/*              </>*/}
+      {/*            )*/}
+      {/*        }*/}
+      {/*      </>*/}
+      {/*    ) : (*/}
+      {/*      <>*/}
+      {/*        <Login />*/}
+      {/*        <Register />*/}
+      {/*      </>*/}
+      {/*    )*/}
+      {/*}*/}
+
     </div>
   );
 };
