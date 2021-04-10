@@ -4,6 +4,16 @@
   min-height: 100vh;
 }
 
+#header:after {
+  background-color: rgba(100, 100, 100, 0.25);
+  content: "";
+  height: 3px;
+  left: 0;
+  position: absolute;
+  top: 100%;
+  width: 100%;
+}
+
 #login-register {
   height: fit-content;
 
@@ -28,9 +38,17 @@
 }
 
 .header-spacing {
-  padding-top: 50px;
+  padding-top: 56px;
+}
+
+.height-full {
+  height: 100%;
 }
 
 .pointer {
   cursor: pointer;
+}
+
+.width-full {
+  width: 100%;
 }

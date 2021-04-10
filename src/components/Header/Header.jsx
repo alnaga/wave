@@ -5,15 +5,18 @@ import { WAVE_COLOUR_MAIN } from '../../constants';
 
 const StyledHeader = styled.header`
   background-color: ${WAVE_COLOUR_MAIN};
-  height: 50px;
+  color: #fff;
+  height: 56px;
   position: fixed;
   width: 100%;
 `;
 
 const Header = () => {
   return (
-    <StyledHeader>
-      Header Placeholder
+    <StyledHeader id="header">
+      <div className="container d-flex align-items-center height-full">
+        Wave
+      </div>
     </StyledHeader>
   );
 };
