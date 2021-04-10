@@ -42,14 +42,15 @@ const LoginRegister = () => {
   };
 
   const handleToggleShowLogin = () => {
+    setError('');
     setShowLogin(!showLogin);
   };
 
   return (
-    <div id="login-register" className="container-sm d-flex justify-content-center">
-      <form className="account-form card d-flex flex-column justify-content-center">
-        <div className="card-body d-flex flex-column justify-content-center">
-          <h5 className="card-title">
+    <div id="login-register" className="container-sm d-flex justify-content-center pl-0 pl-sm-3 pr-0 pr-sm-3">
+      <form className="card d-flex flex-column justify-content-center mt-0 mt-sm-5">
+        <div className="card-body d-flex flex-column">
+          <h5 className="card-title text-center mt-2">
             {
               showLogin
                 ? 'Log In'
@@ -57,56 +58,60 @@ const LoginRegister = () => {
             }
           </h5>
 
-          <div className="mt-2">
-            The way you interact with music is about to change.
-            Enter your details to
+          <div className="flex-grow-1">
+            <div className="mt-2 text-center">
+              The way you interact with music is about to change.
+              <br />
+              Enter your details to
+              {
+                showLogin
+                  ? ' log in!'
+                  : ' get started!'
+              }
+            </div>
+
+            <div className="form-group mt-3">
+              <label className="mb-1" htmlFor="username"> Username </label>
+              <input
+                id="username"
+                className="form-control"
+                type="text"
+                onChange={handleTextChange('username')}
+                placeholder="Username"
+                value={data.username}
+              />
+            </div>
+
+            <div className="form-group mt-3">
+              <label className="mb-1" htmlFor="password"> Password </label>
+              <input
+                id="password"
+                className="form-control"
+                type="password"
+                onChange={handleTextChange('password')}
+                placeholder={"Password"}
+                value={data.password}
+              />
+            </div>
+
             {
-              showLogin
-                ? ' log in!'
-                : ' get started!'
+              !showLogin
+              && (
+                <div className="form-group mt-3">
+                  <label className="mb-1" htmlFor="passwordConfirmation"> Confirm Password </label>
+                  <input
+                    className="form-control"
+                    id="passwordConfirmation"
+                    type="password"
+                    onChange={handleTextChange('passwordConfirmation')}
+                    placeholder={"Confirm Password"}
+                    value={data.passwordConfirmation}
+                  />
+                </div>
+              )
             }
           </div>
 
-          <div className="form-group mt-3">
-            <label className="mb-1" htmlFor="username"> Username </label>
-            <input
-              id="username"
-              className="form-control"
-              type="text"
-              onChange={handleTextChange('username')}
-              placeholder="Username"
-              value={data.username}
-            />
-          </div>
-
-          <div className="form-group mt-3">
-            <label className="mb-1" htmlFor="password"> Password </label>
-            <input
-              id="password"
-              className="form-control"
-              type="password"
-              onChange={handleTextChange('password')}
-              placeholder={"Password"}
-              value={data.password}
-            />
-          </div>
-
-          {
-            !showLogin
-              && (
-              <div className="form-group mt-3">
-                <label className="mb-1" htmlFor="passwordConfirmation"> Confirm Password </label>
-                <input
-                  className="form-control"
-                  id="passwordConfirmation"
-                  type="password"
-                  onChange={handleTextChange('passwordConfirmation')}
-                  placeholder={"Confirm Password"}
-                  value={data.passwordConfirmation}
-                />
-              </div>
-              )
-          }
 
           {
             error
@@ -121,7 +126,7 @@ const LoginRegister = () => {
             )
           }
 
-          <div className="form-group d-flex justify-content-center mt-3">
+          <div className="form-group d-flex flex-column justify-content-center mt-3">
             <button
               className="btn btn-primary flex-grow-1"
               type="submit"
@@ -133,10 +138,16 @@ const LoginRegister = () => {
                   : 'Register'
               }
             </button>
-          </div>
 
-          <div className="mt-4 text-center">
-            <a className="pointer" onClick={handleToggleShowLogin}> Already have an account? Click here to log in. </a>
+            <div className="mt-4 text-center">
+              <a className="pointer" onClick={handleToggleShowLogin}>
+                {
+                  showLogin
+                    ? 'Want to register instead? Click here.'
+                    : 'Already have an account? Click here to log in.'
+                }
+              </a>
+            </div>
           </div>
         </div>
       </form>

@@ -11,6 +11,8 @@ const StyledHeader = styled.header`
   width: 100%;
 `;
 
+// TODO: YOU WERE HERE WHEN YOU SLEPT
+// TODO: NEXT IMPLEMENT SPOTIFY API CALLS TO GET THE CURRENT SONG QUEUE
 const Header = () => {
   return (
     <StyledHeader id="header">
