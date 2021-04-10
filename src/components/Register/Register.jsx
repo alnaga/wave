@@ -9,12 +9,24 @@ const Register = () => {
     password: '',
     passwordConfirmation: ''
   });
+  const [ error, setError ] = useState('');
 
   const dispatch = useAppDispatch();
 
+  const handleDismissError = () => {
+    setError('');
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-    await registerAccount(dispatch, data);
+
+    if (!data.username) setError('Please enter a username.');
+    else if (!data.password) setError('Please enter a password.')
+    else if (data.password !== data.passwordConfirmation) {
+      setError('Passwords do not match.');
+    } else {
+      await registerAccount(dispatch, data);
+    }
   };
 
   const handleTextChange = (field) => (event) => {
@@ -67,6 +79,19 @@ const Register = () => {
               value={data.passwordConfirmation}
             />
           </div>
+
+          {
+            error
+              && (
+                <div className="alert alert-danger alert-dismissible">
+                  { error }
+
+                  <button type="button" className="close" onClick={handleDismissError}>
+                    <span> &times; </span>
+                  </button>
+                </div>
+              )
+          }
 
           <button className="btn btn-primary" type="submit" onClick={handleSubmit}> Register </button>
         </div>
