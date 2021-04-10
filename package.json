@@ -24,7 +24,7 @@
   "homepage": "https://github.com/alnaga/wave#readme",
   "dependencies": {
     "axios": "^0.21.1",
-    "bootstrap": "^4.6.0",
+    "bootstrap": "^5.0.0-alpha1",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",

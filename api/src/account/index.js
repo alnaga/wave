@@ -10,6 +10,12 @@ const router = Router();
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
+  if (username.length === 0 || password.length === 0) {
+    res.status(400).send({
+      message: 'Missing username or password.'
+    });
+  }
+
   User.findOne({ username }, async (error, user) => {
     if (error) {
       res.status(500).send({
@@ -80,6 +86,12 @@ router.post('/refresh', async (req, res) => {
 
 router.post('/register', async (req, res) => {
   const { username, password } = req.body;
+
+  if (username.length === 0 || password.length === 0) {
+    res.status(400).send({
+      message: 'Missing username or password.'
+    });
+  }
 
   // Generate a hash of the user's password. This is what will be stored in the database.
   const passwordHash = await bcrypt.hash(password, 10);

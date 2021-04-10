@@ -4,7 +4,7 @@
   min-height: 100vh;
 }
 
-#registration {
+#login-register {
   height: fit-content;
 
   @include media-breakpoint-only(xs) {
@@ -25,6 +25,10 @@
 .account-form {
   max-width: 400px;
   width: 100%;
+}
+
+.header-spacing {
+  padding-top: 50px;
 }
 
 .pointer {

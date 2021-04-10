@@ -3,8 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import CurrentlyPlaying from '../CurrentlyPlaying/CurrentlyPlaying';
 import DeviceSelection from '../DeviceSelection/DeviceSelection';
 import Header from '../Header/Header';
-import Login from '../Login/Login';
-import Register from '../Register/Register';
+import LoginRegister from '../LoginRegister/LoginRegister';
 import Search from '../Search/Search';
 import SearchResults from '../SearchResults/SearchResults';
 import SpotifyAuthorise from '../SpotifyAuthorise/SpotifyAuthorise';
@@ -92,7 +91,7 @@ const App = () => {
     <div id="app">
       <Header />
 
-      <div id="app-content" className="container-fluid-sm d-flex justify-content-center">
+      <div id="app-content" className="container-fluid-sm d-flex justify-content-center header-spacing">
         {
           wave.accessToken
             ? (
@@ -100,16 +99,7 @@ const App = () => {
                 Dashboard placeholder.
               </>
             ) : (
-              <>
-                {
-                  showLogin
-                    ? (
-                      <Login />
-                    ) : (
-                      <Register />
-                    )
-                }
-              </>
+              <LoginRegister />
             )
         }
       </div>
@@ -148,7 +138,6 @@ const App = () => {
       {/*      </>*/}
       {/*    )*/}
       {/*}*/}
-
     </div>
   );
 };

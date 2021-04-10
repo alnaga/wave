@@ -5,7 +5,8 @@ import { WAVE_COLOUR_MAIN } from '../../constants';
 
 const StyledHeader = styled.header`
   background-color: ${WAVE_COLOUR_MAIN};
-  height: 60px;
+  height: 50px;
+  position: fixed;
   width: 100%;
 `;
 
