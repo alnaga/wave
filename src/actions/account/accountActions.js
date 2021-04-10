@@ -51,7 +51,7 @@ export const refreshAccessToken = async (dispatch, refreshToken) => {
 
     if (response.status === 200) {
       await saveTokens(dispatch, response);
-      return 1;
+      return response.data;
     } else return 0;
   } catch (error) {
     return 0;

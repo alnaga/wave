@@ -37,7 +37,7 @@ mongoose.connect(MONGO_URI, {
 // Start the authorisation server.
 app.oauth2 = new OAuth2Server({
   model: Models,
-  accessTokenLifetime: 10,
+  accessTokenLifetime: 60 * 60,
   refreshTokenLifetime: 60 * 60 * 24 * 14,
   allowBearerTokensInQueryString: true
 });

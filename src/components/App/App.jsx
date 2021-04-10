@@ -42,7 +42,6 @@ const App = () => {
 
     const getNewAccessToken = async () => {
       if (tokensRef.current.wave.accessToken && accessTokenExpired(tokensRef.current.wave.accessTokenExpiresAt)) {
-        console.log('Getting new access token.', tokensRef.current.wave.refreshToken);
         await refreshAccessToken(dispatch, tokensRef.current.wave.refreshToken);
       }
     };
@@ -65,7 +64,7 @@ const App = () => {
 
         if (!devices.length > 0) {
           // await getUserDevices(dispatch, accessToken, spotify.accessToken);
-          await handleGetDevices(dispatch, wave.accessToken, wave.refreshToken, spotify.accessToken, spotify.refreshToken);
+          await handleGetDevices(dispatch, tokens);
         }
       }
       await getNewAccessToken();
@@ -74,7 +73,7 @@ const App = () => {
 
     const checkAccessTokenExpiration = setInterval(async () => {
       await getNewAccessToken();
-    }, 5000);
+    }, 60000);
 
     const checkSpotifyTokenExpiration = setInterval(async () => {
       await getNewSpotifyToken();

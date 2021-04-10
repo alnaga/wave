@@ -79,7 +79,7 @@ export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
         payload: newSpotifyTokens
       });
 
-      return 1;
+      return newSpotifyTokens;
     } else return 0;
   } catch (error) {
     return 0;
@@ -89,7 +89,8 @@ export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
 /**
  * Queries the Wave API to fetch the list of available playback devices from the Spotify API.
  * @param dispatch - Application Dispatch
- * @param accessToken - Spotify API Access Token
+ * @param accessToken - Wave API Access Token
+ * @param spotifyAccessToken - Spotify API Access Token
  * @returns 1 if successful, 0 if failed
  */
 export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) => {
@@ -98,7 +99,11 @@ export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) 
       headers: {
         'Authorization': `Bearer ${accessToken}`
       }
+    }).catch((error) => {
+      return error.response;
     });
+
+    console.log(response);
 
     if (response.status === 200) {
       dispatch({
@@ -107,6 +112,8 @@ export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) 
       });
 
       return 1;
+    } else if (response.status === 401) {
+      return 2;
     } else return 0;
   } catch (error) {
     return 0;

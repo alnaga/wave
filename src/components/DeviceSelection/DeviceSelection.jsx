@@ -1,21 +1,21 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { refreshAccessToken } from '../../actions/account/accountActions';
 import {
   getCurrentlyPlaying,
   getUserDevices,
-  refreshSpotifyAuthToken,
   selectUserDevice
 } from '../../actions/spotify/spotifyActions';
-import { accessTokenExpired, spotifyTokenExpired } from '../../util';
 
-export const handleGetDevices = async (dispatch, accessToken, refreshToken, spotifyAccessToken, spotifyRefreshToken) => {
-  // console.log('Access Token Expired:', accessTokenExpired());
-  // console.log('Spotify Access Token Expired:', spotifyTokenExpired());
+import { retryAction } from '../../util';
 
-  if (accessTokenExpired()) await refreshAccessToken(dispatch, refreshToken);
-  if (spotifyTokenExpired()) await refreshSpotifyAuthToken(dispatch, spotifyRefreshToken);
-  // console.log('Devices', await getUserDevices(dispatch, accessToken, spotifyAccessToken));
+export const handleGetDevices = async (dispatch, tokens) => {
+  const { spotify, wave } = tokens;
+  const args = [
+    { 'waveAccessToken': wave.accessToken },
+    { 'spotifyAccessToken': spotify.accessToken }
+  ];
+
+  await retryAction(getUserDevices, tokens, dispatch, args);
 };
 
 const DeviceSelection = () => {
@@ -25,6 +25,9 @@ const DeviceSelection = () => {
     devices,
     tokens
   } = useAppState();
+
+  const tokensRef = useRef(null);
+  tokensRef.current = tokens;
 
   const { spotify, wave } = tokens;
 
@@ -40,7 +43,7 @@ const DeviceSelection = () => {
   return (
     <div>
       <button
-        onClick={() => handleGetDevices(dispatch, wave.accessToken, wave.refreshToken, spotify.accessToken, spotify.refreshToken)}
+        onClick={() => handleGetDevices(dispatch, tokens)}
       >
         Get Devices
       </button>

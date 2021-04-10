@@ -21,7 +21,7 @@ export const getToken = async (req, res) => {
     const token = await app.oauth2.token(request, response);
     res.status(200).send(token);
   } catch (error) {
-    res.status(500).send(error.message);
+    res.status(error.status).send(error);
   }
 };
 
@@ -33,7 +33,6 @@ export const authenticate = async (req, res, next) => {
     const result = await app.oauth2.authenticate(request, response);
     next();
   } catch(error) {
-    console.log(error);
-    res.status(500).send(error.message);
+    res.status(error.status).send(error);
   }
 }
