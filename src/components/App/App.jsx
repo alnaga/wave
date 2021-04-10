@@ -29,8 +29,6 @@ const App = () => {
     venue
   } = useAppState();
 
-  const [ showLogin, setShowLogin ] = useState(false);
-
   // We need to maintain a reference to the context tokens value as setInterval can't access it normally.
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
