@@ -141,11 +141,7 @@ router.get('/song', async (req, res) => {
 
   const { status } = spotifyResponse;
 
-  if (status === 200 || status === 204) {
-    res.status(status).send(spotifyResponse.data);
-  } else {
-    res.status(status).send(spotifyResponse);
-  }
+  res.status(status).send(spotifyResponse.data);
 });
 
 // Adds a song to the queue on the venue's Spotify account.

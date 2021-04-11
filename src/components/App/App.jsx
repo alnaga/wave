@@ -10,7 +10,7 @@ const App = () => {
   const { tokens } = useAppState();
   const { wave } = tokens;
 
-  console.log(useAppState());
+  // console.log(useAppState());
 
   return (
     <div id="app">

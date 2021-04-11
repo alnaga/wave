@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeadphones } from '@fortawesome/free-solid-svg-icons';
 
@@ -19,11 +19,12 @@ const DeviceSelection = () => {
     devices,
     tokens
   } = useAppState();
+  const { spotify, wave } = tokens;
+
+  const [ showList, setShowList ] = useState(false);
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
-
-  const { spotify, wave } = tokens;
 
   const handleGetDevices = async () => {
     const { spotify, wave } = tokens;

@@ -23,18 +23,11 @@ const CurrentlyPlaying = () => {
 
   const checkSongProgress = async () => {
     if (currentlyPlayingRef && currentlyPlayingRef.current) {
-      const { item, timestamp } = currentlyPlayingRef.current;
-      const songEndTime = timestamp + item.duration_ms;
-      const currentTime = Date.now();
-      const progress = currentTime - timestamp;
-
-      if (currentTime > songEndTime) {
-        await handleFetchCurrentSong();
-      }
-
-      setSongProgressRef.current((progress / item.duration_ms) * 100);
+      await handleFetchCurrentSong();
+      const { item, progress_ms } = currentlyPlayingRef.current;
+      setSongProgressRef.current((progress_ms / item.duration_ms) * 100);
     }
-  }
+  };
 
   const handleFetchCurrentSong = async () => {
     if (spotify.accessToken && await getCurrentlyPlaying(dispatch, spotify.accessToken) === TOKENS_EXPIRED) {
@@ -50,7 +43,7 @@ const CurrentlyPlaying = () => {
 
       const pollSongProgress =  setInterval(async () => {
         await checkSongProgress();
-      }, 1000);
+      }, 3000);
 
       return () => {
         clearInterval(pollSongProgress);
@@ -68,7 +61,7 @@ const CurrentlyPlaying = () => {
         completed={songProgress}
         height="6px"
         isLabelVisible={false}
-        transitionDuration="1s"
+        transitionDuration="3s"
         transitionTimingFunction="linear"
       />
 
