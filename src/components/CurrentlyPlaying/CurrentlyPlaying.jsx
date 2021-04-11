@@ -1,8 +1,10 @@
-import React, {useEffect} from 'react';
-import { useAppDispatch, useAppState } from '../../context/context';
-import { getCurrentlyPlaying } from '../../actions/spotify/spotifyActions';
+import React, { useEffect, useRef, useState } from 'react';
+import ProgressBar from '@ramonak/react-progress-bar';
 
 import Vote from '../Vote/Vote';
+import { WAVE_COLOUR_DARK } from '../../constants';
+import { useAppDispatch, useAppState } from '../../context/context';
+import { getCurrentlyPlaying } from '../../actions/spotify/spotifyActions';
 
 const CurrentlyPlaying = () => {
   const dispatch = useAppDispatch();
@@ -13,37 +15,94 @@ const CurrentlyPlaying = () => {
   } = useAppState();
   const { spotify } = tokens;
 
+  const currentlyPlayingRef = useRef(null);
+  currentlyPlayingRef.current = currentlyPlaying;
+
+  const [ songProgress, setSongProgress ] = useState(0);
+  const setSongProgressRef = useRef(null);
+  setSongProgressRef.current = setSongProgress;
+
+  const checkSongProgress = async () => {
+    if (currentlyPlayingRef) {
+      const { item, timestamp } = currentlyPlayingRef.current;
+      const songEndTime = timestamp + item.duration_ms;
+      const currentTime = Date.now();
+      const progress = currentTime - timestamp;
+
+      if (currentTime > songEndTime) {
+        await handleFetchCurrentSong();
+      }
+
+      setSongProgressRef.current((progress / item.duration_ms) * 100);
+    }
+  }
+
+  const handleFetchCurrentSong = async () => {
+    if (spotify.accessToken) {
+      await getCurrentlyPlaying(dispatch, spotify.accessToken);
+    }
+  }
+  
   useEffect(() => {
     (async () => {
-      await getCurrentlyPlaying(dispatch, spotify.accessToken);
+      await handleFetchCurrentSong();
+      await checkSongProgress();
+
+      const pollSongProgress =  setInterval(async () => {
+        await checkSongProgress();
+      }, 1000);
+
+      return () => {
+        clearInterval(pollSongProgress);
+      }
     })();
-  }, [ , devices]);
+  }, []);
 
   return (
-    <div>
-      {
-        (currentlyPlaying && currentlyPlaying.item)
-          && (
-            <div className="flex-column border-dark">
-              <div>
-                Currently Playing on { devices[0].name }:
-              </div>
+    <>
+      <ProgressBar
+        baseBgColor="rgba(100, 100, 100, 0.25)"
+        bgColor={`${WAVE_COLOUR_DARK}`}
+        borderRadius="0px"
+        className="position-fixed song-progress width-full"
+        completed={songProgress}
+        height="8px"
+        isLabelVisible={false}
+        transitionDuration="1s"
+        transitionTimingFunction="linear"
+      />
 
-              <div>
-                {
-                  currentlyPlaying.item.artists[0].name
-                }
-                {' '} - {' '}
-                {
-                  currentlyPlaying.item.name
-                }
-              </div>
+      <div id="currently-playing" className="d-flex justify-content-center align-items-center">
+        {
+          (currentlyPlaying && currentlyPlaying.item)
+            ? (
+              <>
+                <div className="position-absolute left-0">
+                  <img src={currentlyPlaying.item.album.images[0].url} />
+                </div>
 
-              <Vote />
-            </div>
-          )
-      }
-    </div>
+                <div className="d-flex flex-column align-items-center">
+                  <div className="mb-1">
+                    {
+                      currentlyPlaying.item.artists[0].name
+                    }
+                    {' '} - {' '}
+                    {
+                      currentlyPlaying.item.name
+                    }
+                  </div>
+
+                  <Vote />
+                </div>
+              </>
+            ) : (
+              <div>
+                No song currently playing.
+              </div>
+            )
+        }
+      </div>
+    </>
   );
 };
 

@@ -103,8 +103,6 @@ export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) 
       return error.response;
     });
 
-    console.log(response);
-
     if (response.status === 200) {
       dispatch({
         type: SET_DEVICES,
@@ -123,7 +121,8 @@ export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) 
 /**
  * Updates the chosen playback device in the Spotify API.
  * @param dispatch - Application Dispatch
- * @param accessToken - Spotify API Access Token
+ * @param accessToken - Wave API Access Token
+ * @param spotifyAccessToken - Spotify API Access Token
  * @param device - The Spotify Device Object
  * @returns 1 if successful, 0 if failed
  */
@@ -195,6 +194,7 @@ export const getCurrentlyPlaying = async (dispatch, accessToken) => {
         type: SET_CURRENTLY_PLAYING,
         payload: response.data
       });
+
       return 1;
     } else return 0;
   } catch (error) {
@@ -237,21 +237,16 @@ export const voteSong = async (dispatch, accessToken, venue, vote) => {
     });
 
     if (response.status === 200) {
-      const data = {
-        ...response.data
-      }
-      delete data.skipped;
-
       dispatch({
         type: SET_VENUE,
-        payload: data
+        payload: response.data.venue
       });
 
-      if (response.data.skipped) {
-        return 2;
-      } else {
-        return 1;
-      }
+      const { skipped } = response.data;
+      
+      return {
+        skipped
+      };
     } else return 0;
   } catch (error) {
     return 0;

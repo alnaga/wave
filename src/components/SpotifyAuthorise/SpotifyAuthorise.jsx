@@ -1,7 +1,9 @@
 import React, { useEffect } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 
 import { getSpotifyAuthTokens } from '../../actions/spotify/spotifyActions';
-import { useAppDispatch, useAppState } from '../../context/context';
+import { useAppDispatch } from '../../context/context';
 
 const SpotifyAuthorise = () => {
   const dispatch = useAppDispatch();
@@ -25,9 +27,13 @@ const SpotifyAuthorise = () => {
 
   return (
     <div>
-      <button onClick={handleAuthorise}>
-        Link your account with Spotify.
-      </button>
+      <span
+        className="pointer spotify"
+        onClick={handleAuthorise}
+        title="Link your account with Spotify"
+      >
+        <FontAwesomeIcon icon={faSpotify} size="lg" />
+      </span>
     </div>
   );
 };

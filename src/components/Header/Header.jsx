@@ -1,6 +1,9 @@
 import React from 'react';
 import styled from 'styled-components';
 
+import SpotifyAuthorise from '../SpotifyAuthorise/SpotifyAuthorise';
+
+import { useAppState } from '../../context/context';
 import { WAVE_COLOUR_MAIN } from '../../constants';
 
 const StyledHeader = styled.header`
@@ -11,13 +14,21 @@ const StyledHeader = styled.header`
   width: 100%;
 `;
 
-// TODO: YOU WERE HERE WHEN YOU SLEPT
-// TODO: NEXT IMPLEMENT SPOTIFY API CALLS TO GET THE CURRENT SONG QUEUE
 const Header = () => {
+  const { tokens } = useAppState();
+  const { spotify } = tokens;
+
   return (
     <StyledHeader id="header">
-      <div className="container d-flex align-items-center height-full">
-        Wave
+      <div className="container-fluid d-flex align-items-center height-full justify-content-between">
+        <div>
+          Wave
+        </div>
+
+        {
+          !spotify.accessToken
+          && <SpotifyAuthorise />
+        }
       </div>
     </StyledHeader>
   );

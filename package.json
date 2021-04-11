@@ -23,6 +23,12 @@
   },
   "homepage": "https://github.com/alnaga/wave#readme",
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^1.2.35",
+    "@fortawesome/free-brands-svg-icons": "^5.15.3",
+    "@fortawesome/free-regular-svg-icons": "^5.15.3",
+    "@fortawesome/free-solid-svg-icons": "^5.15.3",
+    "@fortawesome/react-fontawesome": "^0.1.14",
+    "@ramonak/react-progress-bar": "^3.1.0",
     "axios": "^0.21.1",
     "bootstrap": "^5.0.0-alpha1",
     "prop-types": "^15.7.2",

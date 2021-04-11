@@ -1,12 +1,11 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-import CurrentlyPlaying from '../CurrentlyPlaying/CurrentlyPlaying';
+import Dashboard from '../Dashboard/Dashboard';
 import DeviceSelection from '../DeviceSelection/DeviceSelection';
 import Header from '../Header/Header';
 import LoginRegister from '../LoginRegister/LoginRegister';
 import Search from '../Search/Search';
 import SearchResults from '../SearchResults/SearchResults';
-import SpotifyAuthorise from '../SpotifyAuthorise/SpotifyAuthorise';
 
 import { refreshAccessToken } from '../../actions/account/accountActions';
 import {
@@ -23,7 +22,6 @@ import { accessTokenExpired, spotifyTokenExpired } from '../../util';
 const App = () => {
   const dispatch = useAppDispatch();
   const {
-    currentlyPlaying,
     devices,
     tokens,
     venue
@@ -52,25 +50,6 @@ const App = () => {
       }
     };
 
-    (async () => {
-      if (wave.accessToken && spotify.accessToken) {
-        if (!venue) {
-          await getVenue(dispatch, spotify.accessToken);
-        }
-
-        if (!currentlyPlaying) {
-          await getCurrentlyPlaying(dispatch, spotify.accessToken);
-        }
-
-        if (!devices.length > 0) {
-          // await getUserDevices(dispatch, accessToken, spotify.accessToken);
-          await handleGetDevices(dispatch, tokens);
-        }
-      }
-      await getNewAccessToken();
-      await getNewSpotifyToken();
-    })();
-
     const checkAccessTokenExpiration = setInterval(async () => {
       await getNewAccessToken();
     }, 60000);
@@ -79,23 +58,40 @@ const App = () => {
       await getNewSpotifyToken();
     }, 60000);
 
+    (async () => {
+      if (wave.accessToken && spotify.accessToken) {
+        if (!venue) {
+          await getVenue(dispatch, spotify.accessToken);
+        }
+
+        // if (spotify.accessToken && !currentlyPlaying) {
+        //   await getCurrentlyPlaying(dispatch, spotify.accessToken);
+        // }
+        // if (!devices.length > 0) {
+        //   // await getUserDevices(dispatch, accessToken, spotify.accessToken);
+        //   await handleGetDevices(dispatch, tokens);
+        // }
+      }
+
+      await getNewAccessToken();
+      await getNewSpotifyToken();
+    })();
+
     return () => {
       clearInterval(checkAccessTokenExpiration);
       clearInterval(checkSpotifyTokenExpiration)
     };
-  }, []);
+  }, [ , tokens]);
 
   return (
     <div id="app">
       <Header />
 
-      <div id="app-content" className="container-fluid-sm d-flex justify-content-center header-spacing">
+      <div id="app-content" className="d-flex justify-content-center header-spacing">
         {
           wave.accessToken
             ? (
-              <>
-                Dashboard placeholder.
-              </>
+              <Dashboard />
             ) : (
               <LoginRegister />
             )

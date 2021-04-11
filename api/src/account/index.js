@@ -99,7 +99,9 @@ router.post('/register', async (req, res) => {
   // Check to see whether the username already exists in the database and creates one if it doesn't.
   User.findOne({ username }, (error, user) => {
     if (error) {
-      console.log('User not found');
+      res.status(500).send({
+        message: 'Internal server error.'
+      })
     } else {
       if (user) {
         res.status(400).send({

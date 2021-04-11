@@ -3,6 +3,7 @@ import { Router } from 'express';
 
 import { authenticate } from '../util';
 import { useMongoClient } from '../util';
+import { Venue } from '../models/venue';
 import {
   AUTHORISATION,
   CLIENT_ID,
@@ -132,13 +133,13 @@ router.get('/search', async (req, res) => {
 // Gets the currently playing song for the venue's Spotify account.
 router.get('/song', async (req, res) => {
   const { accessToken } = req.query;
-  
-  const spotifyResponse = await axios.get(`https://api.spotify.com/v1/me/player?market=${resultMarket}`, {
+
+  const spotifyResponse = await axios.get(`https://api.spotify.com/v1/me/player`, {
     headers: {
       "Authorization": `Bearer ${accessToken}`
     }
-  });
-  
+  }).catch((error) => error.response);
+
   res.status(spotifyResponse.status).send(spotifyResponse.data);
 });
 
@@ -158,45 +159,57 @@ router.post('/song', async (req, res) => {
 router.get('/venue', async (req, res) => {
   const { accessToken } = req.query;
 
-  const spotifyResponse = await axios.get('https://api.spotify.com/v1/me', {
-    headers: {
-      "Authorization": `Bearer ${accessToken}`
-    }
-  });
-
-  let data = {};
-  if (spotifyResponse.status === 200) {
-    const client = await useMongoClient().connect();
-
-    const venueFound = await client.db('wave').collection('venues').findOne({uri: spotifyResponse.data.uri});
-
-    if (venueFound) {
-      data = {
-        ...venueFound
-      };
-    } else {
-      // If the venue doesn't currently exist in the database, create an entry with the default fields.
-      data = {
-        attendees: 0,
-        displayName: spotifyResponse.data.display_name,
-        uri: spotifyResponse.data.uri,
-        votes: 0
+  try {
+    const spotifyResponse = await axios.get('https://api.spotify.com/v1/me', {
+      headers: {
+        "Authorization": `Bearer ${accessToken}`
       }
+    }).catch((error) => error.response);
 
-      await client.db('wave').collection('venues').insertOne({
-        ...data
+    if (spotifyResponse.status === 200) {
+      const { data } = spotifyResponse;
+      Venue.findOne({ uri: data.uri }, (error, venue) => {
+        if (error) {
+          res.status(500).send({
+            message: 'Internal server error.'
+          });
+        } else if (venue) {
+          res.status(200).send(venue);
+        } else {
+          const newVenue = new Venue({
+            attendees: 0,
+            name: data.display_name,
+            uri: data.uri,
+            songHistory: [],
+            votes: 0
+          });
+
+          newVenue.save((error) => {
+            if (error) {
+              res.status(500).send({
+                message: 'Error occurred while adding venue. Not added.'
+              });
+            } else {
+              res.status(200).send(newVenue);
+            }
+          })
+        }
+      });
+    } else {
+      console.error('An error occurred fetching venue.', spotifyResponse.status);
+      res.status(500).send({
+        message: 'Internal server error.'
       });
     }
+  } catch (error) {
+    console.error('An error occurred fetching venue.', error);
+    res.status(error.status).send(error);
   }
-
-  res.status(spotifyResponse.status).send(data);
 });
 
 router.post('/vote', async (req, res) => {
   const { venue, vote } = req.body;
   const { accessToken } = req.query;
-
-  const client = await useMongoClient().connect();
 
   let voteValue = 0;
 
@@ -205,44 +218,44 @@ router.post('/vote', async (req, res) => {
   } else if (vote === VOTE_DOWN) {
     voteValue = -1;
   }
-
-  const targetVenue = await client.db('wave').collection('venues').findOne({ uri: venue });
-
-  if (targetVenue) {
-    let newVoteValue = targetVenue.votes + voteValue;
-    let skipped = false;
-
-    // Update the votes value for the venue.
-    await client.db('wave').collection('venues').updateOne({ uri: venue }, {
-      "$set": {
-        votes: newVoteValue
+  
+  Venue.findOneAndUpdate(
+    { uri: venue },
+    {
+      $inc: {
+        votes: voteValue
       }
-    });
+    },
+    { new: true },
+    async (error, updatedVenue) => {
+      if (error) {
+        console.error('Error occurred while updating vote value.', error);
+        res.status(500).send({
+          message: 'Internal server error.'
+        });
+      } else if (updatedVenue) {
+        let skipped = false;
 
-    // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
-    if (newVoteValue < (-targetVenue.attendees / 2)) {
-      newVoteValue = 0;
-      skipped = true;
-
-      await skipTrack(accessToken);
-
-      await client.db('wave').collection('venues').updateOne({ uri: venue}, {
-        "$set": {
-          votes: 0
+        // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
+        if (updatedVenue.votes < (-updatedVenue.attendees / 2)) {
+          await skipTrack(accessToken);
+          await Venue.updateOne({ uri: venue }, { votes: 0 });
+          updatedVenue.votes = 0;
+          skipped = true;
         }
-      });
-    }
 
-    res.status(200).send({
-      ...targetVenue,
-      skipped,
-      votes: newVoteValue
-    });
-  } else {
-    res.status(500).send({
-      message: "Could not find venue."
-    });
-  }
+        res.status(200).send({
+          venue: updatedVenue,
+          skipped
+        });
+      } else {
+        console.error('Could not find venue.');
+        res.status(500).send({
+          message: 'Internal server error.'
+        });
+      }
+    }
+  );
 });
 
 module.exports = router;

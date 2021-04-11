@@ -8,4 +8,5 @@ export const SET_WAVE_TOKENS = 'SET_WAVE_TOKENS';
 export const VOTE_DOWN = 'VOTE_DOWN';
 export const VOTE_UP = 'VOTE_UP';
 
+export const WAVE_COLOUR_DARK = '#6e5399';
 export const WAVE_COLOUR_MAIN = '#a37cd9';

@@ -1,4 +1,6 @@
 import React from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMinusCircle, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 
 import { VOTE_DOWN, VOTE_UP } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
@@ -10,8 +12,14 @@ const Vote = () => {
   const { spotify } = tokens;
 
   const handleVote = (vote) => async () => {
-    if (await voteSong(dispatch, spotify.accessToken, venue.uri, vote) === 2) {
-      await getCurrentlyPlaying(dispatch, spotify.accessToken);
+    if (spotify.accessToken) {
+      const { skipped } = await voteSong(dispatch, spotify.accessToken, venue.uri, vote);
+      if (skipped) {
+        // Spotify has a short delay before skipping, so to avoid getting the same song pre-skip, we wait.
+        setTimeout(async () => {
+          await getCurrentlyPlaying(dispatch, spotify.accessToken);
+        }, 250);
+      }
     }
   };
 
@@ -20,14 +28,18 @@ const Vote = () => {
       {
         venue
           && (
-            <div className="flex">
-              <button onClick={handleVote(VOTE_DOWN)}> - </button>
+            <div id="vote" className="d-flex justify-content-between">
+              <span className="pointer" onClick={handleVote(VOTE_DOWN)}>
+                <FontAwesomeIcon icon={faMinusCircle} size="lg" />
+              </span>
 
               <span>
                 { venue.votes }
               </span>
 
-              <button onClick={handleVote(VOTE_UP)}> + </button>
+              <span className="pointer" onClick={handleVote(VOTE_UP)}>
+                <FontAwesomeIcon icon={faPlusCircle} size="lg" />
+              </span>
             </div>
           )
       }

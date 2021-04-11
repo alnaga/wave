@@ -1,7 +1,27 @@
 @import "~bootstrap/scss/bootstrap";
 
+$background-colour: #eee;
+$banner-height: 84px;
+
 #app, #app-content {
   min-height: 100vh;
+}
+
+#currently-playing {
+  img {
+    height: $banner-height
+  }
+
+  background-color: rgba(0, 0, 0, 0.8);
+  bottom: 0;
+  color: #fff;
+  height: $banner-height;
+  position: fixed;
+  width: 100%;
+}
+
+#dashboard {
+  background-color: $background-colour;
 }
 
 #header:after {
@@ -20,20 +40,15 @@
   }
 
   height: fit-content;
-
-  //@include media-breakpoint-only(xs) {
-  //  padding-left: 0;
-  //  padding-right: 0;
-  //}
-
-  //@include media-breakpoint-up(sm) {
-  //  padding-top: 50px;
-  //}
 }
 
 #root {
   height: 100vh;
   width: 100vw;
+}
+
+#vote {
+  width: 72px;
 }
 
 .account-form {
@@ -49,8 +64,20 @@
   height: 100%;
 }
 
+.left-0 {
+  left: 0;
+}
+
 .pointer {
   cursor: pointer;
+}
+
+.song-progress {
+  bottom: $banner-height;
+}
+
+.spotify {
+  color: #1ED760;
 }
 
 .width-full {
