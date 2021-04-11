@@ -1,4 +1,9 @@
 import React, { useRef } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faHeadphones } from '@fortawesome/free-solid-svg-icons';
+
+import { TOKENS_EXPIRED } from '../../constants';
+import { refreshExpiredTokens } from '../../util';
 import { useAppDispatch, useAppState } from '../../context/context';
 import {
   getCurrentlyPlaying,
@@ -6,17 +11,6 @@ import {
   selectUserDevice
 } from '../../actions/spotify/spotifyActions';
 
-import { retryAction } from '../../util';
-
-export const handleGetDevices = async (dispatch, tokens) => {
-  const { spotify, wave } = tokens;
-  const args = [
-    { 'waveAccessToken': wave.accessToken },
-    { 'spotifyAccessToken': spotify.accessToken }
-  ];
-
-  await retryAction(getUserDevices, tokens, dispatch, args);
-};
 
 const DeviceSelection = () => {
   const dispatch = useAppDispatch();
@@ -31,6 +25,15 @@ const DeviceSelection = () => {
 
   const { spotify, wave } = tokens;
 
+  const handleGetDevices = async () => {
+    const { spotify, wave } = tokens;
+
+    if (wave.accessToken && spotify.accessToken && await getUserDevices(dispatch, wave.accessToken, spotify.accessToken) === TOKENS_EXPIRED) {
+      await refreshExpiredTokens(dispatch, tokens);
+      await getUserDevices(dispatch, wave.accessToken, spotify.accessToken);
+    }
+  };
+
   const handleSelectDevice = (device) => async () => {
     await selectUserDevice(dispatch, wave.accessToken, spotify.accessToken, device);
     await getUserDevices(dispatch, wave.accessToken, spotify.accessToken);
@@ -41,12 +44,11 @@ const DeviceSelection = () => {
   };
 
   return (
-    <div>
-      <button
-        onClick={() => handleGetDevices(dispatch, tokens)}
-      >
-        Get Devices
-      </button>
+    <div id="select-devices">
+      <span className="pointer" onClick={handleGetDevices} title="View list of available playback devices.">
+        <FontAwesomeIcon icon={faHeadphones} size="lg" />
+      </span>
+
       {
         devices.length > 0
           && (
@@ -54,7 +56,7 @@ const DeviceSelection = () => {
               {
                 devices.map((device) => {
                   return (
-                    <div className="flex" onClick={handleSelectDevice(device)}>
+                    <div className="flex" key={device.id} onClick={handleSelectDevice(device)}>
                       { device.name }
                       {
                         device.is_active

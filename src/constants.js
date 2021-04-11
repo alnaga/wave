@@ -5,6 +5,8 @@ export const SET_SPOTIFY_TOKENS = 'SET_SPOTIFY_TOKENS';
 export const SET_VENUE = 'SET_VENUE';
 export const SET_WAVE_TOKENS = 'SET_WAVE_TOKENS';
 
+export const TOKENS_EXPIRED = 'TOKENS_EXPIRED';
+
 export const VOTE_DOWN = 'VOTE_DOWN';
 export const VOTE_UP = 'VOTE_UP';
 

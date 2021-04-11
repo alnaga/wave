@@ -1,5 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
 import SpotifyAuthorise from '../SpotifyAuthorise/SpotifyAuthorise';
 
@@ -16,7 +18,7 @@ const StyledHeader = styled.header`
 
 const Header = () => {
   const { tokens } = useAppState();
-  const { spotify } = tokens;
+  const { spotify, wave } = tokens;
 
   return (
     <StyledHeader id="header">
@@ -27,7 +29,16 @@ const Header = () => {
 
         {
           !spotify.accessToken
-          && <SpotifyAuthorise />
+            && <SpotifyAuthorise />
+        }
+
+        {
+          wave.accessToken
+            && (
+              <div>
+                <FontAwesomeIcon icon={faUserCircle} size="lg" />
+              </div>
+            )
         }
       </div>
     </StyledHeader>

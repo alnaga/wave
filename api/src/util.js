@@ -1,14 +1,5 @@
-import { MongoClient } from 'mongodb';
-
-import { MONGO_URI } from './constants';
-import { Request, Response } from 'oauth2-server';
 import app from './index';
-
-export const useMongoClient = () => {
-  return new MongoClient(MONGO_URI, {
-    useUnifiedTopology: true
-  });
-};
+import { Request, Response } from 'oauth2-server';
 
 export const getToken = async (req, res) => {
   const request = new Request(req);

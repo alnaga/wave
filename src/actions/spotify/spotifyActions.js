@@ -5,7 +5,8 @@ import {
   SET_DEVICES,
   SET_SEARCH_RESULTS,
   SET_SPOTIFY_TOKENS,
-  SET_VENUE
+  SET_VENUE,
+  TOKENS_EXPIRED
 } from '../../constants';
 
 /**
@@ -94,28 +95,24 @@ export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
  * @returns 1 if successful, 0 if failed
  */
 export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) => {
-  try {
-    const response = await axios.get(`http://localhost:8081/spotify/devices?accessToken=${spotifyAccessToken}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
-    }).catch((error) => {
-      return error.response;
+  const response = await axios.get(`http://localhost:8081/spotify/devices?accessToken=${spotifyAccessToken}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => {
+    return error.response;
+  });
+
+  if (response.status === 200) {
+    dispatch({
+      type: SET_DEVICES,
+      payload: response.data.devices
     });
 
-    if (response.status === 200) {
-      dispatch({
-        type: SET_DEVICES,
-        payload: response.data.devices
-      });
-
-      return 1;
-    } else if (response.status === 401) {
-      return 2;
-    } else return 0;
-  } catch (error) {
-    return 0;
-  }
+    return 1;
+  } else if (response.status === 401) {
+    return TOKENS_EXPIRED;
+  } else return 0;
 };
 
 /**
@@ -186,20 +183,19 @@ export const getSongSearchResults = (dispatch, accessToken) => async (query) => 
  * @returns 1 if successful, 0 if failed
  */
 export const getCurrentlyPlaying = async (dispatch, accessToken) => {
-  try {
-    const response = await axios.get(`http://localhost:8081/spotify/song?accessToken=${accessToken}`);
+  const response = await axios.get(`http://localhost:8081/spotify/song?accessToken=${accessToken}`)
+    .catch((error) => error.response);
 
-    if (response.status === 200) {
-      dispatch({
-        type: SET_CURRENTLY_PLAYING,
-        payload: response.data
-      });
+  if (response.status === 200) {
+    dispatch({
+      type: SET_CURRENTLY_PLAYING,
+      payload: response.data
+    });
 
-      return 1;
-    } else return 0;
-  } catch (error) {
-    return 0;
-  }
+    return 1;
+  } else if (response.status === 401) {
+    return TOKENS_EXPIRED;
+  } else return 0;
 };
 
 /**
@@ -259,19 +255,21 @@ export const voteSong = async (dispatch, accessToken, venue, vote) => {
  * @param accessToken - Spotify API Access Token
  * @returns 1 if successful, 0 if failed
  */
-export const getVenue = async (dispatch, accessToken) => {
-  try {
-    const response = await axios.get(`http://localhost:8081/spotify/venue?accessToken=${accessToken}`);
+export const getVenue = async (dispatch, accessToken, spotifyAccessToken) => {
+  const response = await axios.get(`http://localhost:8081/spotify/venue?accessToken=${spotifyAccessToken}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
 
-    if (response.status === 200) {
-      dispatch({
-        type: SET_VENUE,
-        payload: response.data
-      });
+  if (response.status === 200) {
+    dispatch({
+      type: SET_VENUE,
+      payload: response.data
+    });
 
-      return 1;
-    } else return 0;
-  } catch (error) {
-    return 0;
-  }
+    return 1;
+  } else if (response.status === 401) {
+    return TOKENS_EXPIRED;
+  } else return 0;
 };

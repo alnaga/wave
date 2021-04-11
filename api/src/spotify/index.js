@@ -2,7 +2,6 @@ import axios from 'axios';
 import { Router } from 'express';
 
 import { authenticate } from '../util';
-import { useMongoClient } from '../util';
 import { Venue } from '../models/venue';
 import {
   AUTHORISATION,
@@ -140,7 +139,13 @@ router.get('/song', async (req, res) => {
     }
   }).catch((error) => error.response);
 
-  res.status(spotifyResponse.status).send(spotifyResponse.data);
+  const { status } = spotifyResponse;
+
+  if (status === 200 || status === 204) {
+    res.status(status).send(spotifyResponse.data);
+  } else {
+    res.status(status).send(spotifyResponse);
+  }
 });
 
 // Adds a song to the queue on the venue's Spotify account.
@@ -156,9 +161,9 @@ router.post('/song', async (req, res) => {
   res.status(spotifyResponse.status).send();
 });
 
-router.get('/venue', async (req, res) => {
+router.get('/venue', authenticate, async (req, res) => {
   const { accessToken } = req.query;
-
+  
   try {
     const spotifyResponse = await axios.get('https://api.spotify.com/v1/me', {
       headers: {

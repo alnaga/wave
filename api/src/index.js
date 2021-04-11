@@ -5,7 +5,11 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import OAuth2Server from 'oauth2-server';
 
-import { MONGO_URI } from './constants';
+import {
+  ACCESS_TOKEN_LIFETIME,
+  REFRESH_TOKEN_LIFETIME,
+  MONGO_URI
+} from './constants';
 import * as Models from './oauth2';
 import account from './account/index';
 import spotify from './spotify/index';
@@ -37,8 +41,8 @@ mongoose.connect(MONGO_URI, {
 // Start the authorisation server.
 app.oauth2 = new OAuth2Server({
   model: Models,
-  accessTokenLifetime: 60 * 60,
-  refreshTokenLifetime: 60 * 60 * 24 * 14,
+  accessTokenLifetime: ACCESS_TOKEN_LIFETIME,
+  refreshTokenLifetime: REFRESH_TOKEN_LIFETIME,
   allowBearerTokensInQueryString: true
 });
 

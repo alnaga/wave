@@ -1,75 +1,37 @@
 import { refreshAccessToken } from './actions/account/accountActions';
 import { refreshSpotifyAuthToken } from './actions/spotify/spotifyActions';
 
+/**
+ * Returns whether or not the Wave API token has expired.
+ * @param expiration - Wave API Token Expiration
+ * @returns {boolean} - Whether the Wave API token has expired.
+ */
 export const accessTokenExpired = (expiration) => {
   return expiration < new Date().toISOString();
 }
 
+/**
+ * Returns whether the Spotify API token has expired.
+ * @param expiration - Spotify API Token Expiration
+ * @returns {boolean} - Whether the Spotify API token has expired.
+ */
 export const spotifyTokenExpired = (expiration) => {
   return expiration < Date.now();
 };
 
-export const retryAction = async (action, tokens, dispatch, args) => {
+/**
+ * Checks to see if either API token has expired and refreshes those which have.
+ * @param dispatch - Application Dispatch
+ * @param tokens - Tokens object containing the Wave and Spotify token objects.
+ */
+export const refreshExpiredTokens = async (dispatch, tokens) => {
   const { spotify, wave } = tokens;
 
-  let argsToUpdate = [];
-  let passedArgs = [];
-
-  const targetPropertyNames = [
-    'spotifyAccessToken',
-    'spotifyRefreshToken',
-    'waveAccessToken',
-    'waveRefreshToken'
-  ];
-
-  args.map((arg, index) => {
-    const propertyName = Object.getOwnPropertyNames(arg)[0];
-    passedArgs.push(arg[propertyName]);
-
-    if (targetPropertyNames.includes(propertyName)) {
-      argsToUpdate.push({
-        index,
-        propertyName
-      });
-    }
-  });
-
-  if (await action(dispatch, ...passedArgs) === 2) {
-    const newTokens = {
-      ...tokens
-    };
-
-    if (accessTokenExpired(wave.accessTokenExpiresAt)) {
-      newTokens.wave = await refreshAccessToken(dispatch, wave.refreshToken);
-    }
-
-    if (spotifyTokenExpired(spotify.accessTokenExpiresAt)) {
-      newTokens.spotify = await refreshSpotifyAuthToken(dispatch, spotify.refreshToken);
-    }
-
-    let newPassedArgs = passedArgs;
-
-    argsToUpdate.map((arg) => {
-      let value = passedArgs[arg.index];
-
-      switch (arg.propertyName) {
-        case 'spotifyAccessToken':
-          value = newTokens.spotify.accessToken;
-          break;
-        case 'spotifyRefreshToken':
-          value = newTokens.spotify.refreshToken;
-          break;
-        case 'waveAccessToken':
-          value = newTokens.wave.accessToken;
-          break;
-        case 'waveRefreshToken':
-          value = newTokens.wave.refreshToken;
-          break;
-      }
-
-      newPassedArgs[arg.index] = value;
-    });
-
-    await action(dispatch, ...newPassedArgs);
+  if (accessTokenExpired(wave.accessTokenExpiresAt)) {
+    await refreshAccessToken(dispatch, wave.refreshToken);
   }
-};
+
+  if (spotifyTokenExpired(spotify.accessTokenExpiresAt)) {
+    await refreshSpotifyAuthToken(dispatch, spotify.refreshToken);
+  }
+}

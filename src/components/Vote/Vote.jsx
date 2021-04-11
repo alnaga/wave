@@ -1,27 +1,45 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMinusCircle, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 
-import { VOTE_DOWN, VOTE_UP } from '../../constants';
+import { refreshExpiredTokens } from '../../util';
+import { TOKENS_EXPIRED, VOTE_DOWN, VOTE_UP } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { getCurrentlyPlaying, voteSong } from '../../actions/spotify/spotifyActions';
+import { getCurrentlyPlaying, getVenue, voteSong } from '../../actions/spotify/spotifyActions';
 
 const Vote = () => {
   const dispatch = useAppDispatch();
   const { tokens, venue } = useAppState();
   const { spotify } = tokens;
 
+  const tokensRef = useRef(null);
+  tokensRef.current = tokens;
+
   const handleVote = (vote) => async () => {
     if (spotify.accessToken) {
       const { skipped } = await voteSong(dispatch, spotify.accessToken, venue.uri, vote);
+
       if (skipped) {
-        // Spotify has a short delay before skipping, so to avoid getting the same song pre-skip, we wait.
+        // Spotify has a short delay before skipping, so to avoid getting the same song as pre-skip, we wait.
         setTimeout(async () => {
           await getCurrentlyPlaying(dispatch, spotify.accessToken);
         }, 250);
       }
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      if (
+        spotify.accessToken
+        && !venue
+        && await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
+      ) {
+        await refreshExpiredTokens(dispatch, tokens);
+        await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
+      };
+    })();
+  }, []);
 
   return (
     <>

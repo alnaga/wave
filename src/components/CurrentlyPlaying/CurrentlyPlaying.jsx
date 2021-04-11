@@ -1,18 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ProgressBar from '@ramonak/react-progress-bar';
 
+import DeviceSelection from '../DeviceSelection/DeviceSelection';
 import Vote from '../Vote/Vote';
-import { WAVE_COLOUR_DARK } from '../../constants';
+
+import { refreshExpiredTokens } from '../../util';
+import { TOKENS_EXPIRED, WAVE_COLOUR_DARK } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getCurrentlyPlaying } from '../../actions/spotify/spotifyActions';
 
 const CurrentlyPlaying = () => {
   const dispatch = useAppDispatch();
-  const {
-    currentlyPlaying,
-    devices,
-    tokens
-  } = useAppState();
+  const { currentlyPlaying, tokens } = useAppState();
   const { spotify } = tokens;
 
   const currentlyPlayingRef = useRef(null);
@@ -23,7 +22,7 @@ const CurrentlyPlaying = () => {
   setSongProgressRef.current = setSongProgress;
 
   const checkSongProgress = async () => {
-    if (currentlyPlayingRef) {
+    if (currentlyPlayingRef && currentlyPlayingRef.current) {
       const { item, timestamp } = currentlyPlayingRef.current;
       const songEndTime = timestamp + item.duration_ms;
       const currentTime = Date.now();
@@ -38,7 +37,8 @@ const CurrentlyPlaying = () => {
   }
 
   const handleFetchCurrentSong = async () => {
-    if (spotify.accessToken) {
+    if (spotify.accessToken && await getCurrentlyPlaying(dispatch, spotify.accessToken) === TOKENS_EXPIRED) {
+      await refreshExpiredTokens(dispatch, tokens);
       await getCurrentlyPlaying(dispatch, spotify.accessToken);
     }
   }
@@ -66,7 +66,7 @@ const CurrentlyPlaying = () => {
         borderRadius="0px"
         className="position-fixed song-progress width-full"
         completed={songProgress}
-        height="8px"
+        height="6px"
         isLabelVisible={false}
         transitionDuration="1s"
         transitionTimingFunction="linear"
@@ -94,6 +94,8 @@ const CurrentlyPlaying = () => {
 
                   <Vote />
                 </div>
+
+                <DeviceSelection />
               </>
             ) : (
               <div>
