@@ -12,33 +12,40 @@ import { getCurrentlyPlaying } from '../../actions/spotify/spotifyActions';
 const CurrentlyPlaying = () => {
   const dispatch = useAppDispatch();
   const { currentlyPlaying, tokens } = useAppState();
-  const { spotify } = tokens;
+  const [ songProgress, setSongProgress ] = useState(0);
 
   const currentlyPlayingRef = useRef(null);
   currentlyPlayingRef.current = currentlyPlaying;
 
-  const [ songProgress, setSongProgress ] = useState(0);
   const setSongProgressRef = useRef(null);
   setSongProgressRef.current = setSongProgress;
 
+  const tokensRef = useRef(null);
+  tokensRef.current = tokens;
+
   const checkSongProgress = async () => {
-    if (currentlyPlayingRef && currentlyPlayingRef.current) {
+    if (currentlyPlayingRef) {
       await handleFetchCurrentSong();
-      const { item, progress_ms } = currentlyPlayingRef.current;
-      setSongProgressRef.current((progress_ms / item.duration_ms) * 100);
+
+      if (currentlyPlayingRef.current) {
+        const { item, progress_ms } = currentlyPlayingRef.current;
+        setSongProgressRef.current((progress_ms / item.duration_ms) * 100);
+      }
     }
   };
 
   const handleFetchCurrentSong = async () => {
-    if (spotify.accessToken && await getCurrentlyPlaying(dispatch, spotify.accessToken) === TOKENS_EXPIRED) {
-      await refreshExpiredTokens(dispatch, tokens);
-      await getCurrentlyPlaying(dispatch, spotify.accessToken);
+    if (
+      tokensRef.current.spotify.accessToken
+      && await getCurrentlyPlaying(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
+    ) {
+      await refreshExpiredTokens(dispatch, tokensRef.current);
+      await getCurrentlyPlaying(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
     }
   }
   
   useEffect(() => {
     (async () => {
-      await handleFetchCurrentSong();
       await checkSongProgress();
 
       const pollSongProgress =  setInterval(async () => {
@@ -88,7 +95,7 @@ const CurrentlyPlaying = () => {
                   <Vote />
                 </div>
 
-                <DeviceSelection />
+                {/*<DeviceSelection />*/}
               </>
             ) : (
               <div>

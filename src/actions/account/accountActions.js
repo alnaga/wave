@@ -10,12 +10,12 @@ import {
  * @param dispatch - Application Dispatch
  * @param response - Response object containing the tokens
  */
-const saveTokens = async (dispatch, response) => {
-  sessionStorage.setItem('waveTokens', JSON.stringify(response.data));
+const saveTokens = async (dispatch, tokens) => {
+  sessionStorage.setItem('waveTokens', JSON.stringify(tokens));
 
   await dispatch({
     type: SET_WAVE_TOKENS,
-    payload: response.data
+    payload: tokens
   });
 }
 
@@ -31,12 +31,25 @@ export const login = async (dispatch, userData) => {
     const response = await axios.post('http://localhost:8081/account/login', userData);
 
     if (response.status === 200) {
-      saveTokens(dispatch, response);
+      saveTokens(dispatch, response.data);
       return 1;
     } else return 0;
   } catch (error) {
     return 0;
   }
+};
+
+/**
+ * Logs the user out by wiping their access tokens.
+ * @param dispatch - Application Dispatch
+ */
+export const logout = async (dispatch) => {
+  await saveTokens(dispatch, {
+    accessToken: undefined,
+    accessTokenExpiresAt: undefined,
+    refreshToken: undefined,
+    refreshTokenExpiresAt: undefined
+  });
 };
 
 /**
@@ -50,7 +63,7 @@ export const refreshAccessToken = async (dispatch, refreshToken) => {
     const response = await axios.post(`http://localhost:8081/account/refresh?refresh_token=${refreshToken}`);
 
     if (response.status === 200) {
-      await saveTokens(dispatch, response);
+      await saveTokens(dispatch, response.data);
       return response.data;
     } else return 0;
   } catch (error) {

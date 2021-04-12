@@ -11,7 +11,6 @@ import {
   selectUserDevice
 } from '../../actions/spotify/spotifyActions';
 
-
 const DeviceSelection = () => {
   const dispatch = useAppDispatch();
   const {
@@ -19,7 +18,6 @@ const DeviceSelection = () => {
     devices,
     tokens
   } = useAppState();
-  const { spotify, wave } = tokens;
 
   const [ showList, setShowList ] = useState(false);
 
@@ -27,20 +25,22 @@ const DeviceSelection = () => {
   tokensRef.current = tokens;
 
   const handleGetDevices = async () => {
-    const { spotify, wave } = tokens;
-
-    if (wave.accessToken && spotify.accessToken && await getUserDevices(dispatch, wave.accessToken, spotify.accessToken) === TOKENS_EXPIRED) {
-      await refreshExpiredTokens(dispatch, tokens);
-      await getUserDevices(dispatch, wave.accessToken, spotify.accessToken);
+    if (
+      tokensRef.current.wave.accessToken
+      && tokensRef.current.spotify.accessToken
+      && await getUserDevices(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
+    ) {
+      await refreshExpiredTokens(dispatch, tokensRef.current);
+      await getUserDevices(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
     }
   };
 
   const handleSelectDevice = (device) => async () => {
-    await selectUserDevice(dispatch, wave.accessToken, spotify.accessToken, device);
-    await getUserDevices(dispatch, wave.accessToken, spotify.accessToken);
+    await selectUserDevice(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, device);
+    await getUserDevices(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
 
     if (!currentlyPlaying) {
-      await getCurrentlyPlaying(dispatch, wave.accessToken);
+      await getCurrentlyPlaying(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
     }
   };
 

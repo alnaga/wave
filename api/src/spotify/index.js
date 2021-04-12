@@ -130,7 +130,7 @@ router.get('/search', async (req, res) => {
 });
 
 // Gets the currently playing song for the venue's Spotify account.
-router.get('/song', async (req, res) => {
+router.get('/song', authenticate, async (req, res) => {
   const { accessToken } = req.query;
 
   const spotifyResponse = await axios.get(`https://api.spotify.com/v1/me/player`, {

@@ -10,19 +10,18 @@ import { getCurrentlyPlaying, getVenue, voteSong } from '../../actions/spotify/s
 const Vote = () => {
   const dispatch = useAppDispatch();
   const { tokens, venue } = useAppState();
-  const { spotify } = tokens;
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
   const handleVote = (vote) => async () => {
-    if (spotify.accessToken) {
-      const { skipped } = await voteSong(dispatch, spotify.accessToken, venue.uri, vote);
+    if (tokensRef.current.spotify.accessToken) {
+      const { skipped } = await voteSong(dispatch, tokensRef.current.spotify.accessToken, venue.uri, vote);
 
       if (skipped) {
         // Spotify has a short delay before skipping, so to avoid getting the same song as pre-skip, we wait.
         setTimeout(async () => {
-          await getCurrentlyPlaying(dispatch, spotify.accessToken);
+          await getCurrentlyPlaying(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
         }, 250);
       }
     }
@@ -31,13 +30,13 @@ const Vote = () => {
   useEffect(() => {
     (async () => {
       if (
-        spotify.accessToken
+        tokensRef.current.spotify.accessToken
         && !venue
         && await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
       ) {
         await refreshExpiredTokens(dispatch, tokens);
         await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
-      };
+      }
     })();
   }, []);
 

@@ -131,7 +131,7 @@ export const saveToken = async (token, client, user, callback) => {
  */
 export const getRefreshToken = (refreshToken, callback) => {
   Token.findOne({ refreshToken }, (error, token) => {
-    if (!token) console.error('Refresh: Token not found.');
+    if (!token) console.error('Refresh: Token not found.', refreshToken);
     if (error) console.error(error);
 
     callback(error, token);

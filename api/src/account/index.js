@@ -72,11 +72,15 @@ router.post('/refresh', async (req, res) => {
       refresh_token
     }
   }).catch((error) => {
-    console.log(error.message);
+    console.error(error.message);
   });
   
   if (refreshResponse && refreshResponse.status === 200) {
     res.status(200).send(refreshResponse.data);
+  } else if (refreshResponse && refreshResponse.status === 400) {
+    res.status(400).send({
+      message: 'Invalid refresh token.'
+    });
   } else {
     res.status(500).send({
       message: 'An error occurred while fetching a new access token. Please try again later.'
@@ -101,7 +105,7 @@ router.post('/register', async (req, res) => {
     if (error) {
       res.status(500).send({
         message: 'Internal server error.'
-      })
+      });
     } else {
       if (user) {
         res.status(400).send({
