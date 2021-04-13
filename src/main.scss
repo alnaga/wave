@@ -2,6 +2,9 @@
 
 $background-colour: #eee;
 $banner-height: 84px;
+$device-list-width: 200px; 
+$wave-colour-dark: #6e5399;
+$wave-colour-main: #a37cd9;
 
 #app, #app-content {
   min-height: 100vh;
@@ -10,6 +13,14 @@ $banner-height: 84px;
 #currently-playing {
   img {
     height: $banner-height
+  }
+
+  > div.d-flex {
+    flex: 1 1 0px;
+  }
+
+  #song-title {
+    white-space: nowrap;
   }
 
   background-color: rgba(0, 0, 0, 0.8);
@@ -22,6 +33,61 @@ $banner-height: 84px;
 
 #dashboard {
   background-color: $background-colour;
+}
+
+#device-selection {
+  #device-list-box {
+    #device-list-title {
+      background-color: $wave-colour-main;
+      color: white;
+      font-weight: 550;
+      text-align: center;
+    }
+
+    #device-list {
+      .device-option {
+        &:hover {
+          background-color: #eee;
+        }
+
+        &:not(:last-child) {
+          border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+        }
+
+        align-items: center;
+        cursor: pointer;
+        display: flex;
+        min-height: 56px;
+        padding: 0 12px;
+      }
+
+      overflow-y: auto;
+    }
+
+    background-color: white;
+    border-radius: 8px;
+    bottom: 32px;
+    box-shadow: 0px 8px 10px rgba(0, 0, 0, 0.5);
+    color: black;
+    height: 300px;
+    left: calc(50% - #{$device-list-width / 2});
+    overflow: hidden;
+    position: absolute;
+    width: $device-list-width;
+  }
+
+  #tab {
+    border-left: 8px solid transparent;
+    border-right: 8px solid transparent;
+    border-top: 8px solid white;
+    height: 0;
+    left: 2px;
+    position: absolute;
+    top: -8px;
+    width: 0;
+  }
+
+  position: relative;
 }
 
 #header:after {
@@ -78,6 +144,10 @@ $banner-height: 84px;
 
 .spotify {
   color: #1ED760;
+}
+
+.text-bold {
+  font-weight: bold;
 }
 
 .width-full {

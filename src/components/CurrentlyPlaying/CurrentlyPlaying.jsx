@@ -67,11 +67,13 @@ const CurrentlyPlaying = () => {
           (currentlyPlaying && currentlyPlaying.item)
             ? (
               <>
-                <div className="position-absolute left-0">
-                  <img src={currentlyPlaying.item.album.images[0].url} />
+                <div className="d-flex">
+                  <div className="align-self-start">
+                    <img src={currentlyPlaying.item.album.images[0].url} alt={`Album Artwork for ${currentlyPlaying.item.album.name}`} />
+                  </div>
                 </div>
 
-                <div className="d-flex flex-column align-items-center">
+                <div id="song-title" className="d-flex flex-column align-items-center">
                   <div className="mb-1">
                     {
                       currentlyPlaying.item.artists[0].name
@@ -85,7 +87,10 @@ const CurrentlyPlaying = () => {
                   <Vote />
                 </div>
 
-                <DeviceSelection />
+                <div className="d-flex justify-content-between">
+                  <DeviceSelection />
+                </div>
+
               </>
             ) : (
               <div>

@@ -124,26 +124,24 @@ export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) 
  * @returns 1 if successful, 0 if failed
  */
 export const selectUserDevice = async (dispatch, accessToken, spotifyAccessToken, device) => {
-  try {
-    const response = await axios.put(`http://localhost:8081/spotify/devices?accessToken=${spotifyAccessToken}`, {
-      device
-    }, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
-      }
+  const response = await axios.put(`http://localhost:8081/spotify/devices?accessToken=${spotifyAccessToken}`, {
+    device
+  }, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response.status === 200) {
+    dispatch({
+      type: SET_DEVICES,
+      payload: []
     });
 
-    if (response.status === 200) {
-      dispatch({
-        type: SET_DEVICES,
-        payload: []
-      });
-
-      return 1;
-    } else return 0;
-  } catch (error) {
-    return 0;
-  }
+    return 1;
+  } else if (response.status === 401) {
+    return TOKENS_EXPIRED;
+  } else return 0;
 };
 
 /**
