@@ -14,25 +14,8 @@ const CurrentlyPlaying = () => {
   const { currentlyPlaying, tokens } = useAppState();
   const [ songProgress, setSongProgress ] = useState(0);
 
-  const currentlyPlayingRef = useRef(null);
-  currentlyPlayingRef.current = currentlyPlaying;
-
-  const setSongProgressRef = useRef(null);
-  setSongProgressRef.current = setSongProgress;
-
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
-
-  const checkSongProgress = async () => {
-    if (currentlyPlayingRef) {
-      await handleFetchCurrentSong();
-
-      if (currentlyPlayingRef.current) {
-        const { item, progress_ms } = currentlyPlayingRef.current;
-        setSongProgressRef.current((progress_ms / item.duration_ms) * 100);
-      }
-    }
-  };
 
   const handleFetchCurrentSong = async () => {
     if (
@@ -43,17 +26,24 @@ const CurrentlyPlaying = () => {
       await getCurrentlyPlaying(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
     }
   }
+
+  useEffect(() => {
+    if (currentlyPlaying) {
+      const { item, progress_ms } = currentlyPlaying;
+      setSongProgress((progress_ms / item.duration_ms) * 100);
+    }
+  }, [ currentlyPlaying ]);
   
   useEffect(() => {
     (async () => {
-      await checkSongProgress();
+      await handleFetchCurrentSong();
 
-      const pollSongProgress =  setInterval(async () => {
-        await checkSongProgress();
-      }, 3000);
+      const pollCurrentSong =  setInterval(async () => {
+        await handleFetchCurrentSong();
+      }, 5000);
 
       return () => {
-        clearInterval(pollSongProgress);
+        clearInterval(pollCurrentSong);
       }
     })();
   }, []);
@@ -68,7 +58,7 @@ const CurrentlyPlaying = () => {
         completed={songProgress}
         height="6px"
         isLabelVisible={false}
-        transitionDuration="3s"
+        transitionDuration="5s"
         transitionTimingFunction="linear"
       />
 
@@ -95,7 +85,7 @@ const CurrentlyPlaying = () => {
                   <Vote />
                 </div>
 
-                {/*<DeviceSelection />*/}
+                <DeviceSelection />
               </>
             ) : (
               <div>
