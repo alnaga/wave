@@ -10,12 +10,9 @@ import { getUserDevices, selectUserDevice } from '../../actions/spotify/spotifyA
 
 const DeviceSelection = () => {
   const dispatch = useAppDispatch();
-  const {
-    devices,
-    tokens
-  } = useAppState();
+  const { devices, tokens } = useAppState();
 
-  const [ showList, setShowList ] = useState(true);
+  const [ showList, setShowList ] = useState(false);
   const showListRef = useRef(null);
   showListRef.current = showList;
 
@@ -82,7 +79,7 @@ const DeviceSelection = () => {
 
   return (
     <div id="device-selection">
-      <span className="pointer" id="show-device-list" onClick={handleToggleShowList} title="View list of available playback devices.">
+      <span className="pointer ui-button" id="show-device-list" onClick={handleToggleShowList} title="View list of available playback devices.">
         <FontAwesomeIcon id="show-device-list-icon" icon={faHeadphones} size="lg" />
       </span>
 

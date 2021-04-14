@@ -19,7 +19,8 @@ const CurrentlyPlaying = () => {
 
   const handleFetchCurrentSong = async () => {
     if (
-      tokensRef.current.spotify.accessToken
+      tokensRef.current.wave.accessToken
+      && tokensRef.current.spotify.accessToken
       && await getCurrentlyPlaying(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);

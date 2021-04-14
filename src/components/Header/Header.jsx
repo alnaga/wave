@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
+import SearchBar from '../SearchBar/SearchBar';
 import SpotifyAuthorise from '../SpotifyAuthorise/SpotifyAuthorise';
 
 import { useAppState } from '../../context/context';
@@ -35,9 +36,15 @@ const Header = () => {
         {
           wave.accessToken
             && (
-              <div>
-                <FontAwesomeIcon icon={faUserCircle} size="lg" />
-              </div>
+              <>
+                <div className="d-flex flex-grow-1 justify-content-center">
+                  <SearchBar />
+                </div>
+
+                <div>
+                  <FontAwesomeIcon icon={faUserCircle} size="lg" />
+                </div>
+              </>
             )
         }
       </div>

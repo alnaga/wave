@@ -16,7 +16,7 @@ const App = () => {
     <div id="app">
       <Header />
 
-      <div id="app-content" className="d-flex justify-content-center header-spacing">
+      <div id="app-content" className="d-flex justify-content-center">
         {
           wave.accessToken
             ? (

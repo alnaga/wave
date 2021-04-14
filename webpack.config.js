@@ -11,8 +11,12 @@ module.exports = {
   mode: environment,
   devServer: {
     contentBase: './build',
+    historyApiFallback: {
+      index: '/'
+    },
     hot: !isProd,
-    port: 8080
+    port: 8080,
+    publicPath: '/'
   },
   devtool: !isProd ? 'eval' : undefined,
   module: {
@@ -55,7 +59,8 @@ module.exports = {
   },
   output: {
     filename: 'bundle.js',
-    path: path.resolve(__dirname, 'build')
+    path: path.resolve(__dirname, 'build'),
+    publicPath: '/'
   },
   plugins: [
     new HtmlWebpackPlugin({

@@ -7,8 +7,8 @@ import {
 /**
  * Utility function that saves the incoming authentication tokens to sessionStorage and then
  * updates their respective context values.
- * @param dispatch - Application Dispatch
- * @param response - Response object containing the tokens
+ * @param dispatch {Function} - Application Dispatch
+ * @param tokens {Object} - Response object containing the tokens
  */
 const saveTokens = async (dispatch, tokens) => {
   sessionStorage.setItem('waveTokens', JSON.stringify(tokens));
@@ -22,8 +22,8 @@ const saveTokens = async (dispatch, tokens) => {
 /**
  * Attempts to log the user in with the credentials provided.
  * Gets an access and refresh token from the OAuth server.
- * @param dispatch - Application Dispatch
- * @param userData - User Credentials
+ * @param dispatch {Function} - Application Dispatch
+ * @param userData {Function} - User Credentials
  * @returns 1 if successful, 0 if failed
  */
 export const login = async (dispatch, userData) => {
@@ -41,7 +41,7 @@ export const login = async (dispatch, userData) => {
 
 /**
  * Logs the user out by wiping their access tokens.
- * @param dispatch - Application Dispatch
+ * @param dispatch {Function} - Application Dispatch
  */
 export const logout = async (dispatch) => {
   await saveTokens(dispatch, {
@@ -54,8 +54,8 @@ export const logout = async (dispatch) => {
 
 /**
  * Attempts to acquire a new access token using the refresh token
- * @param dispatch - Application Dispatch
- * @param refreshToken - Refresh token acquired during authentication
+ * @param dispatch {Function} - Application Dispatch
+ * @param refreshToken {String} - Refresh token acquired during authentication
  * @returns 1 if successful, 0 if failed
  */
 export const refreshAccessToken = async (dispatch, refreshToken) => {
@@ -73,8 +73,8 @@ export const refreshAccessToken = async (dispatch, refreshToken) => {
 
 /**
  * Attempts to register the user with the credentials provided and logs them in if successful.
- * @param dispatch - Application Dispatch
- * @param userData - Desired User Credentials
+ * @param dispatch {Function} - Application Dispatch
+ * @param userData {Object} - Desired User Credentials
  * @returns 1 if successful, 0 if failed
  */
 export const registerAccount = async (dispatch, userData) => {

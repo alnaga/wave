@@ -145,7 +145,7 @@ router.get('/song', authenticate, async (req, res) => {
 });
 
 // Adds a song to the queue on the venue's Spotify account.
-router.post('/song', async (req, res) => {
+router.post('/song', authenticate, async (req, res) => {
   const { accessToken, uri } = req.query;
 
   const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${uri}`, null, {

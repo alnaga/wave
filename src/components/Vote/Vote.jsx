@@ -34,7 +34,7 @@ const Vote = () => {
         && !venue
         && await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
       ) {
-        await refreshExpiredTokens(dispatch, tokens);
+        await refreshExpiredTokens(dispatch, tokensRef.current);
         await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
       }
     })();
@@ -46,7 +46,7 @@ const Vote = () => {
         venue
           && (
             <div id="vote" className="d-flex justify-content-between">
-              <span className="pointer" onClick={handleVote(VOTE_DOWN)}>
+              <span className="pointer ui-button" onClick={handleVote(VOTE_DOWN)}>
                 <FontAwesomeIcon icon={faMinusCircle} size="lg" />
               </span>
 
@@ -54,7 +54,7 @@ const Vote = () => {
                 { venue.votes }
               </span>
 
-              <span className="pointer" onClick={handleVote(VOTE_UP)}>
+              <span className="pointer ui-button" onClick={handleVote(VOTE_UP)}>
                 <FontAwesomeIcon icon={faPlusCircle} size="lg" />
               </span>
             </div>

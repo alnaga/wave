@@ -1,18 +1,33 @@
 @import "~bootstrap/scss/bootstrap";
 
 $background-colour: #eee;
-$banner-height: 84px;
-$device-list-width: 200px; 
+$currently-playing-height: 84px;
+$device-list-width: 250px;
+$header-height: 56px;
+$song-progress-height: 6px;
+$line-separator-colour: rgba(0, 0, 0, 0.125);
 $wave-colour-dark: #6e5399;
+$wave-colour-light: #c3a6ee;
+$wave-colour-lighter: #dac3fa;
 $wave-colour-main: #a37cd9;
+$wave-colour-main-transparent: rgba(163, 124, 217, 0.5);
 
-#app, #app-content {
+#app {
+  font-family: -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
   min-height: 100vh;
+}
+
+#app-content {
+  background-color: $background-colour;
+  min-height: calc(100vh - #{$currently-playing-height});
+  max-height: calc(100vh - #{$currently-playing-height});
+  padding-top: $header-height;
+  overflow-y: auto;
 }
 
 #currently-playing {
   img {
-    height: $banner-height
+    height: $currently-playing-height
   }
 
   > div.d-flex {
@@ -26,13 +41,9 @@ $wave-colour-main: #a37cd9;
   background-color: rgba(0, 0, 0, 0.8);
   bottom: 0;
   color: #fff;
-  height: $banner-height;
+  height: $currently-playing-height;
   position: fixed;
   width: 100%;
-}
-
-#dashboard {
-  background-color: $background-colour;
 }
 
 #device-selection {
@@ -42,16 +53,17 @@ $wave-colour-main: #a37cd9;
       color: white;
       font-weight: 550;
       text-align: center;
+      width: 100%;
     }
 
     #device-list {
       .device-option {
         &:hover {
-          background-color: #eee;
+          background-color: $background-colour;
         }
 
         &:not(:last-child) {
-          border-bottom: 1px solid rgba(0, 0, 0, 0.125);
+          border-bottom: 1px solid $line-separator-colour;
         }
 
         align-items: center;
@@ -90,6 +102,17 @@ $wave-colour-main: #a37cd9;
   position: relative;
 }
 
+#header {
+  form {
+    input {
+      flex-grow: 1;
+    }
+
+    flex-grow: 1;
+    max-width: 360px;
+  }
+}
+
 #header:after {
   background-color: rgba(100, 100, 100, 0.25);
   content: "";
@@ -113,6 +136,88 @@ $wave-colour-main: #a37cd9;
   width: 100vw;
 }
 
+#search-bar {
+  input {
+    border: none;
+    border-radius: 16px;
+    height: 30px;
+    outline: none;
+    padding: 0 12px;
+    z-index: 1;
+  }
+
+  .search-submit {
+    &:hover {
+      background-color: $wave-colour-lighter;
+    }
+
+    align-items: center;
+    background-color: $wave-colour-light;
+    border-radius: 16px;
+    cursor: pointer;
+    display: flex;
+    height: 100%;
+    justify-content: flex-end;
+    padding-right: 8px;
+    position: relative;
+    right: 26px;
+    text-align: right;
+    transition: background-color .1s ease-in-out;
+    width: 54px;
+  }
+
+  position: relative;
+}
+
+#search-results {
+  td {
+    min-height: 64px;
+    max-height: 64px;
+    max-width: 250px;
+    overflow: hidden;
+    padding: 12px 12px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  tr {
+    &:not(:last-child) {
+      border-bottom: 1px solid $line-separator-colour;
+    }
+  }
+
+  thead {
+    td {
+      font-weight: 600;
+      padding-bottom: 8px;
+    }
+
+    border-bottom: 1px solid $line-separator-colour;
+  }
+
+  .search-result {
+    &:hover {
+      background-color: $background-colour;
+    }
+
+    .add-to-queue {
+      &:hover {
+        color: $wave-colour-main;
+      }
+
+      color: $wave-colour-main-transparent;
+      cursor: pointer;
+    }
+
+    padding: 0 8px;
+  }
+
+
+  background-color: #f8f8f8;
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.5);
+  width: fit-content;
+}
+
 #vote {
   width: 72px;
 }
@@ -123,7 +228,7 @@ $wave-colour-main: #a37cd9;
 }
 
 .header-spacing {
-  padding-top: 56px;
+  padding-top: $header-height;
 }
 
 .height-full {
@@ -139,7 +244,7 @@ $wave-colour-main: #a37cd9;
 }
 
 .song-progress {
-  bottom: $banner-height;
+  bottom: $currently-playing-height;
 }
 
 .spotify {
@@ -148,6 +253,15 @@ $wave-colour-main: #a37cd9;
 
 .text-bold {
   font-weight: bold;
+}
+
+.ui-button {
+  &:hover {
+    color: white;
+  }
+
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.1s ease-in-out;
 }
 
 .width-full {
