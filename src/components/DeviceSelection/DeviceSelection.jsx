@@ -88,7 +88,7 @@ const DeviceSelection = () => {
           && (
             <div ref={listRef}>
               <div id="device-list-box" className="d-flex flex-column align-items-center ">
-                <div id="device-list-title" className="pl-3 pr-3 pt-3 pb-3"> Choose playback device </div>
+                <div id="device-list-title" className="pl-3 pr-3 pt-3 pb-3"> Choose a device </div>
 
                 <div id="device-list" className="d-flex flex-column flex-grow-1 width-full">
                   {
