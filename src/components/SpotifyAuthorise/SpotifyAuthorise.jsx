@@ -28,7 +28,7 @@ const SpotifyAuthorise = () => {
   return (
     <div>
       <span
-        className="pointer spotify"
+        className="spotify"
         onClick={handleAuthorise}
         title="Link your account with Spotify"
       >

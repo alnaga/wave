@@ -24,7 +24,7 @@ const Header = () => {
   return (
     <StyledHeader id="header">
       <div className="container-fluid d-flex align-items-center height-full justify-content-between">
-        <div>
+        <div id="logo">
           Wave
         </div>
 

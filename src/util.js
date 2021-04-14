@@ -32,7 +32,6 @@ export const refreshExpiredTokens = async (dispatch, tokens) => {
     await logout(dispatch);
   } else {
     if (tokenExpired(wave.accessTokenExpiresAt)) {
-      console.log('wave expired');
       await refreshAccessToken(dispatch, wave.refreshToken);
     }
 

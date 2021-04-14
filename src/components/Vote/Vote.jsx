@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMinusCircle, faPlusCircle } from '@fortawesome/free-solid-svg-icons';
+import { faThumbsDown, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED, VOTE_DOWN, VOTE_UP } from '../../constants';
@@ -46,16 +46,16 @@ const Vote = () => {
         venue
           && (
             <div id="vote" className="d-flex justify-content-between">
-              <span className="pointer ui-button" onClick={handleVote(VOTE_DOWN)}>
-                <FontAwesomeIcon icon={faMinusCircle} size="lg" />
+              <span className="ui-button vote-button" onClick={handleVote(VOTE_DOWN)}>
+                <FontAwesomeIcon icon={faThumbsDown} size="lg" />
               </span>
 
               <span>
                 { venue.votes }
               </span>
 
-              <span className="pointer ui-button" onClick={handleVote(VOTE_UP)}>
-                <FontAwesomeIcon icon={faPlusCircle} size="lg" />
+              <span className="ui-button vote-button" onClick={handleVote(VOTE_UP)}>
+                <FontAwesomeIcon icon={faThumbsUp} size="lg" />
               </span>
             </div>
           )

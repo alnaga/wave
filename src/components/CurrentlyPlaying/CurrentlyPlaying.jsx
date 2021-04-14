@@ -68,27 +68,25 @@ const CurrentlyPlaying = () => {
           (currentlyPlaying && currentlyPlaying.item)
             ? (
               <>
-                <div className="d-flex">
+                <div className="d-flex flex-grow-1">
                   <div className="align-self-start">
                     <img src={currentlyPlaying.item.album.images[0].url} alt={`Album Artwork for ${currentlyPlaying.item.album.name}`} />
                   </div>
-                </div>
 
-                <div id="song-title" className="d-flex flex-column align-items-center">
-                  <div className="mb-1">
-                    {
-                      currentlyPlaying.item.artists[0].name
-                    }
-                    {' '} - {' '}
-                    {
-                      currentlyPlaying.item.name
-                    }
+                  <div className="d-flex flex-column justify-content-center ml-3">
+                    <div id="song-title">
+                      { currentlyPlaying.item.name }
+                    </div>
+
+                    <div id="artist-name">
+                      { currentlyPlaying.item.artists[0].name }
+                    </div>
                   </div>
-
-                  <Vote />
                 </div>
 
-                <div className="d-flex justify-content-between">
+                <div className="d-flex justify-content-end">
+                  <Vote />
+
                   <DeviceSelection />
                 </div>
 

@@ -27,15 +27,43 @@ $wave-colour-main-transparent: rgba(163, 124, 217, 0.5);
 
 #currently-playing {
   img {
+    @include media-breakpoint-only(xs) {
+      display: none;
+    }
+
+    @include media-breakpoint-up(sm) {
+      display: block;
+      box-sizing: border-box;
+    }
+
     height: $currently-playing-height
   }
 
   > div.d-flex {
-    flex: 1 1 0px;
+    flex: 0 1 0px;
+  }
+
+  #artist-name {
+    color: rgba(255, 255, 255, 0.66);
+    font-size: 12px;
+  }
+
+  #artist-name, #song-title {
+    @include media-breakpoint-up(sm) {
+      max-width: unset;
+    }
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   #song-title {
-    white-space: nowrap;
+    font-size: 15px;
+  }
+
+  #vote {
+    margin-right: 8px;
   }
 
   background-color: rgba(0, 0, 0, 0.8);
@@ -71,34 +99,35 @@ $wave-colour-main-transparent: rgba(163, 124, 217, 0.5);
         display: flex;
         min-height: 56px;
         padding: 0 12px;
+        transition: background-color .1s ease-in-out;
       }
 
       overflow-y: auto;
     }
 
     background-color: white;
-    border-radius: 8px;
+    border-radius: 8px 8px 8px 8px;
     bottom: 32px;
     box-shadow: 0px 8px 10px rgba(0, 0, 0, 0.5);
     color: black;
-    height: 300px;
-    left: calc(50% - #{$device-list-width / 2});
+    max-height: 300px;
     overflow: hidden;
     position: absolute;
+    right: 0;
     width: $device-list-width;
   }
 
   #tab {
-    border-left: 8px solid transparent;
-    border-right: 8px solid transparent;
-    border-top: 8px solid white;
+    border-left: 10px solid transparent;
+    border-right: 10px solid transparent;
+    border-top: 12px solid white;
     height: 0;
-    left: 2px;
     position: absolute;
-    top: -8px;
+    top: -12px;
     width: 0;
   }
 
+  margin-right: 16px;
   position: relative;
 }
 
@@ -110,6 +139,10 @@ $wave-colour-main-transparent: rgba(163, 124, 217, 0.5);
 
     flex-grow: 1;
     max-width: 360px;
+  }
+
+  #logo {
+    font-weight: 600;
   }
 }
 
@@ -219,7 +252,9 @@ $wave-colour-main-transparent: rgba(163, 124, 217, 0.5);
 }
 
 #vote {
-  width: 72px;
+  .vote-button {
+    margin: 0 8px;
+  }
 }
 
 .account-form {
@@ -249,6 +284,7 @@ $wave-colour-main-transparent: rgba(163, 124, 217, 0.5);
 
 .spotify {
   color: #1ED760;
+  cursor: pointer;;
 }
 
 .text-bold {
@@ -257,10 +293,11 @@ $wave-colour-main-transparent: rgba(163, 124, 217, 0.5);
 
 .ui-button {
   &:hover {
-    color: white;
+    color: $wave-colour-light;
   }
 
   color: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
   transition: color 0.1s ease-in-out;
 }
 

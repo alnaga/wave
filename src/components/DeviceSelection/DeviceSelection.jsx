@@ -79,7 +79,7 @@ const DeviceSelection = () => {
 
   return (
     <div id="device-selection">
-      <span className="pointer ui-button" id="show-device-list" onClick={handleToggleShowList} title="View list of available playback devices.">
+      <span className="ui-button" id="show-device-list" onClick={handleToggleShowList} title="View list of available playback devices.">
         <FontAwesomeIcon id="show-device-list-icon" icon={faHeadphones} size="lg" />
       </span>
 
