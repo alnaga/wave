@@ -8,8 +8,7 @@
 
 #app-content {
   background-color: $background-colour;
-  min-height: calc(100vh - #{$currently-playing-height});
-  max-height: calc(100vh - #{$currently-playing-height});
+  height: $app-content-height;
   padding-top: $header-height;
   overflow-y: auto;
 }

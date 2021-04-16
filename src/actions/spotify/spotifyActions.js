@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import {
+  SET_ALBUM_INFO,
   SET_CURRENTLY_PLAYING,
   SET_DEVICES,
   SET_SEARCH_RESULTS,
@@ -136,6 +137,25 @@ export const selectUserDevice = async (dispatch, accessToken, spotifyAccessToken
     dispatch({
       type: SET_DEVICES,
       payload: []
+    });
+
+    return 1;
+  } else if (response && response.status === 401) {
+    return TOKENS_EXPIRED;
+  } else return 0;
+};
+
+export const getAlbumInfo = async (dispatch, accessToken, spotifyAccessToken, albumId) => {
+  const response = await axios.get(`http://localhost:8081/spotify/album?accessToken=${spotifyAccessToken}&albumId=${albumId}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response && response.status === 200) {
+    dispatch({
+      type: SET_ALBUM_INFO,
+      payload: response.data
     });
 
     return 1;

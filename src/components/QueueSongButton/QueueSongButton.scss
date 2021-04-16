@@ -1,0 +1,12 @@
+@import "~bootstrap/scss/bootstrap";
+@import "../../variables";
+
+.add-to-queue {
+  &:hover {
+    color: $wave-colour-main;
+  }
+
+  color: $wave-colour-main-transparent;
+  cursor: pointer;
+  transition: color .1s ease-in-out;
+}

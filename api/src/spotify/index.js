@@ -46,6 +46,29 @@ router.get('/authorise', (req, res) => {
   );
 });
 
+// Fetches album information from Spotify's API and forwards the result of the request to the user.
+router.get('/album', authenticate, async (req, res) => {
+  const { accessToken, albumId } = req.query;
+
+  const spotifyResponse = await axios.get(`https://api.spotify.com/v1/albums/${albumId}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (spotifyResponse) {
+    if (spotifyResponse.status === 200) {
+      res.status(200).send(spotifyResponse.data);
+    } else {
+      res.status(spotifyResponse.status).send(spotifyResponse.data);
+    }
+  } else {
+    res.status(500).send({
+      message: 'Internal server error.'
+    });
+  }
+});
+
 // Fetches the available playback devices from Spotify.
 router.get('/devices', authenticate, async (req, res) => {
   const { accessToken } = req.query;
@@ -54,7 +77,7 @@ router.get('/devices', authenticate, async (req, res) => {
     headers: {
       "Authorization": `Bearer ${accessToken}`
     }
-  });
+  }).catch((error) => error.response);
 
   res.status(spotifyResponse.status).send(spotifyResponse.data);
 });
@@ -152,7 +175,7 @@ router.post('/song', authenticate, async (req, res) => {
     headers: {
       "Authorization": `Bearer ${accessToken}`
     }
-  });
+  }).catch((error) => error.response);
 
   res.status(spotifyResponse.status).send();
 });

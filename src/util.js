@@ -2,6 +2,18 @@ import { logout, refreshAccessToken } from './actions/account/accountActions';
 import { refreshSpotifyAuthToken } from './actions/spotify/spotifyActions';
 
 /**
+ * Converts the duration in milliseconds from Spotify's API into a human-readable length formatted in MM:ss.
+ * @param duration {Number} - Song duration in milliseconds.
+ * @returns {string} - Human-readable length
+ */
+export const formatSongLength = (duration) => {
+  const minutes = Math.floor(duration / 60000);
+  let seconds = ((duration % 60000) / 1000).toFixed(0);
+  if (seconds < 10) seconds = '0' + seconds;
+  return `${minutes}:${seconds}`;
+};
+
+/**
  * Returns whether or not the Wave API token has expired.
  * @param expiration - Wave API Token Expiration
  * @returns {boolean} - Whether the Wave API token has expired.

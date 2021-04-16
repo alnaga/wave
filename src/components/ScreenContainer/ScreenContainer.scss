@@ -1,0 +1,19 @@
+@import "~bootstrap/scss/bootstrap";
+@import "../../variables";
+
+.screen {
+  @include media-breakpoint-down(md); @media (pointer: none), (pointer: coarse) {
+    margin: 0;
+    width: 100vw;
+    min-height: calc(#{$app-content-height} - #{$header-height});
+  }
+
+  @include media-breakpoint-up(lg); @media (pointer: fine) {
+    //margin: 48px 0;
+    width: fit-content;
+  }
+
+  background-color: #f8f8f8;
+  box-shadow: 0 6px 6px rgba(0, 0, 0, 0.5);
+  width: fit-content;
+}

@@ -1,6 +1,7 @@
 import React, {createContext, useContext, useReducer} from 'react';
 
 import {
+  SET_ALBUM_INFO,
   SET_CURRENTLY_PLAYING,
   SET_DEVICES,
   SET_SEARCH_RESULTS,
@@ -13,6 +14,7 @@ const DispatchContext = createContext();
 const StateContext = createContext();
 
 export const initialState = {
+  albumInfo: undefined,
   currentlyPlaying: undefined,
   devices: [],
   searchResults: [],
@@ -34,6 +36,11 @@ export const initialState = {
 
 const appReducer = (state, action) => {
   switch(action.type) {
+    case SET_ALBUM_INFO:
+      return {
+        ...state,
+        albumInfo: action.payload
+      };
     case SET_CURRENTLY_PLAYING:
       return {
         ...state,

@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
@@ -27,7 +28,9 @@ const Header = () => {
     <StyledHeader id="header">
       <div className="container-fluid d-flex align-items-center height-full justify-content-between">
         <div id="logo">
-          Wave
+          <Link to="/">
+            Wave
+          </Link>
         </div>
 
         {

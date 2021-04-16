@@ -2,6 +2,11 @@
 @import "../../variables";
 
 #header {
+  a {
+    color: white;
+    text-decoration: none;
+  }
+
   form {
     input {
       flex-grow: 1;
