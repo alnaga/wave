@@ -48,7 +48,6 @@ const AlbumInfo = (props) => {
                 alt={`${albumInfo.name} Album Art`}
                 src={albumInfo.images[1].url}
                 title={albumInfo.name}
-                width="196"
               />
 
               <div className="d-flex flex-column flex-grow-1 ml-3">

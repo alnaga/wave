@@ -5,7 +5,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 import './SearchBar.scss';
 
-const SearchBar = () => {
+const SearchBar = (props) => {
   const [ query, setQuery ] = useState('');
   const [ redirect, setRedirect ] = useState(false);
 
@@ -28,7 +28,7 @@ const SearchBar = () => {
   }, []);
 
   return (
-    <form id="search-bar" className="d-flex">
+    <form id="search-bar" {...props}>
       <input
         type="text"
         onChange={handleChangeQuery}

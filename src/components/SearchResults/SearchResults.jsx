@@ -43,10 +43,6 @@ const SearchResults = (props) => {
 
   return (
     <ScreenContainer>
-      <div className="d-flex flex-column align-items-center p-3">
-        Showing results for '{ decodeURIComponent(props.match.params.query) }':
-      </div>
-
       {
         searchResults.length > 0
           ? (

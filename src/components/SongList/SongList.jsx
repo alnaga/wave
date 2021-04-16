@@ -40,7 +40,7 @@ const SongList = (props) => {
                     track.album
                       ? (
                         <Link to={`/album/${track.album.id}`}>
-                          <div className="result-name">
+                          <div className="result-name" title={track.name}>
                             { track.name }
                           </div>
                         </Link>

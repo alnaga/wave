@@ -7,18 +7,15 @@
     text-decoration: none;
   }
 
-  form {
-    input {
-      flex-grow: 1;
-    }
-
-    flex-grow: 1;
-    max-width: 360px;
-  }
-
   #logo {
     font-weight: 600;
   }
+
+  background-color: $wave-colour-main;
+  color: white;
+  height: $header-height;
+  position: fixed;
+  width: 100%;
 }
 
 #header:after {

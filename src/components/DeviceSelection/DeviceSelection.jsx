@@ -80,7 +80,7 @@ const DeviceSelection = () => {
   }, []);
 
   return (
-    <div id="device-selection">
+    <div id="device-selection" className="ml-3 mr-3">
       <span className="ui-button" id="show-device-list" onClick={handleToggleShowList} title="View list of available playback devices.">
         <FontAwesomeIcon id="show-device-list-icon" icon={faHeadphones} size="lg" />
       </span>
