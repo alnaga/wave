@@ -31,6 +31,7 @@ const AlbumInfo = (props) => {
     }
   };
 
+  // TODO: Scroll to the top when navigating to this component.
   useEffect(() => {
     (async () => {
       await handleGetAlbumInfo();

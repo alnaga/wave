@@ -17,7 +17,6 @@ const SongList = (props) => {
     <div id="song-list">
       {
         tracks.map((track) => {
-          console.log(track)
           return (
             <div className="result" key={track.id}>
               <div className="result-left">
