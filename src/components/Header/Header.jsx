@@ -9,6 +9,8 @@ import SpotifyAuthorise from '../SpotifyAuthorise/SpotifyAuthorise';
 import { useAppState } from '../../context/context';
 import { WAVE_COLOUR_MAIN } from '../../constants';
 
+import './Header.scss';
+
 const StyledHeader = styled.header`
   background-color: ${WAVE_COLOUR_MAIN};
   color: #fff;

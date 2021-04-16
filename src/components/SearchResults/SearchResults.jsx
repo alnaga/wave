@@ -8,6 +8,8 @@ import { TOKENS_EXPIRED } from '../../constants';
 import { getSongSearchResults, queueSong } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
 
+import './SearchResults.scss';
+
 const SearchResults = (props) => {
   const dispatch = useAppDispatch();
   const { searchResults, tokens } = useAppState();

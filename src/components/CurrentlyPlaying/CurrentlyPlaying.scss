@@ -1,0 +1,66 @@
+@import "~bootstrap/scss/bootstrap";
+@import "../../variables";
+
+#currently-playing {
+  img {
+    @include media-breakpoint-only(xs) {
+      display: none;
+    }
+
+    @include media-breakpoint-up(sm) {
+      display: block;
+    }
+
+    height: $currently-playing-height
+  }
+
+  #mobile-play-icon {
+    @media only screen and (max-width: 320px) {
+      display: none;
+    }
+
+    @include media-breakpoint-only(xs) {
+      display: block;
+    }
+
+    @include media-breakpoint-up(sm) {
+      display: none;
+    }
+  }
+
+  #artist-name {
+    color: rgba(255, 255, 255, 0.66);
+    font-size: 12px;
+  }
+
+  #song-info {
+    div {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    min-width: 0;
+  }
+
+  #song-title {
+    font-size: 15px;
+  }
+
+  #vote {
+    margin-right: 8px;
+  }
+
+  background-color: rgba(0, 0, 0, 0.8);
+  bottom: 0;
+  color: #fff;
+  height: $currently-playing-height;
+  position: fixed;
+  user-select: none;
+  width: 100%;
+}
+
+.song-progress {
+  bottom: $currently-playing-height;
+}

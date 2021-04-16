@@ -3,6 +3,8 @@ import { Redirect } from 'react-router';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
+import './SearchBar.scss';
+
 const SearchBar = () => {
   const [ query, setQuery ] = useState('');
   const [ redirect, setRedirect ] = useState(false);

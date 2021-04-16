@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { login, registerAccount } from '../../actions/account/accountActions';
 import { useAppDispatch } from '../../context/context';
 
+import './LoginRegister.scss';
+
 const LoginRegister = () => {
   const [ data, setData ] = useState({
     username: '',

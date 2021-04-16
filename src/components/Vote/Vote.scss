@@ -1,0 +1,33 @@
+@import "~bootstrap/scss/bootstrap";
+@import "../../variables";
+
+#vote {
+  > span {
+    flex: 1 1 0;
+  }
+
+  .vote-button {
+    &:hover {
+      background-color: $wave-colour-main;
+    }
+
+    background-color: rgba(255, 255, 255, 0.25);
+    border-radius: 32px;
+    cursor: pointer;
+    padding: 4px 8px;
+    transition: background-color .1s ease-in-out;
+  }
+
+  .vote-count {
+    min-width: 40px;
+    text-align: center;
+    font-weight: 600;
+  }
+
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.125);
+  border-radius: 32px;
+  display: flex;
+  justify-content: center;
+  user-select: none;
+}

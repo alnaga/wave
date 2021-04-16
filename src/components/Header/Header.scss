@@ -1,0 +1,27 @@
+@import "~bootstrap/scss/bootstrap";
+@import "../../variables";
+
+#header {
+  form {
+    input {
+      flex-grow: 1;
+    }
+
+    flex-grow: 1;
+    max-width: 360px;
+  }
+
+  #logo {
+    font-weight: 600;
+  }
+}
+
+#header:after {
+  background-color: rgba(100, 100, 100, 0.25);
+  content: "";
+  height: 3px;
+  left: 0;
+  position: absolute;
+  top: 100%;
+  width: 100%;
+}

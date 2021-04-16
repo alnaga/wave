@@ -7,6 +7,8 @@ import { TOKENS_EXPIRED, VOTE_DOWN, VOTE_UP } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getCurrentlyPlaying, getVenue, voteSong } from '../../actions/spotify/spotifyActions';
 
+import './Vote.scss';
+
 const Vote = () => {
   const dispatch = useAppDispatch();
   const { tokens, venue } = useAppState();
@@ -45,17 +47,17 @@ const Vote = () => {
       {
         venue
           && (
-            <div id="vote" className="d-flex justify-content-between">
-              <span className="ui-button vote-button" onClick={handleVote(VOTE_DOWN)}>
-                <FontAwesomeIcon icon={faThumbsDown} size="lg" />
+            <div id="vote">
+              <span className="vote-button" onClick={handleVote(VOTE_DOWN)}>
+                <FontAwesomeIcon icon={faThumbsDown} size="md" />
               </span>
 
-              <span>
+              <span className="vote-count">
                 { venue.votes }
               </span>
 
-              <span className="ui-button vote-button" onClick={handleVote(VOTE_UP)}>
-                <FontAwesomeIcon icon={faThumbsUp} size="lg" />
+              <span className="vote-button" onClick={handleVote(VOTE_UP)}>
+                <FontAwesomeIcon icon={faThumbsUp} size="md" />
               </span>
             </div>
           )

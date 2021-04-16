@@ -1,5 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ProgressBar from '@ramonak/react-progress-bar';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 
 import DeviceSelection from '../DeviceSelection/DeviceSelection';
 import Vote from '../Vote/Vote';
@@ -8,6 +10,8 @@ import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED, WAVE_COLOUR_DARK } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getCurrentlyPlaying } from '../../actions/spotify/spotifyActions';
+
+import './CurrentlyPlaying.scss';
 
 const CurrentlyPlaying = () => {
   const dispatch = useAppDispatch();
@@ -68,12 +72,16 @@ const CurrentlyPlaying = () => {
           (currentlyPlaying && currentlyPlaying.item)
             ? (
               <>
-                <div className="d-flex flex-grow-1">
-                  <div className="align-self-start">
-                    <img src={currentlyPlaying.item.album.images[0].url} alt={`Album Artwork for ${currentlyPlaying.item.album.name}`} />
-                  </div>
+                <div id="song-info" className="d-flex flex-grow-1 align-items-center">
+                  <img src={currentlyPlaying.item.album.images[0].url} alt={`Album Artwork for ${currentlyPlaying.item.album.name}`} />
 
-                  <div className="d-flex flex-column justify-content-center ml-3">
+                  {
+                    currentlyPlaying.is_playing
+                      ? <FontAwesomeIcon id="mobile-play-icon" className="ml-3" icon={faPlay} />
+                      : <FontAwesomeIcon id="mobile-play-icon" className="ml-3" icon={faPause} />
+                  }
+
+                  <div className="ml-3 mr-3">
                     <div id="song-title">
                       { currentlyPlaying.item.name }
                     </div>
@@ -84,7 +92,7 @@ const CurrentlyPlaying = () => {
                   </div>
                 </div>
 
-                <div className="d-flex justify-content-end">
+                <div id="song-controls" className="d-flex justify-content-end align-items-center">
                   <Vote />
 
                   <DeviceSelection />
@@ -92,7 +100,7 @@ const CurrentlyPlaying = () => {
 
               </>
             ) : (
-              <div>
+              <div id="no-song">
                 No song currently playing.
               </div>
             )

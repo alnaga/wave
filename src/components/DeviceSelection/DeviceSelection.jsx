@@ -8,6 +8,8 @@ import { refreshExpiredTokens } from '../../util';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getUserDevices, selectUserDevice } from '../../actions/spotify/spotifyActions';
 
+import './DeviceSelection.scss';
+
 const DeviceSelection = () => {
   const dispatch = useAppDispatch();
   const { devices, tokens } = useAppState();
