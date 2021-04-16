@@ -5,7 +5,7 @@ import { faThumbsDown, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED, VOTE_DOWN, VOTE_UP } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { getCurrentlyPlaying, getVenue, voteSong } from '../../actions/spotify/spotifyActions';
+import { getCurrentlyPlaying, getVenue, voteTrack } from '../../actions/spotify/spotifyActions';
 
 import './Vote.scss';
 
@@ -18,7 +18,7 @@ const Vote = () => {
 
   const handleVote = (vote) => async () => {
     if (tokensRef.current.spotify.accessToken) {
-      const { skipped } = await voteSong(dispatch, tokensRef.current.spotify.accessToken, venue.uri, vote);
+      const { skipped } = await voteTrack(dispatch, tokensRef.current.spotify.accessToken, venue.uri, vote);
 
       if (skipped) {
         // Spotify has a short delay before skipping, so to avoid getting the same song as pre-skip, we wait.

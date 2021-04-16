@@ -67,7 +67,7 @@ const CurrentlyPlaying = () => {
         transitionTimingFunction="linear"
       />
 
-      <div id="currently-playing" className="d-flex justify-content-center align-items-center">
+      <div id="currently-playing">
         {
           (currentlyPlaying && currentlyPlaying.item)
             ? (
@@ -97,7 +97,6 @@ const CurrentlyPlaying = () => {
 
                   <DeviceSelection />
                 </div>
-
               </>
             ) : (
               <div id="no-song">

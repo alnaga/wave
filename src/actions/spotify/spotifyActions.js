@@ -172,7 +172,7 @@ export const getAlbumInfo = async (dispatch, accessToken, spotifyAccessToken, al
  * @param query {String} - Search query
  * @returns 1 if successful, 0 if failed
  */
-export const getSongSearchResults = async (dispatch, accessToken, spotifyAccessToken, query) => {
+export const getTrackSearchResults = async (dispatch, accessToken, spotifyAccessToken, query) => {
   // If the user has not input a query, the request to the API is not made.
   if (!query) {
     return 0;
@@ -229,11 +229,11 @@ export const getCurrentlyPlaying = async (dispatch, accessToken, spotifyAccessTo
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API Access Token
  * @param spotifyAccessToken {String} - Spotify API Access Token
- * @param songUri {String} - The URI of the song to be queued.
+ * @param trackUri {String} - The URI of the track to be queued.
  * @returns 1 if successful, 0 if failed
  */
-export const queueSong = async (dispatch, accessToken, spotifyAccessToken, songUri) => {
-  const response = await axios.post(`http://localhost:8081/spotify/song?accessToken=${spotifyAccessToken}&uri=${songUri}`, null, {
+export const queueTrack = async (dispatch, accessToken, spotifyAccessToken, trackUri) => {
+  const response = await axios.post(`http://localhost:8081/spotify/song?accessToken=${spotifyAccessToken}&uri=${trackUri}`, null, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -254,7 +254,7 @@ export const queueSong = async (dispatch, accessToken, spotifyAccessToken, songU
  * @param vote {String} - The vote value (VOTE_UP or VOTE_DOWN).
  * @returns 1 if successful, 0 if failed
  */
-export const voteSong = async (dispatch, accessToken, venue, vote) => {
+export const voteTrack = async (dispatch, accessToken, venue, vote) => {
   const response = await axios.post(`http://localhost:8081/spotify/vote?accessToken=${accessToken}`, {
     venue,
     vote

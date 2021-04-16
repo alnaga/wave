@@ -4,37 +4,38 @@ import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
-import { queueSong } from '../../actions/spotify/spotifyActions';
+import { queueTrack } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
 
-import './QueueSongButton.scss';
+import './QueueTrackButton.scss';
 
-const QueueSongButton = ({ song }) => {
+const QueueTrackButton = (props) => {
+  const { track } = props;
   const dispatch = useAppDispatch();
   const { tokens } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
-  const handleQueueSong = (song) => async () => {
+  const handleQueueSong = (track) => async () => {
     if (
       tokensRef.current.wave.accessToken
       && tokensRef.current.spotify.accessToken
-      && await queueSong(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, song.uri) === TOKENS_EXPIRED
+      && await queueTrack(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, track.uri) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await queueSong(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, song.uri);
+      await queueTrack(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, track.uri);
     }
   };
   return (
     <FontAwesomeIcon
       className="add-to-queue"
       icon={faPlusCircle}
-      onClick={handleQueueSong(song)}
-      size="lg"
-      title={`Add '${song.artists[0].name} - ${song.name}' to the queue.`}
+      onClick={handleQueueSong(track)}
+      size="2x"
+      title={`Add '${track.artists[0].name} - ${track.name}' to the queue.`}
     />
   );
 };
 
-export default QueueSongButton;
+export default QueueTrackButton;

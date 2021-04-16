@@ -2,11 +2,11 @@ import React, { useEffect, useRef } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
-import SongTable from '../SongTable/SongTable';
+import SongList from '../SongList/SongList';
 
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
-import { getSongSearchResults } from '../../actions/spotify/spotifyActions';
+import { getTrackSearchResults } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
 
 import './SearchResults.scss';
@@ -25,10 +25,10 @@ const SearchResults = (props) => {
     if (
       tokensRef.current.wave.accessToken
       && tokensRef.current.spotify.accessToken
-      && await getSongSearchResults(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, query) === TOKENS_EXPIRED
+      && await getTrackSearchResults(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, query) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getSongSearchResults(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, query);
+      await getTrackSearchResults(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, query);
     }
   }
 
@@ -50,9 +50,9 @@ const SearchResults = (props) => {
       {
         searchResults.length > 0
           ? (
-            <SongTable items={searchResults} />
+            <SongList tracks={searchResults} />
           ) : (
-            <div className="p-3">
+            <div className="p-3 text-center">
               No songs, albums or artists matched your search.
             </div>
           )

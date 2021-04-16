@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
-import SongTable from '../SongTable/SongTable';
+import SongList from '../SongList/SongList';
 
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
@@ -31,8 +31,6 @@ const AlbumInfo = (props) => {
     }
   };
 
-  console.log('test');
-
   useEffect(() => {
     (async () => {
       await handleGetAlbumInfo();
@@ -45,10 +43,13 @@ const AlbumInfo = (props) => {
         albumInfo
         && (
           <>
-            <div id="album-header" className="d-flex align-items-center pl-3 pr-3 pt-3">
-              <div>
-                <img src={albumInfo.images[1].url} width="196"/>
-              </div>
+            <div id="album-header" className="p-3">
+              <img
+                alt={`${albumInfo.name} Album Art`}
+                src={albumInfo.images[1].url}
+                title={albumInfo.name}
+                width="196"
+              />
 
               <div className="d-flex flex-column flex-grow-1 ml-3">
                 <div>
@@ -65,13 +66,7 @@ const AlbumInfo = (props) => {
               </div>
             </div>
 
-            <SongTable
-              items={albumInfo.tracks.items}
-              showAlbum={false}
-              showAlbumArt={false}
-              showArtist={false}
-              showTrackNumber={true}
-            />
+            <SongList showArtist={false} tracks={albumInfo.tracks.items} />
           </>
         )
       }

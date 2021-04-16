@@ -1,0 +1,62 @@
+@import "~bootstrap/scss/bootstrap";
+@import "../../variables";
+
+#song-list {
+  .result {
+    a {
+      &:hover {
+        text-decoration: underline;
+      }
+
+      color: black;
+      text-decoration: none;
+    }
+
+    img {
+      @media only screen and (max-width: 320px) {
+        display: none;
+      }
+
+      @include media-breakpoint-up(sm) {
+        display: block;
+      }
+    }
+
+    &:hover {
+      background-color: $background-colour;
+    }
+
+    .result-artist, .result-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .result-artist {
+      font-size: 12px;
+    }
+
+    .result-left {
+      > div {
+        min-width: 0;
+      }
+
+      align-items: center;
+      display: flex;
+      min-width: 0;
+    }
+    
+    align-items: center;
+    border-bottom: 1px solid $line-separator-colour;
+    display: flex;
+    font-size: 15px;
+    height: 64px;
+    justify-content: space-between;
+    padding: 12px 0;
+    transition: background-color .1s ease-in-out;
+    user-select: none;
+  }
+
+  border-top: 1px solid $line-separator-colour;
+}

@@ -52,10 +52,13 @@
     margin-right: 8px;
   }
 
+  align-items: center;
   background-color: rgba(0, 0, 0, 0.8);
   bottom: 0;
   color: #fff;
+  display: flex;
   height: $currently-playing-height;
+  justify-content: center;
   position: fixed;
   user-select: none;
   width: 100%;
