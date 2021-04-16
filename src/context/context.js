@@ -1,9 +1,11 @@
 import React, {createContext, useContext, useReducer} from 'react';
 
 import {
+  CLEAR_HISTORY,
   SET_ALBUM_INFO,
   SET_CURRENTLY_PLAYING,
   SET_DEVICES,
+  SET_HISTORY,
   SET_SEARCH_RESULTS,
   SET_SPOTIFY_TOKENS,
   SET_VENUE,
@@ -17,6 +19,7 @@ export const initialState = {
   albumInfo: undefined,
   currentlyPlaying: undefined,
   devices: [],
+  history: JSON.parse(sessionStorage.getItem('history')) || [],
   searchResults: [],
   tokens: {
     spotify: JSON.parse(sessionStorage.getItem('spotifyTokens')) || {
@@ -36,6 +39,11 @@ export const initialState = {
 
 const appReducer = (state, action) => {
   switch(action.type) {
+    case CLEAR_HISTORY:
+      return {
+        ...state,
+        history: initialState.history
+      };
     case SET_ALBUM_INFO:
       return {
         ...state,
@@ -50,6 +58,11 @@ const appReducer = (state, action) => {
       return {
         ...state,
         devices: action.payload
+      };
+    case SET_HISTORY:
+      return {
+        ...state,
+        history: action.payload
       };
     case SET_SEARCH_RESULTS:
       return {

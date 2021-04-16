@@ -1,3 +1,6 @@
+export const CLEAR_HISTORY = 'CLEAR_HISTORY';
+export const SET_HISTORY = 'SET_HISTORY';
+
 export const SET_ALBUM_INFO = 'SET_ALBUM_INFO';
 export const SET_CURRENTLY_PLAYING = 'SET_CURRENTLY_PLAYING';
 export const SET_DEVICES = 'SET_DEVICES';

@@ -36,7 +36,7 @@ const AlbumInfo = (props) => {
     (async () => {
       await handleGetAlbumInfo();
     })();
-  }, []);
+  }, [albumId]);
 
   return (
     <ScreenContainer id="album-info">

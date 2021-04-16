@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import ProgressBar from '@ramonak/react-progress-bar';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPause, faPlay } from '@fortawesome/free-solid-svg-icons';
 
@@ -73,7 +74,9 @@ const CurrentlyPlaying = () => {
             ? (
               <>
                 <div id="song-info" className="d-flex flex-grow-1 align-items-center">
-                  <img src={currentlyPlaying.item.album.images[0].url} alt={`Album Artwork for ${currentlyPlaying.item.album.name}`} />
+                  <Link to={`/album/${currentlyPlaying.item.album.id}`}>
+                    <img src={currentlyPlaying.item.album.images[0].url} alt={`Album Artwork for ${currentlyPlaying.item.album.name}`} />
+                  </Link>
 
                   {
                     currentlyPlaying.is_playing

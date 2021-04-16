@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
+import BackButton from '../BackButton/BackButton';
 import SearchBar from '../SearchBar/SearchBar';
 import SpotifyAuthorise from '../SpotifyAuthorise/SpotifyAuthorise';
 
@@ -18,6 +19,8 @@ const Header = () => {
     <div id="header">
       <div className="container-fluid d-flex align-items-center height-full justify-content-between">
         <div id="logo">
+          <BackButton />
+
           <Link to="/">
             Wave
           </Link>
