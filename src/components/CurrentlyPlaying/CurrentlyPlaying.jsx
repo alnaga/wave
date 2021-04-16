@@ -86,7 +86,9 @@ const CurrentlyPlaying = () => {
 
                   <div className="ml-3 mr-3">
                     <div id="song-title">
-                      { currentlyPlaying.item.name }
+                      <Link to={`/album/${currentlyPlaying.item.album.id}`}>
+                        { currentlyPlaying.item.name }
+                      </Link>
                     </div>
 
                     <div id="artist-name">
