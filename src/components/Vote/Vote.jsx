@@ -49,7 +49,7 @@ const Vote = () => {
           && (
             <div id="vote">
               <span className="vote-button" onClick={handleVote(VOTE_DOWN)}>
-                <FontAwesomeIcon icon={faThumbsDown} size="md" />
+                <FontAwesomeIcon icon={faThumbsDown} />
               </span>
 
               <span className="vote-count">
@@ -57,7 +57,7 @@ const Vote = () => {
               </span>
 
               <span className="vote-button" onClick={handleVote(VOTE_UP)}>
-                <FontAwesomeIcon icon={faThumbsUp} size="md" />
+                <FontAwesomeIcon icon={faThumbsUp} />
               </span>
             </div>
           )
