@@ -38,6 +38,10 @@ const AlbumList = (props) => {
                       : 'Single'
                   }
                 </div>
+
+                <div className="album-release-year">
+                  { album.release_date.split('-')[0] }
+                </div>
               </Link>
             );
           }

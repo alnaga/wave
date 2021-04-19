@@ -17,8 +17,18 @@
       width: 100%;
     }
 
+    .album-release-year {
+      font-size: 12px;
+    }
+
     .album-title {
+      display: -webkit-box;
       font-weight: 500;
+      max-height: 48px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      -webkit-box-orient: vertical;
+      -webkit-line-clamp: 2;
     }
 
     .album-type {
@@ -34,6 +44,14 @@
     max-width: 100%;
     padding: 8px;
     text-decoration: none;
+  }
+
+  @media only screen and (max-width: 280px) {
+    grid-template-columns: repeat(auto-fill, calc(100% - 24px));
+  }
+
+  @media only print, screen and (max-width: 479px) and (min-width: 281px) {
+    grid-template-columns: repeat(auto-fill, calc(50% - 16px));
   }
 
   display: grid;
