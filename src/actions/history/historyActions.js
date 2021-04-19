@@ -5,6 +5,8 @@ import { CLEAR_HISTORY, SET_HISTORY } from '../../constants';
  * @param dispatch - Application Dispatch
  */
 export const clearHistory = (dispatch) => {
+  sessionStorage.setItem('history', JSON.stringify([]));
+
   dispatch({
     type: CLEAR_HISTORY
   });

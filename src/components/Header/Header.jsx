@@ -7,13 +7,19 @@ import BackButton from '../BackButton/BackButton';
 import SearchBar from '../SearchBar/SearchBar';
 import SpotifyAuthorise from '../SpotifyAuthorise/SpotifyAuthorise';
 
-import { useAppState } from '../../context/context';
+import { clearHistory } from '../../actions/history/historyActions';
+import { useAppDispatch, useAppState } from '../../context/context';
 
 import './Header.scss';
 
 const Header = () => {
+  const dispatch = useAppDispatch();
   const { tokens } = useAppState();
   const { spotify, wave } = tokens;
+
+  const handleGoHome = () => {
+    clearHistory(dispatch);
+  };
 
   return (
     <div id="header">
@@ -21,7 +27,7 @@ const Header = () => {
         <div id="logo">
           <BackButton />
 
-          <Link to="/">
+          <Link to="/" onClick={handleGoHome}>
             Wave
           </Link>
         </div>

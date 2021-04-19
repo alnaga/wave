@@ -50,7 +50,7 @@ const appReducer = (state, action) => {
     case CLEAR_HISTORY:
       return {
         ...state,
-        history: initialState.history
+        history: []
       };
     case SET_ACCOUNT_INFO:
       return {
