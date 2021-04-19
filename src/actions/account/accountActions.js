@@ -22,7 +22,7 @@ const saveTokens = async (dispatch, tokens) => {
 }
 
 export const getAccountDetails = async (dispatch, accessToken, username) => {
-  const response = await axios.get(`http://localhost:8081/account/account?username=${username}`, {
+  const response = await axios.get(`http://localhost:8081/account?username=${username}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }

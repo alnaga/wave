@@ -9,7 +9,7 @@ import { AUTHORISATION } from '../constants';
 
 const router = Router();
 
-router.get('/account', authenticate, async (req, res) => {
+router.get('/', authenticate, async (req, res) => {
   const { username } = req.query;
 
   User.findOne({ username }, async (error, user) => {
