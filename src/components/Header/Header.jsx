@@ -37,9 +37,9 @@ const Header = () => {
               <div className="d-flex flex-grow-1 align-items-center justify-content-end">
                 <SearchBar className="ml-3 mr-3" />
 
-                <div>
+                <Link to="/account">
                   <FontAwesomeIcon icon={faUserCircle} size="lg" />
-                </div>
+                </Link>
               </div>
             )
         }

@@ -1,7 +1,9 @@
 import axios from 'axios';
 
 import {
-  SET_WAVE_TOKENS
+  SET_ACCOUNT_DETAILS,
+  SET_WAVE_TOKENS,
+  TOKENS_EXPIRED
 } from '../../constants';
 
 /**
@@ -19,11 +21,32 @@ const saveTokens = async (dispatch, tokens) => {
   });
 }
 
+export const getAccountDetails = async (dispatch, accessToken, username) => {
+  const response = await axios.get(`http://localhost:8081/account/account?username=${username}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response && response.status === 200) {
+    dispatch({
+      type: SET_ACCOUNT_DETAILS,
+      payload: response.data
+    });
+
+    return 1
+  } else if (response && response.status === 401) {
+    return TOKENS_EXPIRED;
+  } else {
+    return 0;
+  }
+};
+
 /**
  * Attempts to log the user in with the credentials provided.
  * Gets an access and refresh token from the OAuth server.
  * @param dispatch {Function} - Application Dispatch
- * @param userData {Function} - User Credentials
+ * @param userData {Object} - User Credentials
  * @returns 1 if successful, 0 if failed
  */
 export const login = async (dispatch, userData) => {

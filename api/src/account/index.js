@@ -2,10 +2,67 @@ import { Router } from 'express';
 import axios from 'axios';
 import bcrypt from 'bcrypt';
 import { User } from '../models/user';
+import { Venue } from '../models/venue';
 
+import { authenticate } from '../util';
 import { AUTHORISATION } from '../constants';
 
 const router = Router();
+
+router.get('/account', authenticate, async (req, res) => {
+  const { username } = req.query;
+
+  User.findOne({ username }, async (error, user) => {
+    if (error) {
+      res.status(500).send({
+        message: 'Internal server error.'
+      });
+    } else if (user) {
+      let venues = [];
+
+      // Fetch the foreign key data for each item in the user's venues array.
+      for (let venueId of user.venues) {
+        await Venue.findOne({
+          _id: venueId
+        }, async (error, venue) => {
+          if (error) {
+            res.status(500).send({
+              message: 'Internal server error occurred while fetching account data.'
+            });
+          } else if (!venue) {
+            // The venue no longer exists and so it must be deleted from the User object.
+            const removedIndex = user.venues.findIndex((removed) => removed === venueId);
+
+            const newVenues = user.venues;
+            newVenues.splice(removedIndex, 1);
+
+            await User.updateOne({ username }, {
+              venues: newVenues
+            });
+          } else {
+            venues.push({
+              _id: venue._id,
+              address: venue.address,
+              name: venue.name
+            });
+          }
+        })
+      }
+
+      // Remove the password field from the user object that is returned to the user to preserve security.
+      res.status(200).send({
+        firstName: user.firstName,
+        lastName: user.lastName,
+        username: user.username,
+        venues
+      });
+    } else {
+      res.status(400).send({
+        message: 'Invalid user.'
+      });
+    }
+  });
+});
 
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
@@ -89,11 +146,21 @@ router.post('/refresh', async (req, res) => {
 });
 
 router.post('/register', async (req, res) => {
-  const { username, password } = req.body;
+  const {
+    firstName,
+    lastName,
+    username,
+    password
+  } = req.body;
 
-  if (username.length === 0 || password.length === 0) {
+  if (
+    firstName.length === 0
+    || lastName.length === 0
+    ||username.length === 0
+    || password.length === 0
+  ) {
     res.status(400).send({
-      message: 'Missing username or password.'
+      message: 'Missing account information.'
     });
   }
 
@@ -104,7 +171,7 @@ router.post('/register', async (req, res) => {
   User.findOne({ username }, (error, user) => {
     if (error) {
       res.status(500).send({
-        message: 'Internal server error.'
+        message: 'Internal server error during account registration.'
       });
     } else {
       if (user) {
@@ -113,8 +180,11 @@ router.post('/register', async (req, res) => {
         });
       } else {
         const newUser = new User({
+          firstName,
+          lastName,
           username,
-          password: passwordHash
+          password: passwordHash,
+          venues: []
         });
 
         newUser.save((error, user) => {

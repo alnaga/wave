@@ -12,6 +12,7 @@ import {
 } from './constants';
 import * as Models from './oauth2';
 import account from './account/index';
+import venue from './venue/index';
 import spotify from './spotify/index';
 import { getToken } from './util';
 
@@ -47,6 +48,7 @@ app.oauth2 = new OAuth2Server({
 });
 
 app.use('/account', account);
+app.use('/venue', venue);
 app.use('/spotify', spotify);
 
 app.listen(port, () => {

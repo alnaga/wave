@@ -1,4 +1,4 @@
-import {Buffer} from 'buffer';
+import { Buffer } from 'buffer';
 
 export const ACCESS_TOKEN_LIFETIME = 60 * 60;
 export const REFRESH_TOKEN_LIFETIME = 60 * 60 * 24 * 14;

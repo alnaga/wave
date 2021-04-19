@@ -30,16 +30,16 @@ const Vote = () => {
   };
 
   useEffect(() => {
-    (async () => {
-      if (
-        tokensRef.current.spotify.accessToken
-        && !venue
-        && await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
-      ) {
-        await refreshExpiredTokens(dispatch, tokensRef.current);
-        await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
-      }
-    })();
+    // (async () => {
+    //   if (
+    //     tokensRef.current.spotify.accessToken
+    //     && !venue
+    //     && await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
+    //   ) {
+    //     await refreshExpiredTokens(dispatch, tokensRef.current);
+    //     await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
+    //   }
+    // })();
   }, []);
 
   return (

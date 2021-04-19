@@ -13,8 +13,6 @@ const App = (props) => {
   const { history, tokens } = useAppState();
   const { wave } = tokens;
 
-  // console.log(useAppState());
-
   useEffect(() => {
     if (props.history.location.pathname !== history[history.length - 1]) {
       pushToHistory(dispatch, history, props.history.location.pathname);
