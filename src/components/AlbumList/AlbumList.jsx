@@ -17,11 +17,13 @@ const AlbumList = (props) => {
                 key={album.id}
                 to={`/album/${album.id}`}
               >
-                <img
-                  alt={`${album.name} Album Art`}
-                  src={album.images[1].url}
-                  title={album.name}
-                />
+                <div className="album-art">
+                  <img
+                    alt={`${album.name} Album Art`}
+                    src={album.images[1].url}
+                    title={album.name}
+                  />
+                </div>
 
                 <div className="album-title">
                   { album.name }

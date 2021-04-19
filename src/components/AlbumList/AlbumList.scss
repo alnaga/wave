@@ -1,9 +1,20 @@
 #album-list {
   .album {
     &:hover {
-      .album-title {
-        text-decoration: underline;
+      img {
+        background-color: black;
+        opacity: 0.75;
       }
+    }
+
+    .album-art {
+      img {
+        height: 100%;
+        width: 100%;
+      }
+      background-color: black;
+
+      width: 100%;
     }
 
     .album-title {

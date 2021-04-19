@@ -97,7 +97,7 @@ router.get('/artist', authenticate, async (req, res) => {
         }).catch((error) => error.response);
 
         if (artistAlbumsResponse) {
-          items.concat(artistAlbumsResponse.data.items);
+          items.push(...artistAlbumsResponse.data.items);
         }
       }
 
