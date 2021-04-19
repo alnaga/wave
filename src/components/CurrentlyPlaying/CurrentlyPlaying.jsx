@@ -92,7 +92,9 @@ const CurrentlyPlaying = () => {
                     </div>
 
                     <div id="artist-name">
-                      { currentlyPlaying.item.artists[0].name }
+                      <Link to={`/artist/${currentlyPlaying.item.artists[0].id}`}>
+                        { currentlyPlaying.item.artists[0].name }
+                      </Link>
                     </div>
                   </div>
                 </div>

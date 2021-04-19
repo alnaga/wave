@@ -1,0 +1,25 @@
+#artist-info {
+  #artist-header {
+    img {
+      max-height: 480px;
+      object-fit: cover;
+      width: 100%;
+    }
+
+    #artist-name {
+      background-image: linear-gradient(rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.85));
+      bottom: 0;
+      color: white;
+      font-weight: 600;
+      position: absolute;
+      //text-align: center;
+      width: 100%;
+    }
+
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+  }
+}

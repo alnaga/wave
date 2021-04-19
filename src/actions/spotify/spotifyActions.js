@@ -2,6 +2,7 @@ import axios from 'axios';
 
 import {
   SET_ALBUM_INFO,
+  SET_ARTIST_INFO,
   SET_CURRENTLY_PLAYING,
   SET_DEVICES,
   SET_SEARCH_RESULTS,
@@ -162,6 +163,29 @@ export const getAlbumInfo = async (dispatch, accessToken, spotifyAccessToken, al
   } else if (response && response.status === 401) {
     return TOKENS_EXPIRED;
   } else return 0;
+};
+
+export const getArtistInfo = async (dispatch, accessToken, spotifyAccessToken, artistId) => {
+  const response = await axios.get(`http://localhost:8081/spotify/artist?accessToken=${spotifyAccessToken}&artistId=${artistId}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      dispatch({
+        type: SET_ARTIST_INFO,
+        payload: response.data
+      });
+
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    }
+  } else {
+    return 0;
+  }
 };
 
 /**

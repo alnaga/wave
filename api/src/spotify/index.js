@@ -64,7 +64,58 @@ router.get('/album', authenticate, async (req, res) => {
     }
   } else {
     res.status(500).send({
-      message: 'Internal server error.'
+      message: 'Internal server error occurred while fetching album information.'
+    });
+  }
+});
+
+// Fetches information about an artist from Spotify's API and forwards the result of the request to the user.
+router.get('/artist', authenticate, async (req, res) => {
+  const { accessToken, artistId } = req.query;
+
+  const artistResponse = await axios.get(`https://api.spotify.com/v1/artists/${artistId}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (artistResponse) {
+    let artistAlbumsResponse = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums?market=${resultMarket}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    }).catch((error) => error.response);
+
+    if (artistAlbumsResponse) {
+      let { items } = artistAlbumsResponse.data;
+
+      while (artistAlbumsResponse.data.next !== null) {
+        artistAlbumsResponse = await axios.get(artistAlbumsResponse.data.next, {
+          headers: {
+            'Authorization': `Bearer ${accessToken}`
+          }
+        }).catch((error) => error.response);
+
+        if (artistAlbumsResponse) {
+          items.concat(artistAlbumsResponse.data.items);
+        }
+      }
+
+      res.status(artistResponse.status).send({
+        albums: {
+          ...artistAlbumsResponse.data,
+          items
+        },
+        ...artistResponse.data
+      });
+    } else {
+      res.status(500).send({
+        message: 'Internal server error occurred while fetching artist albums.'
+      });
+    }
+  } else {
+    res.status(500).send({
+      message: 'Internal server error occurred while fetching artist information.'
     });
   }
 });

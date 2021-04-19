@@ -100,4 +100,8 @@ router.post('/', authenticate, async (req, res) => {
 
 });
 
+router.post('/check-in', authenticate, async (req, res) => {
+
+});
+
 module.exports = router;

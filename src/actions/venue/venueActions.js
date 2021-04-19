@@ -1,6 +1,10 @@
 import axios from 'axios';
 import { SET_VENUE, TOKENS_EXPIRED } from '../../constants';
 
+export const checkIn = async (dispatch, accessToken, venueId) => {
+
+};
+
 export const getVenueData = async (dispatch, accessToken, venueId) => {
   const response = await axios.get(`http://localhost:8081/venue?id=${venueId}`, {
     headers: {

@@ -2,8 +2,9 @@ import React, {createContext, useContext, useReducer} from 'react';
 
 import {
   CLEAR_HISTORY,
-  SET_ACCOUNT_DETAILS,
+  SET_ACCOUNT_INFO,
   SET_ALBUM_INFO,
+  SET_ARTIST_INFO,
   SET_CURRENTLY_PLAYING,
   SET_DEVICES,
   SET_HISTORY,
@@ -17,12 +18,13 @@ const DispatchContext = createContext();
 const StateContext = createContext();
 
 export const initialState = {
-  accountDetails: {
+  accountInfo: {
     firstName: undefined,
     lastName: undefined,
     username: undefined
   },
   albumInfo: undefined,
+  artistInfo: undefined,
   currentlyPlaying: undefined,
   devices: [],
   history: JSON.parse(sessionStorage.getItem('history')) || [],
@@ -50,15 +52,20 @@ const appReducer = (state, action) => {
         ...state,
         history: initialState.history
       };
-    case SET_ACCOUNT_DETAILS:
+    case SET_ACCOUNT_INFO:
       return {
         ...state,
-        accountDetails: action.payload
+        accountInfo: action.payload
       };
     case SET_ALBUM_INFO:
       return {
         ...state,
         albumInfo: action.payload
+      };
+    case SET_ARTIST_INFO:
+      return {
+        ...state,
+        artistInfo: action.payload
       };
     case SET_CURRENTLY_PLAYING:
       return {

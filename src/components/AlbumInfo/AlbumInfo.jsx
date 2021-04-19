@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { withRouter } from 'react-router-dom';
+import { Link, withRouter } from 'react-router-dom';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
 import SongList from '../SongList/SongList';
@@ -57,7 +57,9 @@ const AlbumInfo = (props) => {
                 </div>
 
                 <div id="album-artist">
-                  { albumInfo.artists[0].name }
+                  <Link to={`/artist/${albumInfo.artists[0].id}`}>
+                    { albumInfo.artists[0].name }
+                  </Link>
                 </div>
 
                 <div id="album-release-date">

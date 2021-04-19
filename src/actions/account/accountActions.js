@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 import {
-  SET_ACCOUNT_DETAILS,
+  SET_ACCOUNT_INFO,
   SET_WAVE_TOKENS,
   TOKENS_EXPIRED
 } from '../../constants';
@@ -21,7 +21,7 @@ const saveTokens = async (dispatch, tokens) => {
   });
 }
 
-export const getAccountDetails = async (dispatch, accessToken, username) => {
+export const getAccountInfo = async (dispatch, accessToken, username) => {
   const response = await axios.get(`http://localhost:8081/account?username=${username}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
@@ -30,7 +30,7 @@ export const getAccountDetails = async (dispatch, accessToken, username) => {
 
   if (response && response.status === 200) {
     dispatch({
-      type: SET_ACCOUNT_DETAILS,
+      type: SET_ACCOUNT_INFO,
       payload: response.data
     });
 

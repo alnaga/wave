@@ -54,7 +54,9 @@ const SongList = (props) => {
                     showArtist
                       && (
                         <div className="result-artist">
-                          { track.artists[0].name }
+                          <Link to={`/artist/${track.artists[0].id}`}>
+                            { track.artists[0].name }
+                          </Link>
                         </div>
                       )
                   }
