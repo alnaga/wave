@@ -89,6 +89,7 @@ router.get('/artist', authenticate, async (req, res) => {
     if (artistAlbumsResponse) {
       let { items } = artistAlbumsResponse.data;
 
+      // If there are multiple pages of albums, keep fetching and adding them to the items list until there are no more.
       while (artistAlbumsResponse.data.next !== null) {
         artistAlbumsResponse = await axios.get(artistAlbumsResponse.data.next, {
           headers: {
