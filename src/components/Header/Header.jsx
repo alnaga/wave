@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { faCog, faHome, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
 import BackButton from '../BackButton/BackButton';
 import SearchBar from '../SearchBar/SearchBar';
@@ -28,14 +28,9 @@ const Header = () => {
           <BackButton />
 
           <Link to="/" onClick={handleGoHome}>
-            Wave
+            <FontAwesomeIcon icon={faHome} size="lg" />
           </Link>
         </div>
-
-        {
-          !spotify.accessToken
-            && <SpotifyAuthorise />
-        }
 
         {
           wave.accessToken
@@ -43,8 +38,17 @@ const Header = () => {
               <div className="d-flex flex-grow-1 align-items-center justify-content-end">
                 <SearchBar className="ml-3 mr-3" />
 
-                <Link to="/account">
+                {
+                  !spotify.accessToken
+                  && <SpotifyAuthorise className="mr-3" />
+                }
+
+                <Link to="/account" className="mr-3">
                   <FontAwesomeIcon icon={faUserCircle} size="lg" />
+                </Link>
+
+                <Link to="/settings">
+                  <FontAwesomeIcon icon={faCog} size="lg" />
                 </Link>
               </div>
             )

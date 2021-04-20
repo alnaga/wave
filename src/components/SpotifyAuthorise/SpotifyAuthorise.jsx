@@ -5,7 +5,7 @@ import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import { getSpotifyAuthTokens } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch } from '../../context/context';
 
-const SpotifyAuthorise = () => {
+const SpotifyAuthorise = (props) => {
   const dispatch = useAppDispatch();
 
   const handleAuthorise = (event) => {
@@ -26,7 +26,7 @@ const SpotifyAuthorise = () => {
   }, []);
 
   return (
-    <div>
+    <div {...props}>
       <span
         className="spotify"
         onClick={handleAuthorise}

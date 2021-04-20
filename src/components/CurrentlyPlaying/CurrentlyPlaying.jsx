@@ -14,6 +14,7 @@ import { getCurrentlyPlaying } from '../../actions/spotify/spotifyActions';
 
 import './CurrentlyPlaying.scss';
 
+// TODO: Hide bar when there is no song playing.
 const CurrentlyPlaying = () => {
   const dispatch = useAppDispatch();
   const { currentlyPlaying, tokens } = useAppState();

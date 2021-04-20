@@ -1,5 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
 
@@ -7,6 +9,8 @@ import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getAccountInfo, logout } from '../../actions/account/accountActions';
+
+import './AccountInfo.scss';
 
 const AccountInfo = () => {
   const dispatch = useAppDispatch();
@@ -40,51 +44,89 @@ const AccountInfo = () => {
 
   return (
     <ScreenContainer>
-      <div className="p-3 pb-0">
-        Account Overview
-      </div>
+      <div id="account-info">
+        <div id="account-info-header" className="p-3">
+          <div>
+            Account Overview
+          </div>
 
-      <div className="p-3">
-        <div>
-          <label> Name </label>
-          <div> { accountInfo.firstName + ' ' + accountInfo.lastName } </div>
-        </div>
-
-        <div>
-          <label> Username </label>
-          <div> { accountInfo.username } </div>
+          <div id="log-out">
+            <Link
+              to="/"
+              title="Log out"
+              onClick={handleLogout}
+            >
+              Log out
+            </Link>
+          </div>
         </div>
 
         {
-          (accountInfo.venues && accountInfo.venues.length > 0)
+          accountInfo.username
             && (
-              <>
-                <div>
-                  Owned Venues
+              <div id="account-info-body" className="p-3">
+                <div className="mb-3">
+                  <label> Name </label>
+                  <div> { accountInfo.firstName + ' ' + accountInfo.lastName } </div>
                 </div>
 
-                {
-                  accountInfo.venues.map((ownedVenue) => {
-                    return (
-                      <div key={ownedVenue._id}>
-                        <Link to={`/venue/${ownedVenue._id}`}>
-                          { ownedVenue.name }
-                        </Link>
-                      </div>
-                    );
-                  })
-                }
-              </>
+                <div className="mb-3">
+                  <label> Username </label>
+                  <div> { accountInfo.username } </div>
+                </div>
+
+                <div className="mb-3">
+                  <div id="account-venues-header">
+                    <label className="mb-1"> Your Venues </label>
+
+                    <Link to="/register-venue" title="Register a new venue">
+                      Register a new venue
+                    </Link>
+                  </div>
+
+                  {
+                    (accountInfo.venues && accountInfo.venues.length > 0)
+                      ? (
+                        <div id="account-venues">
+                          {
+                            accountInfo.venues.map((ownedVenue) => {
+                              return (
+                                <Link
+                                  to={`/venue/${ownedVenue._id}`}
+                                  className="account-venue"
+                                  key={ownedVenue._id}
+                                  title={`Go to ${ownedVenue.name}`}
+                                >
+                                  <div className="venue-name">
+                                    { ownedVenue.name }
+                                  </div>
+
+                                  <FontAwesomeIcon icon={faArrowCircleRight} size="lg" />
+                                </Link>
+                              );
+                            })
+                          }
+                        </div>
+                      ) : (
+                        <div id="no-venues">
+                          You currently have no registered venues.
+                        </div>
+                      )
+                  }
+                </div>
+
+                <div id="account-links">
+                  <Link to="/settings" className="mb-2">
+                    App Settings
+                  </Link>
+
+                  <Link to="/delete">
+                    Delete account
+                  </Link>
+                </div>
+              </div>
             )
         }
-
-        <Link to="/register-venue">
-          Register a Venue
-        </Link>
-
-        <div onClick={handleLogout}>
-          Log Out
-        </div>
       </div>
     </ScreenContainer>
   );
