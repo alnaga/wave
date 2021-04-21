@@ -3,11 +3,11 @@ import axios from 'axios';
 import {
   SET_ALBUM_INFO,
   SET_ARTIST_INFO,
-  SET_CURRENTLY_PLAYING,
+  SET_CURRENT_SONG,
   SET_DEVICES,
   SET_SEARCH_RESULTS,
   SET_SPOTIFY_TOKENS,
-  SET_VENUE,
+  SET_VENUE_INFO,
   TOKENS_EXPIRED
 } from '../../constants';
 
@@ -238,7 +238,7 @@ export const getCurrentlyPlaying = async (dispatch, accessToken, spotifyAccessTo
 
   if (response && response.status === 200) {
     dispatch({
-      type: SET_CURRENTLY_PLAYING,
+      type: SET_CURRENT_SONG,
       payload: response.data
     });
 
@@ -286,7 +286,7 @@ export const voteTrack = async (dispatch, accessToken, venue, vote) => {
 
   if (response && response.status === 200) {
     dispatch({
-      type: SET_VENUE,
+      type: SET_VENUE_INFO,
       payload: response.data.venue
     });
 
@@ -311,7 +311,7 @@ export const getVenue = async (dispatch, accessToken, spotifyAccessToken) => {
 
   if (response && response.status === 200) {
     dispatch({
-      type: SET_VENUE,
+      type: SET_VENUE_INFO,
       payload: response.data
     });
 

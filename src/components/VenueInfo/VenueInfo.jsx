@@ -13,7 +13,7 @@ import './VenueInfo.scss';
 
 const VenueInfo = (props) => {
   const dispatch = useAppDispatch();
-  const { tokens, venue } = useAppState();
+  const { tokens, venueInfo } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
@@ -21,8 +21,8 @@ const VenueInfo = (props) => {
   const displayAddress = () => {
     let output = [];
 
-    for (let field in venue.address) {
-      output.push(venue.address[field]);
+    for (let field in venueInfo.address) {
+      output.push(venueInfo.address[field]);
     }
 
     return output;
@@ -44,10 +44,10 @@ const VenueInfo = (props) => {
     <ScreenContainer>
       <div id="venue-info">
         {
-          venue
+          venueInfo
             && (
               <>
-                <ScreenHeader title={venue.name} />
+                <ScreenHeader title={venueInfo.name} />
 
                 <div className="p-3">
                   <div className="mb-3">
@@ -65,10 +65,10 @@ const VenueInfo = (props) => {
                   </div>
 
                   {
-                    venue.googleMapsLink
+                    venueInfo.googleMapsLink
                     && (
                       <div>
-                        <a href={venue.googleMapsLink} target="_blank"> Google Maps Link </a>
+                        <a href={venueInfo.googleMapsLink} target="_blank"> Google Maps Link </a>
                       </div>
                     )
                   }

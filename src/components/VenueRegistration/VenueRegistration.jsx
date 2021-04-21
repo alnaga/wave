@@ -13,13 +13,13 @@ import './VenueRegistration.scss';
 
 const VenueRegistration = (props) => {
   const dispatch = useAppDispatch();
-  const { tokens, venue } = useAppState();
+  const { tokens, venueInfo } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
   const venueRef = useRef(null);
-  venueRef.current = venue;
+  venueRef.current = venueInfo;
 
   const [ data, setData ] = useState({
     addressLine1: '',

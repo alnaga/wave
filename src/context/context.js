@@ -5,12 +5,13 @@ import {
   SET_ACCOUNT_INFO,
   SET_ALBUM_INFO,
   SET_ARTIST_INFO,
-  SET_CURRENTLY_PLAYING,
+  SET_CURRENT_SONG,
+  SET_CURRENT_VENUE,
   SET_DEVICES,
   SET_HISTORY,
   SET_SEARCH_RESULTS,
   SET_SPOTIFY_TOKENS,
-  SET_VENUE,
+  SET_VENUE_INFO,
   SET_WAVE_TOKENS
 } from '../constants';
 
@@ -25,7 +26,8 @@ export const initialState = {
   },
   albumInfo: undefined,
   artistInfo: undefined,
-  currentlyPlaying: undefined,
+  currentSong: undefined,
+  currentVenue: undefined,
   devices: [],
   history: JSON.parse(sessionStorage.getItem('history')) || [],
   searchResults: [],
@@ -42,7 +44,7 @@ export const initialState = {
       refreshTokenExpiresAt: undefined
     }
   },
-  venue: undefined
+  venueInfo: undefined
 };
 
 const appReducer = (state, action) => {
@@ -67,10 +69,15 @@ const appReducer = (state, action) => {
         ...state,
         artistInfo: action.payload
       };
-    case SET_CURRENTLY_PLAYING:
+    case SET_CURRENT_SONG:
       return {
         ...state,
-        currentlyPlaying: action.payload
+        currentSong: action.payload
+      };
+    case SET_CURRENT_VENUE:
+      return {
+        ...state,
+        currentVenue: action.payload
       };
     case SET_DEVICES:
       return {
@@ -95,10 +102,10 @@ const appReducer = (state, action) => {
           wave: state.tokens.wave
         }
       };
-    case SET_VENUE:
+    case SET_VENUE_INFO:
       return {
         ...state,
-        venue: action.payload
+        venueInfo: action.payload
       };
     case SET_WAVE_TOKENS:
       return {

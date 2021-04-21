@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { SET_VENUE, TOKENS_EXPIRED } from '../../constants';
+import { SET_VENUE_INFO, TOKENS_EXPIRED } from '../../constants';
 
 export const checkIn = async (dispatch, accessToken, venueId) => {
 
@@ -14,7 +14,7 @@ export const getVenueData = async (dispatch, accessToken, venueId) => {
 
   if (response && response.status === 200) {
     dispatch({
-      type: SET_VENUE,
+      type: SET_VENUE_INFO,
       payload: response.data.venue
     });
     return 1;
@@ -38,7 +38,7 @@ export const registerVenue = async (dispatch, accessToken, venueData, ownerUsern
 
   if (response && response.status === 200) {
     dispatch({
-      type: SET_VENUE,
+      type: SET_VENUE_INFO,
       payload: response.data.venue
     });
 

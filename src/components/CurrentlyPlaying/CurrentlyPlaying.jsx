@@ -17,7 +17,7 @@ import './CurrentlyPlaying.scss';
 // TODO: Hide bar when there is no song playing.
 const CurrentlyPlaying = () => {
   const dispatch = useAppDispatch();
-  const { currentlyPlaying, tokens } = useAppState();
+  const { currentSong, tokens } = useAppState();
   const [ songProgress, setSongProgress ] = useState(0);
 
   const tokensRef = useRef(null);
@@ -35,11 +35,11 @@ const CurrentlyPlaying = () => {
   }
 
   useEffect(() => {
-    if (currentlyPlaying) {
-      const { item, progress_ms } = currentlyPlaying;
+    if (currentSong) {
+      const { item, progress_ms } = currentSong;
       setSongProgress((progress_ms / item.duration_ms) * 100);
     }
-  }, [ currentlyPlaying ]);
+  }, [ currentSong ]);
   
   useEffect(() => {
     (async () => {
@@ -71,30 +71,30 @@ const CurrentlyPlaying = () => {
 
       <div id="currently-playing">
         {
-          (currentlyPlaying && currentlyPlaying.item)
+          (currentSong && currentSong.item)
             ? (
               <>
                 <div id="song-info" className="d-flex flex-grow-1 align-items-center">
-                  <Link to={`/album/${currentlyPlaying.item.album.id}`}>
-                    <img src={currentlyPlaying.item.album.images[0].url} alt={`Album Artwork for ${currentlyPlaying.item.album.name}`} />
+                  <Link to={`/album/${currentSong.item.album.id}`}>
+                    <img src={currentSong.item.album.images[0].url} alt={`Album Artwork for ${currentSong.item.album.name}`} />
                   </Link>
 
                   {
-                    currentlyPlaying.is_playing
+                    currentSong.is_playing
                       ? <FontAwesomeIcon id="mobile-play-icon" className="ml-3" icon={faPlay} />
                       : <FontAwesomeIcon id="mobile-play-icon" className="ml-3" icon={faPause} />
                   }
 
                   <div className="ml-3 mr-3">
                     <div id="song-title">
-                      <Link to={`/album/${currentlyPlaying.item.album.id}`}>
-                        { currentlyPlaying.item.name }
+                      <Link to={`/album/${currentSong.item.album.id}`}>
+                        { currentSong.item.name }
                       </Link>
                     </div>
 
                     <div id="artist-name">
-                      <Link to={`/artist/${currentlyPlaying.item.artists[0].id}`}>
-                        { currentlyPlaying.item.artists[0].name }
+                      <Link to={`/artist/${currentSong.item.artists[0].id}`}>
+                        { currentSong.item.artists[0].name }
                       </Link>
                     </div>
                   </div>

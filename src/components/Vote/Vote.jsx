@@ -11,14 +11,14 @@ import './Vote.scss';
 
 const Vote = () => {
   const dispatch = useAppDispatch();
-  const { tokens, venue } = useAppState();
+  const { tokens, venueInfo } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
   const handleVote = (vote) => async () => {
     if (tokensRef.current.spotify.accessToken) {
-      const { skipped } = await voteTrack(dispatch, tokensRef.current.spotify.accessToken, venue.uri, vote);
+      const { skipped } = await voteTrack(dispatch, tokensRef.current.spotify.accessToken, venueInfo.uri, vote);
 
       if (skipped) {
         // Spotify has a short delay before skipping, so to avoid getting the same song as pre-skip, we wait.
@@ -33,7 +33,7 @@ const Vote = () => {
     // (async () => {
     //   if (
     //     tokensRef.current.spotify.accessToken
-    //     && !venue
+    //     && !venueInfo
     //     && await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
     //   ) {
     //     await refreshExpiredTokens(dispatch, tokensRef.current);
@@ -45,7 +45,7 @@ const Vote = () => {
   return (
     <>
       {
-        venue
+        venueInfo
           && (
             <div id="vote">
               <span className="vote-button" onClick={handleVote(VOTE_DOWN)}>
@@ -53,7 +53,7 @@ const Vote = () => {
               </span>
 
               <span className="vote-count">
-                { venue.votes }
+                { venueInfo.votes }
               </span>
 
               <span className="vote-button" onClick={handleVote(VOTE_UP)}>
