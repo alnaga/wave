@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
+import ScreenHeader from '../ScreenHeader/ScreenHeader';
 
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
@@ -45,11 +46,7 @@ const AccountInfo = () => {
   return (
     <ScreenContainer>
       <div id="account-info">
-        <div id="account-info-header" className="p-3 pb-2">
-          <div className="header">
-            Account Overview
-          </div>
-        </div>
+        <ScreenHeader title="Account Overview" />
 
         {
           accountInfo.username

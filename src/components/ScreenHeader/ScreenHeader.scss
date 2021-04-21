@@ -1,0 +1,11 @@
+@import '../../variables';
+
+.screen-header {
+  .title {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 32px;
+    font-weight: 600;
+  }
+
+  border-bottom: 1px solid $line-separator-colour;
+}

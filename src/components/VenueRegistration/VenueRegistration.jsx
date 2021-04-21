@@ -2,6 +2,8 @@ import React, { useRef, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
+import ScreenHeader from '../ScreenHeader/ScreenHeader';
+
 import { TOKENS_EXPIRED } from '../../constants';
 import { refreshExpiredTokens } from '../../util';
 import { useAppDispatch, useAppState } from '../../context/context';
@@ -20,13 +22,14 @@ const VenueRegistration = (props) => {
   venueRef.current = venue;
 
   const [ data, setData ] = useState({
-    addressLine1: '52 Royal Park Avenue',
+    addressLine1: '',
     addressLine2: '',
     city: '',
+    county: '',
     spotifyConsent: true,
     googleMapsLink: '',
-    postcode: 'LS6 1EY',
-    name: 'Alexander Naggar'
+    postcode: '',
+    name: ''
   });
 
   const [ error, setError ] = useState('');
@@ -61,6 +64,8 @@ const VenueRegistration = (props) => {
       setError('Please enter the venue\'s postcode.');
     } else if (!data.city) {
       setError('Please enter the city your venue is in.');
+    } else if (!data.county) {
+      setError('Please enter the county your venue is in.')
     } else if (!data.spotifyConsent) {
       setError('Consent to use your Spotify account is required to register your venue.');
     } else {
@@ -84,19 +89,14 @@ const VenueRegistration = (props) => {
   return (
     <ScreenContainer>
       <form id="venue-registration">
-        <div id="venue-registration-header" className="p-3 pb-2">
-          <div className="header">
-            Venue Registration
-          </div>
-
-          <div>
-            Please enter the details for your venue below:
-          </div>
-        </div>
+        <ScreenHeader
+          title="Venue Registration"
+          subtitle="Please enter the details for your venue below:"
+        />
 
         <div id="venue-registration-body" className="p-3">
           <div className="mb-3 form-section">
-            <label htmlFor="venue-name" className="mb-1"> Venue Name </label>
+            <label htmlFor="venue-name" className="mb-1"> Venue Name * </label>
             <input
               name="venue-name"
               onChange={handleFormChange('name')}
@@ -107,9 +107,9 @@ const VenueRegistration = (props) => {
           </div>
 
           <div className="mb-3 form-section">
-            <label htmlFor="address-line-1" className="mb-1"> Address </label>
+            <label htmlFor="address-line-1" className="mb-1"> Address * </label>
             <input
-              className="mb-1"
+              className="mb-2"
               name="address-line-1"
               onChange={handleFormChange('addressLine1')}
               placeholder="Address Line 1"
@@ -117,34 +117,38 @@ const VenueRegistration = (props) => {
               value={data.addressLine1}
             />
             <input
+              className="mb-2"
               name="address-line-2"
               onChange={handleFormChange('addressLine2')}
               placeholder="Address Line 2"
               value={data.addressLine2}
             />
 
-            <div className="d-flex justify-content-between mt-1 flex-wrap">
-              <div className="mb-1 form-section flex-grow-1 flex-shrink-1">
-                <input
-                  className="mr-1"
-                  name="postcode"
-                  onChange={handleFormChange('postcode')}
-                  placeholder="Postcode"
-                  required
-                  value={data.postcode}
-                />
-              </div>
+            <input
+              className="mb-2"
+              name="city"
+              onChange={handleFormChange('city')}
+              placeholder="City"
+              required
+              value={data.city}
+            />
 
-              <div className="form-section flex-grow-1 flex-shrink-1">
-                <input
-                  name="city"
-                  onChange={handleFormChange('city')}
-                  placeholder="City"
-                  required
-                  value={data.city}
-                />
-              </div>
-            </div>
+            <input
+              className="mb-2"
+              name="county"
+              onChange={handleFormChange('county')}
+              placeholder="County"
+              required
+              value={data.county}
+            />
+
+            <input
+              name="postcode"
+              onChange={handleFormChange('postcode')}
+              placeholder="Postcode"
+              required
+              value={data.postcode}
+            />
           </div>
 
           <div className="mb-3 form-section">
@@ -160,9 +164,9 @@ const VenueRegistration = (props) => {
 
           <div id="consent" className="form-section">
             <div>
-              Authorisation with a Spotify account is required in order for Wave to function correctly.
-              By ticking this box you are giving us consent to use the Spotify account you have
-              currently logged in with.
+              Authorisation with a Spotify account is required in order for Wave to control playback and song queuing.
+              By ticking this box you are giving consent for Wave to use the Spotify account you have
+              currently connected.
             </div>
 
             <input

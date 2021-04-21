@@ -1,11 +1,15 @@
 import React, { useEffect, useRef } from 'react';
 import { withRouter } from 'react-router-dom';
 
+import ScreenContainer from '../ScreenContainer/ScreenContainer';
+import ScreenHeader from '../ScreenHeader/ScreenHeader';
+
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getVenueData } from '../../actions/venue/venueActions';
-import ScreenContainer from '../ScreenContainer/ScreenContainer';
+
+import './VenueInfo.scss';
 
 const VenueInfo = (props) => {
   const dispatch = useAppDispatch();
@@ -38,42 +42,40 @@ const VenueInfo = (props) => {
 
   return (
     <ScreenContainer>
-      <div className="p-3">
-        Venue Information
-
-        <div>
-          {
-            venue
+      <div id="venue-info">
+        {
+          venue
             && (
-              <div>
-                <div>
-                  { venue.name }
-                </div>
+              <>
+                <ScreenHeader title={venue.name} />
 
-                <div>
+                <div className="p-3">
+                  <div className="mb-3">
+                    <label> Address </label>
+
+                    {
+                      displayAddress().map((line, index) => {
+                        return (
+                          <div key={index}>
+                            { line }
+                          </div>
+                        );
+                      })
+                    }
+                  </div>
+
                   {
-                    displayAddress().map((line, index) => {
-                      return (
-                        <div key={index}>
-                          { line }
-                        </div>
-                      );
-                    })
-                  }
-                </div>
-
-                {
-                  venue.googleMapsLink
+                    venue.googleMapsLink
                     && (
                       <div>
-                        { venue.googleMapsLink }
+                        <a href={venue.googleMapsLink} target="_blank"> Google Maps Link </a>
                       </div>
                     )
-                }
-              </div>
+                  }
+                </div>
+              </>
             )
-          }
-        </div>
+        }
       </div>
     </ScreenContainer>
   );

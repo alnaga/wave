@@ -37,6 +37,7 @@ router.post('/', authenticate, async (req, res) => {
     addressLine1,
     addressLine2,
     city,
+    county,
     spotifyConsent,
     googleMapsLink,
     name,
@@ -49,6 +50,7 @@ router.post('/', authenticate, async (req, res) => {
     addressLine1,
     addressLine2,
     city,
+    county,
     postcode
   }
 

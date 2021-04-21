@@ -2,20 +2,31 @@
 @import "../../variables";
 
 .screen {
-  @include media-breakpoint-down(md); @media (pointer: none), (pointer: coarse) {
+  @media (pointer: none), (pointer: coarse) {
     width: 100vw;
   }
 
-  @include media-breakpoint-up(lg); @media (pointer: fine) {
+  @media (pointer: fine) {
     min-width: 0;
-    max-width: 540px;
+    max-width: 720px;
     width: 100%;
   }
 
-  .header {
-    font-family: 'DM Sans';
-    font-size: 32px;
+  a {
+    &:hover {
+      color: $wave-colour-light;
+      text-decoration: underline;
+    }
+
+    color: $wave-colour-light;
+    font-weight: 500;
+    text-decoration: none;
+  }
+
+  label {
+    font-size: 14px;
     font-weight: 600;
+    user-select: none;
   }
 
   background-color: $screen-background-colour;

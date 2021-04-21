@@ -2,19 +2,7 @@
 
 #account-info {
   a {
-    &:hover {
-      text-decoration: underline;
-    }
-
-    color: $wave-colour-light;
     font-size: 14px;
-    font-weight: 500;
-    text-decoration: none;
-  }
-
-  label {
-    font-size: 14px;
-    font-weight: 600;
   }
 
   #account-venues {
@@ -50,14 +38,6 @@
       transition: background-color .1s ease-in-out;
       white-space: nowrap;
     }
-  }
-
-  #account-info-header {
-    align-items: center;
-    border-bottom: 1px solid $line-separator-colour;
-    display: flex;
-    font-weight: 600;
-    justify-content: space-between;
   }
 
   #account-links {
