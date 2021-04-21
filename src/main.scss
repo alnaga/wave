@@ -1,9 +1,10 @@
 @import "~bootstrap/scss/bootstrap";
 @import "variables";
 @import url(https://fonts.googleapis.com/css?family=Karla:300,400,500,600,700);
-@import url(https://fonts.googleapis.com/css?family=Reem+Kufi:300,400,500,600,700);
+@import url(https://fonts.googleapis.com/css?family=DM+Sans:300,400,500,600,700);
 
 #app {
+  color: white;
   font-family: Karla;
   letter-spacing: -0.1px;
   min-height: 100vh;

@@ -11,6 +11,8 @@
   }
 
   input {
+    background-color: $input-background-colour;
+    color: white;
     border: 1px solid $line-separator-colour;
     border-radius: 8px;
     padding: 8px 10px;
@@ -39,12 +41,6 @@
   }
 
   #venue-registration-header {
-    .header {
-      font-family: 'Reem Kufi';
-      font-size: 32px;
-      font-weight: 600;
-    }
-
     border-bottom: 1px solid $line-separator-colour;
   }
 
@@ -53,6 +49,7 @@
     flex-direction: column;
   }
 
+  color: white;
   display: flex;
   flex-direction: column;
   height: 100%;

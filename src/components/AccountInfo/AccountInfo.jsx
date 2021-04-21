@@ -45,19 +45,9 @@ const AccountInfo = () => {
   return (
     <ScreenContainer>
       <div id="account-info">
-        <div id="account-info-header" className="p-3">
-          <div>
+        <div id="account-info-header" className="p-3 pb-2">
+          <div className="header">
             Account Overview
-          </div>
-
-          <div id="log-out">
-            <Link
-              to="/"
-              title="Log out"
-              onClick={handleLogout}
-            >
-              Log out
-            </Link>
           </div>
         </div>
 
@@ -120,8 +110,16 @@ const AccountInfo = () => {
                     App Settings
                   </Link>
 
-                  <Link to="/delete">
+                  <Link to="/delete" className="mb-2">
                     Delete account
+                  </Link>
+
+                  <Link
+                    to="/"
+                    title="Log out"
+                    onClick={handleLogout}
+                  >
+                    Log out
                   </Link>
                 </div>
               </div>

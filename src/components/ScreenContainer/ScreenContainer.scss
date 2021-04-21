@@ -12,6 +12,12 @@
     width: 100%;
   }
 
+  .header {
+    font-family: 'DM Sans';
+    font-size: 32px;
+    font-weight: 600;
+  }
+
   background-color: $screen-background-colour;
   box-shadow: 0 6px 6px rgba(0, 0, 0, 0.5);
   min-height: calc(#{$app-content-height} - #{$header-height});

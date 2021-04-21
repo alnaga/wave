@@ -1,11 +1,14 @@
-$background-colour: #eee;
-$screen-background-colour: #f8f8f8;
+$background-colour: #2f2f2f;
+$input-background-colour: rgb(44, 44, 44);
+$line-separator-colour: rgba(255, 255, 255, 0.25);
+$screen-background-colour: rgb(33, 33, 33);
+
 $currently-playing-height: 72px;
 $app-content-height: calc(100vh - #{$currently-playing-height});
 $device-list-width: 250px;
 $header-height: 56px;
 $song-progress-height: 6px;
-$line-separator-colour: rgba(0, 0, 0, 0.125);
+
 $wave-colour-dark: #6e5399;
 $wave-colour-light: #c3a6ee;
 $wave-colour-lighter: #dac3fa;

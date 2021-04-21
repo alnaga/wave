@@ -51,7 +51,7 @@ const ArtistInfo = (props) => {
                   title={artistInfo.name}
                 />
 
-                <Textfit id="artist-name" className="pl-4 pr-4 pb-3" max={32} min={28}>
+                <Textfit id="artist-name" className="pl-4 pr-4 pb-2 pt-2" min={36}>
                   { artistInfo.name }
                 </Textfit>
               </div>
