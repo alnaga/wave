@@ -1,0 +1,59 @@
+@import '../../variables';
+
+#venue-registration {
+  button {
+    background-color: $wave-colour-main;
+    border: none;
+    border-radius: 24px;
+    color: white;
+    padding: 8px 16px;
+    width: 100%;
+  }
+
+  input {
+    border: 1px solid $line-separator-colour;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
+  label {
+    font-size: 14px;
+    font-weight: 600;
+    user-select: none;
+  }
+
+  #consent {
+    input {
+      transform: scale(1.25);
+    }
+
+    align-items: center;
+    flex-direction: row;
+    font-size: 14px;
+  }
+
+  #venue-registration-body {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  #venue-registration-header {
+    .header {
+      font-family: 'Reem Kufi';
+      font-size: 32px;
+      font-weight: 600;
+    }
+
+    border-bottom: 1px solid $line-separator-colour;
+  }
+
+  .form-section {
+    display: flex;
+    flex-direction: column;
+  }
+
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}

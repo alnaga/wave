@@ -36,6 +36,7 @@ router.post('/', authenticate, async (req, res) => {
   const {
     addressLine1,
     addressLine2,
+    city,
     spotifyConsent,
     googleMapsLink,
     name,
@@ -47,6 +48,7 @@ router.post('/', authenticate, async (req, res) => {
   const address = {
     addressLine1,
     addressLine2,
+    city,
     postcode
   }
 
@@ -96,8 +98,6 @@ router.post('/', authenticate, async (req, res) => {
       });
     }
   });
-
-
 });
 
 router.post('/check-in', authenticate, async (req, res) => {

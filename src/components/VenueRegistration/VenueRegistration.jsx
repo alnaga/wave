@@ -7,6 +7,8 @@ import { refreshExpiredTokens } from '../../util';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { registerVenue } from '../../actions/venue/venueActions';
 
+import './VenueRegistration.scss';
+
 const VenueRegistration = (props) => {
   const dispatch = useAppDispatch();
   const { tokens, venue } = useAppState();
@@ -20,6 +22,7 @@ const VenueRegistration = (props) => {
   const [ data, setData ] = useState({
     addressLine1: '52 Royal Park Avenue',
     addressLine2: '',
+    city: '',
     spotifyConsent: true,
     googleMapsLink: '',
     postcode: 'LS6 1EY',
@@ -56,6 +59,8 @@ const VenueRegistration = (props) => {
       setError('Please enter an address for your venue.');
     } else if (!data.postcode) {
       setError('Please enter the venue\'s postcode.');
+    } else if (!data.city) {
+      setError('Please enter the city your venue is in.');
     } else if (!data.spotifyConsent) {
       setError('Consent to use your Spotify account is required to register your venue.');
     } else {
@@ -78,91 +83,115 @@ const VenueRegistration = (props) => {
 
   return (
     <ScreenContainer>
-      <form className="p-3">
-        <div>
-          Venue Registration
+      <form id="venue-registration">
+        <div id="venue-registration-header" className="p-3 pb-2">
+          <div className="header">
+            Venue Registration
+          </div>
+
+          <div>
+            Please enter the details for your venue below:
+          </div>
         </div>
 
-        <div>
-          Please enter your venue's details below:
-        </div>
+        <div id="venue-registration-body" className="p-3">
+          <div className="mb-3 form-section">
+            <label htmlFor="venue-name" className="mb-1"> Venue Name </label>
+            <input
+              name="venue-name"
+              onChange={handleFormChange('name')}
+              placeholder="Venue Name"
+              required
+              value={data.name}
+            />
+          </div>
 
-        <div>
-          <label htmlFor="venue-name"> Venue Name </label>
-          <input
-            name="venue-name"
-            onChange={handleFormChange('name')}
-            placeholder="Venue Name"
-            required
-            value={data.name}
-          />
-          <small> Please enter the name of your venue so that customers can search for it. </small>
-        </div>
+          <div className="mb-3 form-section">
+            <label htmlFor="address-line-1" className="mb-1"> Address </label>
+            <input
+              className="mb-1"
+              name="address-line-1"
+              onChange={handleFormChange('addressLine1')}
+              placeholder="Address Line 1"
+              required
+              value={data.addressLine1}
+            />
+            <input
+              name="address-line-2"
+              onChange={handleFormChange('addressLine2')}
+              placeholder="Address Line 2"
+              value={data.addressLine2}
+            />
 
-        <div>
-          <label htmlFor="address-line-1"> Address Line 1 </label>
-          <input
-            name="address-line-1"
-            onChange={handleFormChange('addressLine1')}
-            placeholder="Address Line 1"
-            required
-            value={data.addressLine1}
-          />
-        </div>
+            <div className="d-flex justify-content-between mt-1 flex-wrap">
+              <div className="mb-1 form-section flex-grow-1 flex-shrink-1">
+                <input
+                  className="mr-1"
+                  name="postcode"
+                  onChange={handleFormChange('postcode')}
+                  placeholder="Postcode"
+                  required
+                  value={data.postcode}
+                />
+              </div>
 
-        <div>
-          <label htmlFor="address-line-2"> Address Line 2 </label>
-          <input
-            name="address-line-2"
-            onChange={handleFormChange('addressLine2')}
-            placeholder="Address Line 2"
-            value={data.addressLine2}
-          />
-        </div>
-
-        <div>
-          <label htmlFor="postcode"> Postcode </label>
-          <input
-            name="postcode"
-            onChange={handleFormChange('postcode')}
-            placeholder="Postcode"
-            required
-            value={data.postcode}
-          />
-        </div>
-
-        <div>
-          <label>
-            Authorisation with a Spotify account is required in order for Wave to function correctly.
-            By ticking this box you are giving us consent to use the Spotify account you have
-            currently logged in with.
-          </label>
-
-          <input
-            name="spotify-consent"
-            defaultChecked={data.spotifyConsent}
-            onChange={handleFormChange('spotifyConsent')}
-            required
-            type="checkbox"
-          />
-        </div>
-
-        {
-          error
-          && (
-            <div className="alert alert-danger alert-dismissible mt-3 mb-0">
-              { error }
-
-              <button type="button" className="close" onClick={handleDismissError}>
-                <span> &times; </span>
-              </button>
+              <div className="form-section flex-grow-1 flex-shrink-1">
+                <input
+                  name="city"
+                  onChange={handleFormChange('city')}
+                  placeholder="City"
+                  required
+                  value={data.city}
+                />
+              </div>
             </div>
-          )
-        }
+          </div>
 
-        <button type="submit" onClick={handleSubmit}>
-          Submit
-        </button>
+          <div className="mb-3 form-section">
+            <label className="mb-1"> Google Maps Link </label>
+            <input
+              name="google-maps-link"
+              onChange={handleFormChange('googleMapsLink')}
+              placeholder="Google Maps Link"
+              required
+              value={data.googleMapsLink}
+            />
+          </div>
+
+          <div id="consent" className="form-section">
+            <div>
+              Authorisation with a Spotify account is required in order for Wave to function correctly.
+              By ticking this box you are giving us consent to use the Spotify account you have
+              currently logged in with.
+            </div>
+
+            <input
+              className="ml-3"
+              name="spotify-consent"
+              defaultChecked={data.spotifyConsent}
+              onChange={handleFormChange('spotifyConsent')}
+              required
+              type="checkbox"
+            />
+          </div>
+
+          {
+            error
+            && (
+              <div className="alert alert-danger alert-dismissible mt-3 mb-0">
+                { error }
+
+                <div className="close" onClick={handleDismissError}>
+                  <span> &times; </span>
+                </div>
+              </div>
+            )
+          }
+
+          <button className="mt-4" type="submit" onClick={handleSubmit}>
+            Submit
+          </button>
+        </div>
       </form>
     </ScreenContainer>
   );
