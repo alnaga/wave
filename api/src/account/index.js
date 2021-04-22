@@ -24,22 +24,17 @@ router.get('/', authenticate, async (req, res) => {
       // This is in an IIFE so that it will fetch all venues before sending the response.
       await (async () => {
         for (let venueId of user.venues) {
-          await Venue.findOne({
-            _id: venueId
-          }, async (error, venue) => {
+          await Venue.findOne({ _id: venueId }, async (error, venue) => {
             if (error) {
               res.status(500).send({
                 message: 'Internal server error occurred while fetching account data.'
               });
             } else if (!venue) {
               // The venue no longer exists and so it must be deleted from the User object.
-              const removedIndex = user.venues.findIndex((removed) => removed === venueId);
-
-              const newVenues = user.venues;
-              newVenues.splice(removedIndex, 1);
-
               await User.updateOne({ username }, {
-                venues: newVenues
+                $pull: {
+                  venues: venueId
+                }
               });
             } else {
               venues.push({

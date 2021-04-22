@@ -27,7 +27,7 @@ export const initialState = {
   albumInfo: undefined,
   artistInfo: undefined,
   currentSong: undefined,
-  currentVenue: undefined,
+  currentVenue: JSON.parse(sessionStorage.getItem('currentVenue')) || undefined,
   devices: [],
   history: JSON.parse(sessionStorage.getItem('history')) || [],
   searchResults: [],

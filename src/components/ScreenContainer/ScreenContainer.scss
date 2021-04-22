@@ -23,10 +23,59 @@
     text-decoration: none;
   }
 
+  button {
+    &:focus {
+      outline: none;
+    }
+
+    &:hover {
+      background-color: $wave-colour-dark;
+    }
+
+    background-color: $wave-colour-main;
+    border: none;
+    border-radius: 24px;
+    color: white;
+    padding: 8px 16px;
+    transition: background-color .1s ease-in-out;
+    width: 100%;
+  }
+
   label {
     font-size: 14px;
     font-weight: 600;
     user-select: none;
+  }
+
+  .list {
+    .list-item {
+      &:first-child {
+        border-top: 1px solid $line-separator-colour;
+      }
+
+      &.clickable {
+        &:hover {
+          background-color: $background-colour;
+        }
+
+        cursor: pointer;
+        transition: background-color .1s ease-in-out;
+      }
+
+      background-color: $screen-background-colour;
+      border: 1px solid $line-separator-colour;
+      border-top: none;
+      color: white;
+      display: flex;
+      font-size: 14px;
+      justify-content: space-between;
+      overflow: hidden;
+      padding: 12px;
+      text-decoration: none;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
   }
 
   background-color: $screen-background-colour;

@@ -11,32 +11,9 @@
         color: $wave-colour-light;
       }
 
-      &:first-child {
-        border-top: 1px solid $line-separator-colour;
-      }
-
-      &:hover {
-        background-color: $background-colour;
-      }
-
       .venue-name {
         min-width: 0;
       }
-
-      background-color: $screen-background-colour;
-      border: 1px solid $line-separator-colour;
-      border-top: none;
-      color: white;
-      cursor: pointer;
-      display: flex;
-      font-size: 14px;
-      justify-content: space-between;
-      overflow: hidden;
-      padding: 12px;
-      text-decoration: none;
-      text-overflow: ellipsis;
-      transition: background-color .1s ease-in-out;
-      white-space: nowrap;
     }
   }
 

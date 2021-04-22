@@ -7,13 +7,13 @@ import ScreenHeader from '../ScreenHeader/ScreenHeader';
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { getVenueData } from '../../actions/venue/venueActions';
+import { checkIn, checkOut, getVenueData } from '../../actions/venue/venueActions';
 
 import './VenueInfo.scss';
 
 const VenueInfo = (props) => {
   const dispatch = useAppDispatch();
-  const { tokens, venueInfo } = useAppState();
+  const { currentVenue, tokens, venueInfo } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
@@ -28,15 +28,43 @@ const VenueInfo = (props) => {
     return output;
   };
 
+  const handleCheckIn = async () => {
+    if (
+      tokensRef.current.wave.accessToken
+      && await checkIn(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId) === TOKENS_EXPIRED
+    ) {
+      await refreshExpiredTokens(dispatch, tokensRef.current);
+      await checkIn(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId);
+    }
+
+    await handleGetVenueInfo();
+  };
+
+  const handleCheckOut = async () => {
+    if (
+      tokensRef.current.wave.accessToken
+      && await checkOut(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId) === TOKENS_EXPIRED
+    ) {
+      await refreshExpiredTokens(dispatch, tokensRef.current);
+      await checkOut(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId);
+    }
+
+    await handleGetVenueInfo();
+  };
+
+  const handleGetVenueInfo = async () => {
+    if (
+      tokensRef.current.wave.accessToken
+      && await getVenueData(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId) === TOKENS_EXPIRED
+    ) {
+      await refreshExpiredTokens(dispatch, tokensRef.current);
+      await getVenueData(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId)
+    }
+  };
+
   useEffect(() => {
     (async () => {
-      if (
-        tokensRef.current.wave.accessToken
-        && await getVenueData(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId) === TOKENS_EXPIRED
-      ) {
-        await refreshExpiredTokens(dispatch, tokensRef.current);
-        await getVenueData(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId)
-      }
+      await handleGetVenueInfo();
     })();
   }, []);
 
@@ -64,6 +92,31 @@ const VenueInfo = (props) => {
                     }
                   </div>
 
+                  <div className="mb-3">
+                    <label> Attendees </label>
+
+                    {
+                      venueInfo.attendees.length > 0
+                        ? (
+                          <div className="list mt-1">
+                            {
+                              venueInfo.attendees.map((attendee) => {
+                                return (
+                                  <div className="list-item" key={attendee.username}>
+                                    { attendee.username }
+                                  </div>
+                                )
+                              })
+                            }
+                          </div>
+                        ) : (
+                          <div>
+                            There are currently no attendees. Why not check in and get started?
+                          </div>
+                        )
+                    }
+                  </div>
+
                   {
                     venueInfo.googleMapsLink
                     && (
@@ -71,6 +124,25 @@ const VenueInfo = (props) => {
                         <a href={venueInfo.googleMapsLink} target="_blank"> Google Maps Link </a>
                       </div>
                     )
+                  }
+
+                  {
+                    (venueInfo.attendees.length > 0 && venueInfo.attendees.find((attendee) => attendee.username === tokensRef.current.wave.user.username))
+                      ? (
+                        <button
+                          className="mt-3"
+                          onClick={handleCheckOut}
+                        >
+                          Check Out
+                        </button>
+                      ) : (
+                        <button
+                          className="mt-3"
+                          onClick={handleCheckIn}
+                        >
+                          Check In
+                        </button>
+                      )
                   }
                 </div>
               </>

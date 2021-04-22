@@ -74,13 +74,13 @@ const AccountInfo = () => {
                   {
                     (accountInfo.venues && accountInfo.venues.length > 0)
                       ? (
-                        <div id="account-venues">
+                        <div id="account-venues" className="list">
                           {
                             accountInfo.venues.map((ownedVenue) => {
                               return (
                                 <Link
                                   to={`/venue/${ownedVenue._id}`}
-                                  className="account-venue"
+                                  className="account-venue list-item clickable"
                                   key={ownedVenue._id}
                                   title={`Go to ${ownedVenue.name}`}
                                 >

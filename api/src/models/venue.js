@@ -2,7 +2,10 @@ import mongoose from 'mongoose';
 
 export const Venue = mongoose.model('venue', mongoose.Schema({
   address: Object,
-  attendees: Number,
+  attendees: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user'
+  }],
   googleMapsLink: String,
   name: String,
   owners: [{

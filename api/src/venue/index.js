@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { User } from '../models/user';
+import { Token } from '../models/token';
 import { Venue } from '../models/venue';
 
 import { authenticate } from '../util';
@@ -9,19 +10,46 @@ const router = Router();
 router.get('/', authenticate, async (req, res) => {
   const { id } = req.query;
 
-  await Venue.findOne({ _id: id }, (error, venue) => {
+  await Venue.findOne({ _id: id }, async (error, venue) => {
     if (error) {
       res.status(500).send({
         message: 'Internal server error occurred while fetching venue data.'
       });
     } else if (venue) {
+      const attendees = [];
+
+      for (let userId of venue.attendees) {
+        await User.findOne({ _id: userId }, async (error, user) => {
+          if (error) {
+            res.status(500).send({
+              message: 'Internal server error occurred while fetching venue data.'
+            });
+          } else if (!user) {
+            // The user no longer exists and so it must be deleted from the venue attendees array.
+            await Venue.updateOne({ _id: id }, {
+              $pull: {
+                attendees: userId
+              }
+            });
+          } else {
+            attendees.push({
+              firstName: user.firstName,
+              lastName: user.lastName,
+              username: user.username
+            });
+          }
+        });
+      }
+
       res.status(200).send({
         venue: {
-          _id: venue._id,
+          id: venue._id,
           address: venue.address,
+          attendees,
           googleMapsLink: venue.googleMapsLink,
           name: venue.name,
-          songHistory: venue.songHistory
+          songHistory: venue.songHistory,
+          votes: venue.votes || 0
         }
       });
     } else {
@@ -64,11 +92,13 @@ router.post('/', authenticate, async (req, res) => {
     } else {
       const newVenue = new Venue({
         address,
+        attendees: [],
         googleMapsLink,
         name,
         owners: [ user._id ],
         spotifyConsent,
-        spotifyTokens
+        spotifyTokens,
+        votes: 0
       });
 
       await newVenue.save(async (error, venue) => {
@@ -78,12 +108,10 @@ router.post('/', authenticate, async (req, res) => {
           });
         } else {
           await User.updateOne({ _id: user._id }, {
-            $push: {
+            $addToSet: {
               venues: venue._id
             }
           });
-
-          console.log('New Venue:', venue);
 
           res.status(200).send({
             venue: {
@@ -103,7 +131,133 @@ router.post('/', authenticate, async (req, res) => {
 });
 
 router.post('/check-in', authenticate, async (req, res) => {
+  const { accessToken, venueId } = req.body;
 
+  await Token.findOne({ accessToken }, async (error, token) => {
+    if (error) {
+      res.status(500).send({
+        message: 'Internal server error occurred while checking into venue.'
+      });
+    } else if (token && new Date(token.accessTokenExpiresAt).getTime() < Date.now()) {
+      res.status(401).send({
+        message: 'Access token expired.'
+      });
+    } else if (!token) {
+      res.status(400).send({
+        message: 'Invalid access token.'
+      });
+    } else {
+      const userCheckingIn = await User.findOne({ username: token.user.username }, async (error, user) => {
+        if (error) {
+          res.status(500).send({
+            message: 'Internal server error occurred while checking into venue.'
+          });
+        } else if (!user) {
+          res.status(400).send({
+            message: 'Invalid user.'
+          });
+        } else {
+          await Venue.findOne({ _id: venueId }, async (error, venue) => {
+            if (error) {
+              res.status(500).send({
+                message: 'Internal server error occurred while checking into venue.'
+              });
+            } else if (!venue) {
+              res.status(400).send({
+                message: 'Invalid venue ID.'
+              });
+            } else if (venue && venue.attendees.includes(userCheckingIn._id)) {
+              res.status(400).send({
+                message: 'User already checked in.'
+              });
+            } else {
+              await Venue.updateOne({ _id: venueId }, {
+                $addToSet: {
+                  attendees: userCheckingIn._id
+                }
+              }, (error, result) => {
+                if (error || result.modifiedCount === 0) {
+                  res.status(500).send({
+                    message: 'Internal server error occurred while checking into venue.'
+                  });
+                } else {
+                  res.status(200).send({
+                    id: venue._id,
+                    name: venue.name,
+                    votes: venue.votes || 0
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+});
+
+router.post('/check-out', authenticate, async (req, res) => {
+  const { accessToken, venueId } = req.body;
+
+  await Token.findOne({ accessToken }, async (error, token) => {
+    if (error) {
+      res.status(500).send({
+        message: 'Internal server error occurred while checking out.'
+      });
+    } else if (token && new Date(token.accessTokenExpiresAt).getTime() < Date.now()) {
+      res.status(401).send({
+        message: 'Access token expired.'
+      });
+    } else if (!token) {
+      res.status(400).send({
+        message: 'Invalid access token.'
+      });
+    } else {
+      const userCheckingIn = await User.findOne({ username: token.user.username }, async (error, user) => {
+        if (error) {
+          res.status(500).send({
+            message: 'Internal server error occurred while checking out.'
+          });
+        } else if (!user) {
+          res.status(400).send({
+            message: 'Invalid user.'
+          });
+        } else {
+          await Venue.findOne({ _id: venueId }, async (error, venue) => {
+            if (error) {
+              res.status(500).send({
+                message: 'Internal server error occurred while checking out.'
+              });
+            } else if (!venue) {
+              res.status(400).send({
+                message: 'Invalid venue ID.'
+              });
+            } else if (venue && !venue.attendees.includes(userCheckingIn._id)) {
+              res.status(400).send({
+                message: 'User not checked in.'
+              });
+            } else {
+              await Venue.updateOne({ _id: venueId }, {
+                $pull: {
+                  attendees: `${userCheckingIn._id}`
+                }
+              }, (error, result) => {
+                if (error || result.modifiedCount === 0) {
+                  res.status(500).send({
+                    message: 'Internal server error occurred while checking out.'
+                  });
+                } else {
+                  res.status(200).send({
+                    message: 'User checked out successfully.'
+                  });
+                }
+              });
+            }
+          });
+        }
+      });
+    }
+  });
 });
 
 module.exports = router;
