@@ -5,7 +5,8 @@ import { faThumbsDown, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED, VOTE_DOWN, VOTE_UP } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { getCurrentlyPlaying, getVenue, voteTrack } from '../../actions/spotify/spotifyActions';
+import { getCurrentSong } from '../../actions/spotify/spotifyActions';
+import { voteTrack } from '../../actions/venue/venueActions';
 
 import './Vote.scss';
 
@@ -23,7 +24,7 @@ const Vote = () => {
       if (skipped) {
         // Spotify has a short delay before skipping, so to avoid getting the same song as pre-skip, we wait.
         setTimeout(async () => {
-          await getCurrentlyPlaying(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
+          await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
         }, 250);
       }
     }

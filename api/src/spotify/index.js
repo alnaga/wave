@@ -15,6 +15,63 @@ const router = Router();
 // The application is currently only concerned with the UK.
 const resultMarket = 'GB';
 
+const getSpotifyAccessToken = async (venueId, res) => {
+  let spotifyAccessToken;
+
+  await Venue.findOne({ _id: venueId }, async (error, venue) => {
+    if (error) {
+      res.status(500).send({
+        message: 'Internal server error.'
+      });
+    } else if (!venue) {
+      res.status(400).send({
+        message: 'Invalid venue ID.'
+      });
+    } else {
+      spotifyAccessToken = venue.spotifyTokens.accessToken;
+      if (venue.spotifyTokens.accessTokenExpiresAt < Date.now()) {
+        await refreshSpotifyToken(venueId, venue.spotifyTokens.refreshToken);
+        await Venue.findOne({ _id: venueId }, (error, updatedVenue) => {
+          spotifyAccessToken = updatedVenue.spotifyTokens.accessToken;
+        });
+      }
+    }
+  });
+
+  return spotifyAccessToken;
+};
+
+const refreshSpotifyToken = async (venueId, refreshToken) => {
+  console.log('Refreshing Spotify Access Token', new Date().toISOString());
+  const spotifyResponse = await axios.post('https://accounts.spotify.com/api/token', null, {
+    headers: {
+      "Authorization": `Basic ${AUTHORISATION}`,
+      "Content-Type": 'application/x-www-form-urlencoded'
+    },
+    params: {
+      "grant_type": "refresh_token",
+      "refresh_token": refreshToken
+    }
+  });
+
+  if (spotifyResponse) {
+    if (spotifyResponse.status === 200) {
+      const newAccessToken = spotifyResponse.data.access_token;
+      const newTokenExpiresAt = Date.now() + (spotifyResponse.data.expires_in * 1000);
+
+      await Venue.updateOne({ _id: venueId }, {
+        $set: {
+          spotifyTokens: {
+            accessToken: newAccessToken,
+            accessTokenExpiresAt: newTokenExpiresAt,
+            refreshToken
+          }
+        }
+      })
+    }
+  }
+};
+
 const skipTrack = async (accessToken) => {
   const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
     headers: {
@@ -204,32 +261,64 @@ router.get('/search', async (req, res) => {
   });
 });
 
+// TODO: Fix random 401 error while making Spotify API calls.
+
 // Gets the currently playing song for the venue's Spotify account.
 router.get('/song', authenticate, async (req, res) => {
-  const { accessToken } = req.query;
+  const { venueId } = req.query;
 
-  const spotifyResponse = await axios.get(`https://api.spotify.com/v1/me/player`, {
-    headers: {
-      "Authorization": `Bearer ${accessToken}`
-    }
-  }).catch((error) => error.response);
+  const spotifyAccessToken = await getSpotifyAccessToken(venueId, res);
 
-  const { status } = spotifyResponse;
+  if (spotifyAccessToken) {
+    const spotifyResponse = await axios.get(`https://api.spotify.com/v1/me/player`, {
+      headers: {
+        "Authorization": `Bearer ${spotifyAccessToken}`
+      }
+    }).catch((error) => error.response);
 
-  res.status(status).send(spotifyResponse.data);
+    const { status } = spotifyResponse;
+
+    res.status(status).send(spotifyResponse.data);
+  } else {
+    res.status(500).send({
+      message: 'Internal server error while fetching current song.'
+    });
+  }
 });
 
-// Adds a song to the queue on the venue's Spotify account.
+// Adds a song to the queue on a venue's Spotify account.
 router.post('/song', authenticate, async (req, res) => {
-  const { accessToken, uri } = req.query;
+  const { trackUri, venueId } = req.body;
 
-  const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${uri}`, null, {
-    headers: {
-      "Authorization": `Bearer ${accessToken}`
+  const spotifyAccessToken = await getSpotifyAccessToken(venueId, res);
+
+  if (spotifyAccessToken) {
+    const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${trackUri}`, null, {
+      headers: {
+        "Authorization": `Bearer ${spotifyAccessToken}`
+      }
+    }).catch((error) => error.response);
+
+    if (spotifyResponse) {
+      if (spotifyResponse.status === 200) {
+        res.status(200).send({
+          message: 'Song queued successfully.'
+        });
+      } else {
+        res.status(spotifyResponse.status).send({
+          message: 'Queuing request to Spotify API failed.'
+        });
+      }
+    } else {
+      res.status(500).send({
+        message: 'Internal server error occurred while queuing song.'
+      });
     }
-  }).catch((error) => error.response);
-
-  res.status(spotifyResponse.status).send();
+  } else {
+    res.status(500).send({
+      message: 'Internal server error occurred while queuing song.'
+    });
+  }
 });
 
 router.get('/venue', authenticate, async (req, res) => {

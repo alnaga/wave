@@ -245,8 +245,8 @@ export const getTrackSearchResults = async (dispatch, accessToken, spotifyAccess
  * @param spotifyAccessToken {String} - Spotify API Access Token
  * @returns 1 if successful, 0 if failed
  */
-export const getCurrentlyPlaying = async (dispatch, accessToken, spotifyAccessToken) => {
-  const response = await axios.get(`http://localhost:8081/spotify/song?accessToken=${spotifyAccessToken}`, {
+export const getCurrentSong = async (dispatch, accessToken, venueId) => {
+  const response = await axios.get(`http://localhost:8081/spotify/song?venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -268,12 +268,15 @@ export const getCurrentlyPlaying = async (dispatch, accessToken, spotifyAccessTo
  * Adds a song to the venue's current queue.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API Access Token
- * @param spotifyAccessToken {String} - Spotify API Access Token
+ * @param venueId {String} - The ID of the target venue.
  * @param trackUri {String} - The URI of the track to be queued.
  * @returns 1 if successful, 0 if failed
  */
-export const queueTrack = async (dispatch, accessToken, spotifyAccessToken, trackUri) => {
-  const response = await axios.post(`http://localhost:8081/spotify/song?accessToken=${spotifyAccessToken}&uri=${trackUri}`, null, {
+export const queueTrack = async (dispatch, accessToken, venueId, trackUri) => {
+  const response = await axios.post(`http://localhost:8081/spotify/song`, {
+    trackUri,
+    venueId
+  }, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -286,53 +289,29 @@ export const queueTrack = async (dispatch, accessToken, spotifyAccessToken, trac
   } else return 0;
 };
 
-/**
- * Submits a vote for the currently playing song in a venue.
- * @param dispatch {Function} - Application Dispatch
- * @param accessToken {String} - Spotify API Access Token
- * @param venue {String} - The URI of the target venue
- * @param vote {String} - The vote value (VOTE_UP or VOTE_DOWN).
- * @returns 1 if successful, 0 if failed
- */
-export const voteTrack = async (dispatch, accessToken, venue, vote) => {
-  const response = await axios.post(`http://localhost:8081/spotify/vote?accessToken=${accessToken}`, {
-    venue,
-    vote
-  }).catch((error) => error.response);
 
-  if (response && response.status === 200) {
-    dispatch({
-      type: SET_VENUE_INFO,
-      payload: response.data.venue
-    });
-
-    const { skipped } = response.data;
-    return { skipped };
-  } else return 0;
-};
-
-/**
- * Fetches the data for the current venue.
- * @param dispatch {Function} - Application Dispatch
- * @param accessToken {String} - Wave API Access Token
- * @param spotifyAccessToken {String} - Spotify API Access Token
- * @returns 1 if successful, 0 if failed
- */
-export const getVenue = async (dispatch, accessToken, spotifyAccessToken) => {
-  const response = await axios.get(`http://localhost:8081/spotify/venue?accessToken=${spotifyAccessToken}`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`
-    }
-  }).catch((error) => error.response);
-
-  if (response && response.status === 200) {
-    dispatch({
-      type: SET_VENUE_INFO,
-      payload: response.data
-    });
-
-    return 1;
-  } else if (response && response.status === 401) {
-    return TOKENS_EXPIRED;
-  } else return 0;
-};
+// /**
+//  * Fetches the data for the current venue.
+//  * @param dispatch {Function} - Application Dispatch
+//  * @param accessToken {String} - Wave API Access Token
+//  * @param spotifyAccessToken {String} - Spotify API Access Token
+//  * @returns 1 if successful, 0 if failed
+//  */
+// export const getVenue = async (dispatch, accessToken, spotifyAccessToken) => {
+//   const response = await axios.get(`http://localhost:8081/spotify/venue?accessToken=${spotifyAccessToken}`, {
+//     headers: {
+//       'Authorization': `Bearer ${accessToken}`
+//     }
+//   }).catch((error) => error.response);
+//
+//   if (response && response.status === 200) {
+//     dispatch({
+//       type: SET_VENUE_INFO,
+//       payload: response.data
+//     });
+//
+//     return 1;
+//   } else if (response && response.status === 401) {
+//     return TOKENS_EXPIRED;
+//   } else return 0;
+// };

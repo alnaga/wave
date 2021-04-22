@@ -12,7 +12,7 @@ import './QueueTrackButton.scss';
 const QueueTrackButton = (props) => {
   const { track } = props;
   const dispatch = useAppDispatch();
-  const { tokens } = useAppState();
+  const { currentVenue, tokens } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
@@ -20,21 +20,27 @@ const QueueTrackButton = (props) => {
   const handleQueueSong = (track) => async () => {
     if (
       tokensRef.current.wave.accessToken
-      && tokensRef.current.spotify.accessToken
-      && await queueTrack(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, track.uri) === TOKENS_EXPIRED
+      && await queueTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, track.uri) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await queueTrack(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, track.uri);
+      await queueTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, track.uri);
     }
   };
   return (
-    <FontAwesomeIcon
-      className="add-to-queue"
-      icon={faPlusCircle}
-      onClick={handleQueueSong(track)}
-      size="2x"
-      title={`Add '${track.artists[0].name} - ${track.name}' to the queue.`}
-    />
+    <>
+      {
+        currentVenue
+          && (
+            <FontAwesomeIcon
+              className="add-to-queue"
+              icon={faPlusCircle}
+              onClick={handleQueueSong(track)}
+              size="2x"
+              title={`Add '${track.artists[0].name} - ${track.name}' to the queue.`}
+            />
+          )
+      }
+    </>
   );
 };
 

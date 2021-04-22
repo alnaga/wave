@@ -6,7 +6,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 import './SearchBar.scss';
 
-const SearchBar = ({ placeholder, resultsPage, searchType, ...props }) => {
+const SearchBar = ({ placeholder, resultsPage, searchType, staticContext, ...props }) => {
   const [ query, setQuery ] = useState('');
   const [ redirect, setRedirect ] = useState(false);
 

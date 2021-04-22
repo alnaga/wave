@@ -10,14 +10,14 @@ import Vote from '../Vote/Vote';
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED, WAVE_COLOUR_DARK } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { getCurrentlyPlaying } from '../../actions/spotify/spotifyActions';
+import { getCurrentSong } from '../../actions/spotify/spotifyActions';
 
 import './CurrentlyPlaying.scss';
 
 // TODO: Hide bar when there is no song playing.
 const CurrentlyPlaying = () => {
   const dispatch = useAppDispatch();
-  const { currentSong, tokens } = useAppState();
+  const { currentSong, currentVenue, tokens } = useAppState();
   const [ songProgress, setSongProgress ] = useState(0);
 
   const tokensRef = useRef(null);
@@ -26,11 +26,12 @@ const CurrentlyPlaying = () => {
   const handleFetchCurrentSong = async () => {
     if (
       tokensRef.current.wave.accessToken
-      && tokensRef.current.spotify.accessToken
-      && await getCurrentlyPlaying(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
+      && currentVenue
+      && currentVenue.id
+      && await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.id) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getCurrentlyPlaying(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
+      await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
     }
   }
 
