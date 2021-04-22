@@ -175,13 +175,33 @@ router.post('/check-in', authenticate, async (req, res) => {
                 $addToSet: {
                   attendees: userCheckingIn._id
                 }
-              }, (error, result) => {
+              }, async (error, result) => {
                 if (error || result.modifiedCount === 0) {
                   res.status(500).send({
                     message: 'Internal server error occurred while checking into venue.'
                   });
                 } else {
+                  // If the user is already checked in at another venue, check them out before checking them into
+                  // the new one.
+                  if (userCheckingIn.currentVenue !== venueId) {
+                    await Venue.updateOne({ _id: userCheckingIn.currentVenue }, {
+                      $pull: {
+                        attendees: userCheckingIn._id
+                      }
+                    });
+                  }
+
+                  await User.updateOne({ _id: userCheckingIn._id }, {
+                    $set: {
+                      currentVenue: venue._id
+                    }
+                  });
+
                   res.status(200).send({
+                    attendees: [
+                      ...venue.attendees,
+                      userCheckingIn._id
+                    ],
                     id: venue._id,
                     name: venue.name,
                     votes: venue.votes || 0
@@ -213,7 +233,7 @@ router.post('/check-out', authenticate, async (req, res) => {
         message: 'Invalid access token.'
       });
     } else {
-      const userCheckingIn = await User.findOne({ username: token.user.username }, async (error, user) => {
+      const userCheckingOut = await User.findOne({ username: token.user.username }, async (error, user) => {
         if (error) {
           res.status(500).send({
             message: 'Internal server error occurred while checking out.'
@@ -232,21 +252,27 @@ router.post('/check-out', authenticate, async (req, res) => {
               res.status(400).send({
                 message: 'Invalid venue ID.'
               });
-            } else if (venue && !venue.attendees.includes(userCheckingIn._id)) {
+            } else if (venue && !venue.attendees.includes(userCheckingOut._id)) {
               res.status(400).send({
                 message: 'User not checked in.'
               });
             } else {
               await Venue.updateOne({ _id: venueId }, {
                 $pull: {
-                  attendees: `${userCheckingIn._id}`
+                  attendees: `${userCheckingOut._id}`
                 }
-              }, (error, result) => {
+              }, async (error, result) => {
                 if (error || result.modifiedCount === 0) {
                   res.status(500).send({
                     message: 'Internal server error occurred while checking out.'
                   });
                 } else {
+                  await User.updateOne({ _id: userCheckingOut._id }, {
+                    $set: {
+                      currentVenue: undefined
+                    }
+                  });
+
                   res.status(200).send({
                     message: 'User checked out successfully.'
                   });
