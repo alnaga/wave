@@ -5,9 +5,11 @@ import AccountInfo from '../AccountInfo/AccountInfo';
 import AlbumInfo from '../AlbumInfo/AlbumInfo';
 import ArtistInfo from '../ArtistInfo/ArtistInfo';
 import CurrentlyPlaying from '../CurrentlyPlaying/CurrentlyPlaying';
-import SearchResults from '../SearchResults/SearchResults';
+import Home from '../Home/Home';
+import TrackSearchResults from '../TrackSearchResults/TrackSearchResults';
 import VenueInfo from '../VenueInfo/VenueInfo';
 import VenueRegistration from '../VenueRegistration/VenueRegistration';
+import VenueSearchResults from '../VenueSearchResults/VenueSearchResults';
 
 import './Dashboard.scss';
 
@@ -21,8 +23,10 @@ const Dashboard = () => {
           <Route exact path="/album/:albumId" component={AlbumInfo} />
           <Route exact path="/artist/:artistId" component={ArtistInfo} />
           <Route exact path="/register-venue" component={VenueRegistration} />
-          <Route exact path="/search/:query" component={SearchResults} />
+          <Route exact path="/tracks/search/:query" component={TrackSearchResults} />
+          <Route exact path="/venues/search/:query" component={VenueSearchResults} />
           <Route exact path="/venue/:venueId" component={VenueInfo} />
+          <Route exact path="/" component={Home} />
         </Switch>
       </div>
 

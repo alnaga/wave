@@ -9,9 +9,10 @@ import {
   SET_CURRENT_VENUE,
   SET_DEVICES,
   SET_HISTORY,
-  SET_SEARCH_RESULTS,
+  SET_TRACK_SEARCH_RESULTS,
   SET_SPOTIFY_TOKENS,
   SET_VENUE_INFO,
+  SET_VENUE_SEARCH_RESULTS,
   SET_WAVE_TOKENS
 } from '../constants';
 
@@ -30,7 +31,10 @@ export const initialState = {
   currentVenue: JSON.parse(sessionStorage.getItem('currentVenue')) || undefined,
   devices: [],
   history: JSON.parse(sessionStorage.getItem('history')) || [],
-  searchResults: [],
+  searchResults: {
+    tracks: [],
+    venues: []
+  },
   tokens: {
     spotify: JSON.parse(sessionStorage.getItem('spotifyTokens')) || {
       accessToken: undefined,
@@ -89,11 +93,6 @@ const appReducer = (state, action) => {
         ...state,
         history: action.payload
       };
-    case SET_SEARCH_RESULTS:
-      return {
-        ...state,
-        searchResults: action.payload
-      };
     case SET_SPOTIFY_TOKENS:
       return {
         ...state,
@@ -102,10 +101,26 @@ const appReducer = (state, action) => {
           wave: state.tokens.wave
         }
       };
+    case SET_TRACK_SEARCH_RESULTS:
+      return {
+        ...state,
+        searchResults: {
+          tracks: action.payload,
+          venues: state.searchResults.venues
+        }
+      };
     case SET_VENUE_INFO:
       return {
         ...state,
         venueInfo: action.payload
+      };
+    case SET_VENUE_SEARCH_RESULTS:
+      return {
+        ...state,
+        searchResults: {
+          tracks: state.searchResults.tracks,
+          venues: action.payload
+        }
       };
     case SET_WAVE_TOKENS:
       return {

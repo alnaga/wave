@@ -5,7 +5,7 @@ import {
   SET_ARTIST_INFO,
   SET_CURRENT_SONG,
   SET_DEVICES,
-  SET_SEARCH_RESULTS,
+  SET_TRACK_SEARCH_RESULTS,
   SET_SPOTIFY_TOKENS,
   SET_VENUE_INFO,
   TOKENS_EXPIRED
@@ -146,6 +146,14 @@ export const selectUserDevice = async (dispatch, accessToken, spotifyAccessToken
   } else return 0;
 };
 
+/**
+ * Queries the Wave API to fetch information about a given album from the Spotify API.
+ * @param dispatch {Function}
+ * @param accessToken {String}
+ * @param spotifyAccessToken {String}
+ * @param albumId {String}
+ * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if one of the access tokens have expired.
+ */
 export const getAlbumInfo = async (dispatch, accessToken, spotifyAccessToken, albumId) => {
   const response = await axios.get(`http://localhost:8081/spotify/album?accessToken=${spotifyAccessToken}&albumId=${albumId}`, {
     headers: {
@@ -165,6 +173,14 @@ export const getAlbumInfo = async (dispatch, accessToken, spotifyAccessToken, al
   } else return 0;
 };
 
+/**
+ * Queries the Wave API to fetch information about a given artist from the Spotify API.
+ * @param dispatch {Function}
+ * @param accessToken {String}
+ * @param spotifyAccessToken {String}
+ * @param artistId {String}
+ * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if one of the access tokens have expired.
+ */
 export const getArtistInfo = async (dispatch, accessToken, spotifyAccessToken, artistId) => {
   const response = await axios.get(`http://localhost:8081/spotify/artist?accessToken=${spotifyAccessToken}&artistId=${artistId}`, {
     headers: {
@@ -212,7 +228,7 @@ export const getTrackSearchResults = async (dispatch, accessToken, spotifyAccess
     const results = response.data;
 
     dispatch({
-      type: SET_SEARCH_RESULTS,
+      type: SET_TRACK_SEARCH_RESULTS,
       payload: response.data.tracks.items
     });
 

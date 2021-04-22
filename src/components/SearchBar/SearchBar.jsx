@@ -5,7 +5,7 @@ import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
 import './SearchBar.scss';
 
-const SearchBar = (props) => {
+const SearchBar = ({ placeholder, resultsPage, searchType, ...props }) => {
   const [ query, setQuery ] = useState('');
   const [ redirect, setRedirect ] = useState(false);
 
@@ -22,8 +22,8 @@ const SearchBar = (props) => {
 
   useEffect(() => {
     const urlSegments = window.location.pathname.split('/');
-    if (urlSegments[1] === 'search' && urlSegments[2]) {
-      setQuery(decodeURIComponent(urlSegments[2]));
+    if (urlSegments[1] === searchType && urlSegments[2] === 'search' && urlSegments[3]) {
+      setQuery(decodeURIComponent(urlSegments[3]));
     }
   }, []);
 
@@ -32,7 +32,7 @@ const SearchBar = (props) => {
       <input
         type="text"
         onChange={handleChangeQuery}
-        placeholder="Search for a song/artist"
+        placeholder={placeholder}
         value={query}
       />
 
@@ -44,7 +44,7 @@ const SearchBar = (props) => {
 
       {
         redirect
-          && <Redirect to={`/search/${encodeURIComponent(query)}`} />
+          && <Redirect to={`${resultsPage}/${encodeURIComponent(query)}`} />
       }
     </form>
   );

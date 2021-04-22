@@ -1,0 +1,26 @@
+@import '../../variables';
+
+#venue-list {
+  .result {
+    svg {
+      color: $wave-colour-light;
+    }
+
+    &:hover {
+      background-color: $background-colour;
+      text-decoration: none;
+    }
+
+    border-bottom: 1px solid $line-separator-colour;
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    padding: 16px;
+    transition: background-color .1s ease-in-out;
+    user-select: none;
+    width: 100%;
+  }
+
+  display: flex;
+  flex-direction: column;
+}

@@ -1,20 +1,24 @@
 import React from 'react';
+import classNames from 'classnames';
 
 import './ScreenHeader.scss';
 
-const ScreenHeader = (props) => {
-  const { subtitle, title } = props;
+const ScreenHeader = ({ subtitle, title, className }) => (
+  <div
+    className={classNames({
+      'screen-header': true,
+      'p-3': true,
+      'pb-2': true,
+      [className]: className
+    })}
+  >
+    <div className="title"> { title } </div>
 
-  return (
-    <div className="screen-header p-3 pb-2">
-      <div className="title"> { title } </div>
-
-      {
-        subtitle
-          && <div> { subtitle } </div>
-      }
-    </div>
-  );
-};
+    {
+      subtitle
+        && <div> { subtitle } </div>
+    }
+  </div>
+);
 
 export default ScreenHeader;

@@ -9,9 +9,9 @@ import { TOKENS_EXPIRED } from '../../constants';
 import { getTrackSearchResults } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
 
-import './SearchResults.scss';
+import './TrackSearchResults.scss';
 
-const SearchResults = (props) => {
+const TrackSearchResults = (props) => {
   const dispatch = useAppDispatch();
   const { searchResults, tokens } = useAppState();
 
@@ -44,9 +44,9 @@ const SearchResults = (props) => {
   return (
     <ScreenContainer>
       {
-        searchResults.length > 0
+        searchResults.tracks.length > 0
           ? (
-            <SongList tracks={searchResults} />
+            <SongList tracks={searchResults.tracks} />
           ) : (
             <div className="p-3 text-center">
               No songs, albums or artists matched your search.
@@ -57,4 +57,4 @@ const SearchResults = (props) => {
   );
 };
 
-export default withRouter(SearchResults);
+export default withRouter(TrackSearchResults);

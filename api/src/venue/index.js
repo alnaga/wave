@@ -260,4 +260,41 @@ router.post('/check-out', authenticate, async (req, res) => {
   });
 });
 
+router.get('/search', authenticate, async (req, res) => {
+  const query = req.query.q;
+
+  await Venue.find({
+    name: {
+      $regex: query,
+      $options: 'i'
+    }
+  }, (error, results) => {
+    if (error) {
+      res.status(500).send({
+        message: 'Internal server error occurred while searching for venue.'
+      });
+    } else {
+      const returned = [];
+
+      for (let result of results) {
+        result = result.toObject();
+        delete result.attendees;
+        delete result.address;
+        delete result.googleMapsLink;
+        delete result.owners;
+        delete result.songHistory;
+        delete result.spotifyConsent;
+        delete result.spotifyTokens;
+        delete result.votes;
+        delete result.__v;
+        returned.push(result);
+      }
+
+      res.status(200).send([
+        ...returned
+      ]);
+    }
+  })
+});
+
 module.exports = router;

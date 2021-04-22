@@ -14,7 +14,7 @@ import './Header.scss';
 
 const Header = () => {
   const dispatch = useAppDispatch();
-  const { tokens } = useAppState();
+  const { currentVenue, tokens } = useAppState();
   const { spotify, wave } = tokens;
 
   const handleGoHome = () => {
@@ -36,7 +36,17 @@ const Header = () => {
           wave.accessToken
             && (
               <div className="d-flex flex-grow-1 align-items-center justify-content-end">
-                <SearchBar className="ml-3 mr-3" />
+                {
+                  currentVenue
+                    && (
+                      <SearchBar
+                        className="ml-3 mr-3"
+                        resultsPage="/tracks/search"
+                        searchType="tracks"
+                        placeholder="Search for a song/artist"
+                      />
+                    )
+                }
 
                 {
                   !spotify.accessToken
