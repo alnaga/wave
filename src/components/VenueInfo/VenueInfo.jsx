@@ -92,8 +92,17 @@ const VenueInfo = (props) => {
                     }
                   </div>
 
+                  {
+                    venueInfo.googleMapsLink
+                    && (
+                      <div className="mb-3">
+                        <a href={venueInfo.googleMapsLink} target="_blank"> Google Maps Link </a>
+                      </div>
+                    )
+                  }
+
                   <div className="mb-3">
-                    <label> Attendees </label>
+                    <label> Checked In Users </label>
 
                     {
                       venueInfo.attendees.length > 0
@@ -111,33 +120,22 @@ const VenueInfo = (props) => {
                           </div>
                         ) : (
                           <div>
-                            There are currently no attendees. Why not check in and get started?
+                            No users have currently checked into this venue. Why not be the first to start playing?
                           </div>
                         )
                     }
                   </div>
 
                   {
-                    venueInfo.googleMapsLink
-                    && (
-                      <div>
-                        <a href={venueInfo.googleMapsLink} target="_blank"> Google Maps Link </a>
-                      </div>
-                    )
-                  }
-
-                  {
                     (venueInfo.attendees.length > 0 && venueInfo.attendees.find((attendee) => attendee.username === tokensRef.current.wave.user.username))
                       ? (
                         <button
-                          className="mt-3"
                           onClick={handleCheckOut}
                         >
                           Check Out
                         </button>
                       ) : (
                         <button
-                          className="mt-3"
                           onClick={handleCheckIn}
                         >
                           Check In
