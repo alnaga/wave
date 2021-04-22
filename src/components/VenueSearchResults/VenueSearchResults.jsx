@@ -9,7 +9,6 @@ import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getVenueSearchResults } from '../../actions/venue/venueActions';
-import SearchBar from '../SearchBar/SearchBar';
 
 const VenueSearchResults = (props) => {
   const dispatch = useAppDispatch();
@@ -40,15 +39,7 @@ const VenueSearchResults = (props) => {
 
   return (
     <ScreenContainer>
-      <SearchBar
-        className="justify-content-center mt-3"
-        resultsPage="/venues/search"
-        searchType="venues"
-        placeholder="Search for a venue"
-      />
-
       <ScreenHeader
-        className="pt-2"
         title="Venue Search Results"
         subtitle={`Showing results for '${decodeURIComponent(props.match.params.query)}':`}
       />

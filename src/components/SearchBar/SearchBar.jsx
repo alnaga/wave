@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Redirect } from 'react-router';
+import { withRouter } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSearch } from '@fortawesome/free-solid-svg-icons';
 
@@ -24,8 +25,12 @@ const SearchBar = ({ placeholder, resultsPage, searchType, ...props }) => {
     const urlSegments = window.location.pathname.split('/');
     if (urlSegments[1] === searchType && urlSegments[2] === 'search' && urlSegments[3]) {
       setQuery(decodeURIComponent(urlSegments[3]));
+    } else {
+      setQuery('');
     }
-  }, []);
+
+    setRedirect(false);
+  }, [searchType, props.history.location]);
 
   return (
     <form id="search-bar" {...props}>
@@ -50,4 +55,4 @@ const SearchBar = ({ placeholder, resultsPage, searchType, ...props }) => {
   );
 };
 
-export default SearchBar;
+export default withRouter(SearchBar);
