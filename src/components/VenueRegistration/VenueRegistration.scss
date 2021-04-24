@@ -1,14 +1,6 @@
 @import '../../variables';
 
 #venue-registration {
-  input {
-    background-color: $input-background-colour;
-    color: white;
-    border: 1px solid $line-separator-colour;
-    border-radius: 8px;
-    padding: 8px 10px;
-  }
-
   #consent {
     input {
       transform: scale(1.25);
@@ -23,11 +15,6 @@
     display: flex;
     flex-direction: column;
     flex-grow: 1;
-  }
-
-  .form-section {
-    display: flex;
-    flex-direction: column;
   }
 
   color: white;

@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
+import { Redirect } from 'react-router-dom';
+
+import Error from '../Error/Error';
+import ScreenContainer from '../ScreenContainer/ScreenContainer';
+import ScreenHeader from '../ScreenHeader/ScreenHeader';
 
 import { login, registerAccount } from '../../actions/account/accountActions';
-import { useAppDispatch } from '../../context/context';
+import { useAppDispatch, useAppState } from '../../context/context';
 
 import './LoginRegister.scss';
 
@@ -14,9 +19,10 @@ const LoginRegister = () => {
     passwordConfirmation: ''
   });
   const [ error, setError ] = useState('');
-  const [ showLogin, setShowLogin ] = useState(false);
+  const [ showLogin, setShowLogin ] = useState(true);
 
   const dispatch = useAppDispatch();
+  const { tokens } = useAppState();
 
   const handleDismissError = () => {
     setError('');
@@ -57,147 +63,124 @@ const LoginRegister = () => {
   };
 
   return (
-    <div id="login-register" className="container-sm d-flex justify-content-center pl-0 pl-sm-3 pr-0 pr-sm-3">
-      <form className="card d-flex flex-column justify-content-center mt-0 mt-sm-5">
-        <div className="card-body d-flex flex-column">
-          <h5 className="card-title text-center mt-2">
+    <ScreenContainer>
+      <ScreenHeader
+        title={showLogin ? 'Login' : 'Register'}
+        subtitle={
+          `The way you interact with music is about to change. Enter your details to ${showLogin ? 'log in' : 'get started'}!`
+        }
+      />
+
+      {
+        tokens.wave.accessToken
+        && <Redirect to="/" />
+      }
+
+      <form className="mr-3 ml-3">
+        {
+          !showLogin
+            && (
+              <>
+                <div className="form-section mt-3">
+                  <label className="mb-1" htmlFor="first-name"> First Name </label>
+                  <input
+                    id="first-name"
+                    type="text"
+                    onChange={handleFormChange('firstName')}
+                    placeholder="First Name"
+                    required
+                    value={data.firstName}
+                  />
+                </div>
+
+                <div className="form-section mt-3">
+                  <label className="mb-1" htmlFor="last-name"> Last Name </label>
+                  <input
+                    id="last-name"
+                    type="text"
+                    onChange={handleFormChange('lastName')}
+                    placeholder="Last Name"
+                    required
+                    value={data.lastName}
+                  />
+                </div>
+              </>
+            )
+        }
+
+        <div className="form-section mt-3">
+          <label className="mb-1" htmlFor="username"> Username </label>
+          <input
+            id="username"
+            type="text"
+            onChange={handleFormChange('username')}
+            placeholder="Username"
+            required
+            value={data.username}
+          />
+        </div>
+
+        <div className="form-section mt-3">
+          <label className="mb-1" htmlFor="password"> Password </label>
+          <input
+            id="password"
+            type="password"
+            onChange={handleFormChange('password')}
+            placeholder={"Password"}
+            required
+            value={data.password}
+          />
+        </div>
+
+        {
+          !showLogin
+            && (
+              <div className="form-section mt-3">
+                <label className="mb-1" htmlFor="passwordConfirmation"> Confirm Password </label>
+                <input
+                  id="passwordConfirmation"
+                  type="password"
+                  onChange={handleFormChange('passwordConfirmation')}
+                  placeholder={"Confirm Password"}
+                  required
+                  value={data.passwordConfirmation}
+                />
+              </div>
+            )
+        }
+
+        <Error
+          className="mt-3"
+          message={error}
+          onDismiss={handleDismissError}
+          show={error}
+        />
+
+        <div className="form-group d-flex flex-column justify-content-center mt-3">
+          <button
+            className="btn btn-primary flex-grow-1"
+            type="submit"
+            onClick={handleSubmit}
+          >
             {
               showLogin
                 ? 'Log In'
                 : 'Register'
             }
-          </h5>
-
-          <div className="flex-grow-1">
-            <div className="mt-2 text-center">
-              The way you interact with music is about to change.
-              <br />
-              Enter your details to
-              {
-                showLogin
-                  ? ' log in!'
-                  : ' get started!'
-              }
-            </div>
-
-            {
-              !showLogin
-                && (
-                  <>
-                    <div className="form-group mt-3">
-                      <label className="mb-1" htmlFor="first-name"> First Name </label>
-                      <input
-                        id="first-name"
-                        className="form-control"
-                        type="text"
-                        onChange={handleFormChange('firstName')}
-                        placeholder="First Name"
-                        required
-                        value={data.firstName}
-                      />
-                    </div>
-
-                    <div className="form-group mt-3">
-                      <label className="mb-1" htmlFor="last-name"> Last Name </label>
-                      <input
-                        id="last-name"
-                        className="form-control"
-                        type="text"
-                        onChange={handleFormChange('lastName')}
-                        placeholder="Last Name"
-                        required
-                        value={data.lastName}
-                      />
-                    </div>
-                  </>
-                )
-            }
-
-            <div className="form-group mt-3">
-              <label className="mb-1" htmlFor="username"> Username </label>
-              <input
-                id="username"
-                className="form-control"
-                type="text"
-                onChange={handleFormChange('username')}
-                placeholder="Username"
-                required
-                value={data.username}
-              />
-            </div>
-
-            <div className="form-group mt-3">
-              <label className="mb-1" htmlFor="password"> Password </label>
-              <input
-                id="password"
-                className="form-control"
-                type="password"
-                onChange={handleFormChange('password')}
-                placeholder={"Password"}
-                required
-                value={data.password}
-              />
-            </div>
-
-            {
-              !showLogin
-              && (
-                <div className="form-group mt-3">
-                  <label className="mb-1" htmlFor="passwordConfirmation"> Confirm Password </label>
-                  <input
-                    className="form-control"
-                    id="passwordConfirmation"
-                    type="password"
-                    onChange={handleFormChange('passwordConfirmation')}
-                    placeholder={"Confirm Password"}
-                    required
-                    value={data.passwordConfirmation}
-                  />
-                </div>
-              )
-            }
-          </div>
-
-
-          {
-            error
-            && (
-              <div className="alert alert-danger alert-dismissible mt-3 mb-0">
-                { error }
-
-                <button type="button" className="close" onClick={handleDismissError}>
-                  <span> &times; </span>
-                </button>
-              </div>
-            )
-          }
-
-          <div className="form-group d-flex flex-column justify-content-center mt-3">
-            <button
-              className="btn btn-primary flex-grow-1"
-              type="submit"
-              onClick={handleSubmit}
-            >
-              {
-                showLogin
-                  ? 'Log In'
-                  : 'Register'
-              }
-            </button>
-
-            <div className="mt-4 text-center">
-              <a className="pointer" onClick={handleToggleShowLogin}>
-                {
-                  showLogin
-                    ? 'Want to register instead? Click here.'
-                    : 'Already have an account? Click here to log in.'
-                }
-              </a>
-            </div>
-          </div>
+          </button>
         </div>
       </form>
-    </div>
+
+      <div className="text-center mt-4 mb-4 ml-3 mr-3">
+        <a className="pointer" onClick={handleToggleShowLogin}>
+          {
+            showLogin
+              ? 'Want to register instead? Click here.'
+              : 'Already have an account? Click here to log in.'
+          }
+        </a>
+      </div>
+    </ScreenContainer>
   );
 };
 

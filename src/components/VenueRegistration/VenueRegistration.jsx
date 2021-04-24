@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { withRouter } from 'react-router-dom';
 
+import Error from '../Error/Error';
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
 import ScreenHeader from '../ScreenHeader/ScreenHeader';
 
@@ -179,20 +180,14 @@ const VenueRegistration = (props) => {
             />
           </div>
 
-          {
-            error
-            && (
-              <div className="alert alert-danger alert-dismissible mt-3 mb-0">
-                { error }
+          <Error
+            className="mt-3"
+            message={error}
+            onDismiss={handleDismissError}
+            show={error}
+          />
 
-                <div className="close" onClick={handleDismissError}>
-                  <span> &times; </span>
-                </div>
-              </div>
-            )
-          }
-
-          <button className="mt-4" type="submit" onClick={handleSubmit}>
+          <button className="mt-3" type="submit" onClick={handleSubmit}>
             Submit
           </button>
         </div>

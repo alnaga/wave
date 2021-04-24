@@ -1,0 +1,14 @@
+@import '../../variables';
+
+.error {
+  .dismiss {
+    cursor: pointer;
+    font-size: 32px;
+  }
+
+  align-items: center;
+  background-color: $error-colour;
+  border-radius: 24px;
+  display: flex;
+  justify-content: space-between;
+}

@@ -20,6 +20,11 @@ const CurrentlyPlaying = () => {
   const { currentSong, currentVenue, tokens } = useAppState();
   const [ songProgress, setSongProgress ] = useState(0);
 
+  const [ pollCurrentSongInterval, setPollCurrentSongInterval ] = useState();
+
+  const currentVenueRef = useRef(null);
+  currentVenueRef.current = currentVenue;
+
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
@@ -28,10 +33,10 @@ const CurrentlyPlaying = () => {
       tokensRef.current.wave.accessToken
       && currentVenue
       && currentVenue.id
-      && await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.id) === TOKENS_EXPIRED
+      && await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+      await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.current.id);
     }
   }
 
@@ -46,15 +51,26 @@ const CurrentlyPlaying = () => {
     (async () => {
       await handleFetchCurrentSong();
 
-      const pollCurrentSong =  setInterval(async () => {
-        await handleFetchCurrentSong();
-      }, 5000);
+      // This checks to see whether there is a venue the user is currently checked into
+      // and whether the client is polling the current song.
+      // When the user checks out of a venue it will stop polling the current song to save
+      // on performance.
+      if (currentVenue && !pollCurrentSongInterval) {
+        setPollCurrentSongInterval(setInterval(async () => {
+          await handleFetchCurrentSong();
+        }, 5000))
+      } else if (!currentVenue && pollCurrentSongInterval) {
+        clearInterval(pollCurrentSongInterval);
+        setPollCurrentSongInterval();
+      }
 
       return () => {
-        clearInterval(pollCurrentSong);
-      }
+        if (pollCurrentSongInterval) {
+          clearInterval(pollCurrentSongInterval);
+        }
+      };
     })();
-  }, []);
+  }, [ , currentVenue]);
 
   return (
     <>
@@ -109,7 +125,7 @@ const CurrentlyPlaying = () => {
               </>
             ) : (
               <div id="no-song">
-                No song currently playing.
+                No song playing.
               </div>
             )
         }

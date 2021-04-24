@@ -25,6 +25,8 @@
 
   button {
     &:focus {
+      background-color: $wave-colour-dark;
+      box-shadow: none;
       outline: none;
     }
 
@@ -41,10 +43,23 @@
     width: 100%;
   }
 
+  input {
+    background-color: $input-background-colour;
+    color: white;
+    border: 1px solid $line-separator-colour;
+    border-radius: 8px;
+    padding: 8px 10px;
+  }
+
   label {
     font-size: 14px;
     font-weight: 600;
     user-select: none;
+  }
+
+  .form-section {
+    display: flex;
+    flex-direction: column;
   }
 
   .list {

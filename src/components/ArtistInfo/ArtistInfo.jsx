@@ -20,6 +20,10 @@ const ArtistInfo = (props) => {
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
+  // if (artistInfo) {
+  //   console.log(artistInfo);
+  // }
+
   const handleGetArtistInfo = async () => {
     if (
       tokensRef.current.wave.accessToken

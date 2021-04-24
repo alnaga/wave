@@ -32,44 +32,42 @@ const Header = () => {
           </Link>
         </div>
 
-        {
-          wave.accessToken
-            && (
-              <div className="d-flex flex-grow-1 align-items-center justify-content-end">
-                {
-                  currentVenue
-                    ? (
-                      <SearchBar
-                        className="ml-3 mr-3"
-                        resultsPage="/tracks/search"
-                        searchType="tracks"
-                        placeholder="Search for a song/artist"
-                      />
-                    ) : (
-                      <SearchBar
-                        className="ml-3 mr-3"
-                        resultsPage="/venues/search"
-                        searchType="venues"
-                        placeholder="Search for a venue"
-                      />
-                    )
-                }
+        <div className="d-flex flex-grow-1 align-items-center justify-content-end">
+          {
+            (wave.accessToken && currentVenue)
+              ? (
+                <SearchBar
+                  className="ml-3 mr-3"
+                  resultsPage="/tracks/search"
+                  searchType="tracks"
+                  placeholder="Search for a song/artist"
+                />
+              ) : (
+                <SearchBar
+                  className="ml-3 mr-3"
+                  resultsPage="/venues/search"
+                  searchType="venues"
+                  placeholder="Search for a venue"
+                />
+              )
+          }
 
-                {
-                  !spotify.accessToken
-                  && <SpotifyAuthorise className="mr-3" />
-                }
+          {
+            (wave.access && !spotify.accessToken)
+            && <SpotifyAuthorise className="mr-3" />
+          }
 
-                <Link to="/account" className="mr-3">
-                  <FontAwesomeIcon icon={faUserCircle} size="lg" />
-                </Link>
+          <Link
+            to={wave.accessToken ? '/account' : '/login'}
+            className="mr-3"
+          >
+            <FontAwesomeIcon icon={faUserCircle} size="lg" />
+          </Link>
 
-                <Link to="/settings">
-                  <FontAwesomeIcon icon={faCog} size="lg" />
-                </Link>
-              </div>
-            )
-        }
+          <Link to="/settings">
+            <FontAwesomeIcon icon={faCog} size="lg" />
+          </Link>
+        </div>
       </div>
     </div>
   );

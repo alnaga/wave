@@ -4,8 +4,8 @@ import { Switch, Route } from 'react-router-dom';
 import AccountInfo from '../AccountInfo/AccountInfo';
 import AlbumInfo from '../AlbumInfo/AlbumInfo';
 import ArtistInfo from '../ArtistInfo/ArtistInfo';
-import CurrentlyPlaying from '../CurrentlyPlaying/CurrentlyPlaying';
 import Home from '../Home/Home';
+import LoginRegister from '../LoginRegister/LoginRegister';
 import TrackSearchResults from '../TrackSearchResults/TrackSearchResults';
 import VenueInfo from '../VenueInfo/VenueInfo';
 import VenueRegistration from '../VenueRegistration/VenueRegistration';
@@ -22,6 +22,8 @@ const Dashboard = () => {
           <Route exact path="/account" component={AccountInfo} />
           <Route exact path="/album/:albumId" component={AlbumInfo} />
           <Route exact path="/artist/:artistId" component={ArtistInfo} />
+          <Route exact path="/login" component={LoginRegister} />
+          <Route exact path="/register" component={LoginRegister} />
           <Route exact path="/register-venue" component={VenueRegistration} />
           <Route exact path="/tracks/search/:query" component={TrackSearchResults} />
           <Route exact path="/venues/search/:query" component={VenueSearchResults} />
@@ -30,7 +32,6 @@ const Dashboard = () => {
         </Switch>
       </div>
 
-      <CurrentlyPlaying />
     </div>
   );
 };
