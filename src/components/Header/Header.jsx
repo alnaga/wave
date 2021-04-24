@@ -53,7 +53,7 @@ const Header = () => {
           }
 
           {
-            (wave.access && !spotify.accessToken)
+            (wave.accessToken && !spotify.accessToken)
             && <SpotifyAuthorise className="mr-3" />
           }
 
