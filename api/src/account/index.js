@@ -10,6 +10,23 @@ import { AUTHORISATION } from '../constants';
 
 const router = Router();
 
+const getVenuesByIds = async (venueIds, res, callback) => {
+  const venues = await venueIds.map(async (venueId) => {
+    return Venue.findOne({ _id: venueId }, (error) => {
+      if (error) {
+        res.status(500).send({
+          message: 'Internal server error.'
+        });
+      }
+    }).select({
+      address: 1,
+      name: 1
+    });
+  });
+
+  callback(await Promise.all(venues));
+};
+
 router.delete('/', authenticate, async (req, res) => {
   const accessToken = req.headers.authorization.split('Bearer ')[1];
 
@@ -27,37 +44,46 @@ router.delete('/', authenticate, async (req, res) => {
         // We need to find the user so we can check whether we need to delete any venues.
         await User.findOne({ username: token.user.username }, async (error, user) => {
           if (error) {
-
+            res.status(500).send({
+              message: 'Internal server error occurred while deleting user.'
+            });
           } else if (!user) {
-
+            res.status(400).send({
+              message: 'Invalid user.'
+            });
           } else {
-            // Find all the venues with the user listed as an owner and delete them if that is the only owner.
-            await Venue.find({ owners: user._id }, async (error, venues) => {
+            // If the user owns any venues, check to see whether they need to be deleted (if they are the only owner).
+            await getVenuesByIds(user.venues, res, async (venues) => {
               if (venues.length > 0) {
-                for (let venue of venues) {
+                const deletingVenues = await venues.map((venue) => {
+                  // If this owner is the last owner left, the venue must be deleted.
                   if (venue.owners.length === 1) {
-                    await Venue.deleteOne({ _id: venue._id }, (error, result) => {
+                    return Venue.deleteOne({ _id: venue._id }, (error, result) => {
                       if (error || result.nModified === 0) {
                         res.status(500).send({
-                          message: 'Internal server error occurred while deleting user\'s own venues.'
+                          message: 'Internal server error occurred while deleting user\'s owned venues.'
                         });
                       }
-                    })
+                    });
                   }
-                }
+                });
+
+                await Promise.all(deletingVenues);
               }
             });
 
             // We need to check whether the user is checked into any venues, and check them out if they are.
             await Venue.find({ attendees: user._id }, async (error, venues) => {
               if (venues.length > 0) {
-                for (let venue of venues) {
-                  await Venue.updateOne({ _id: venue._id }, {
+                const checkingOutOfVenues = await venues.map((venue) => {
+                  return Venue.updateOne({ _id: venue._id }, {
                     $pull: {
                       attendees: user._id
                     }
                   });
-                }
+                });
+
+                await Promise.all(checkingOutOfVenues);
               }
             });
 
@@ -71,7 +97,7 @@ router.delete('/', authenticate, async (req, res) => {
                   message: 'Account deleted successfully.'
                 });
               }
-            })
+            });
           }
         });
       }
@@ -88,42 +114,14 @@ router.get('/', authenticate, async (req, res) => {
         message: 'Internal server error.'
       });
     } else if (user) {
-      let venues = [];
-
-      // Fetch the foreign key data for each item in the user's venues array.
-      // This is in an IIFE so that it will fetch all venues before sending the response.
-      await (async () => {
-        for (let venueId of user.venues) {
-          await Venue.findOne({ _id: venueId }, async (error, venue) => {
-            if (error) {
-              res.status(500).send({
-                message: 'Internal server error occurred while fetching account data.'
-              });
-            } else if (!venue) {
-              // The venue no longer exists and so it must be deleted from the User object.
-              await User.updateOne({ username }, {
-                $pull: {
-                  venues: venueId
-                }
-              });
-            } else {
-              venues.push({
-                _id: venue._id,
-                address: venue.address,
-                name: venue.name
-              });
-            }
-          })
-        }
-      })();
-
-
-      // Remove the password field from the user object that is returned to the user to preserve security.
-      res.status(200).send({
-        firstName: user.firstName,
-        lastName: user.lastName,
-        username: user.username,
-        venues
+      await getVenuesByIds(user.venues, res, (venues) => {
+        // Remove the password field from the user object that is returned to the user to preserve security.
+        res.status(200).send({
+          firstName: user.firstName,
+          lastName: user.lastName,
+          username: user.username,
+          venues
+        });
       });
     } else {
       res.status(400).send({

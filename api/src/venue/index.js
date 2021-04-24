@@ -7,6 +7,25 @@ import { authenticate } from '../util';
 
 const router = Router();
 
+const getUsersByIds = async (userIds, res, callback) => {
+  const users = await userIds.map(async (userId) => {
+    return User.findOne({ _id: userId }, (error) => {
+      if (error) {
+        res.status(500).send({
+          message: 'Internal server error.'
+        });
+      }
+    }).select({
+      _id: 0,
+      firstName: 1,
+      lastName: 1,
+      username: 1
+    });
+  });
+
+  callback(await Promise.all(users));
+}
+
 router.get('/', authenticate, async (req, res) => {
   const { id } = req.query;
 
@@ -16,41 +35,21 @@ router.get('/', authenticate, async (req, res) => {
         message: 'Internal server error occurred while fetching venue data.'
       });
     } else if (venue) {
-      const attendees = [];
-
-      for (let userId of venue.attendees) {
-        await User.findOne({ _id: userId }, async (error, user) => {
-          if (error) {
-            res.status(500).send({
-              message: 'Internal server error occurred while fetching venue data.'
-            });
-          } else if (!user) {
-            // The user no longer exists and so it must be deleted from the venue attendees array.
-            await Venue.updateOne({ _id: id }, {
-              $pull: {
-                attendees: userId
-              }
-            });
-          } else {
-            attendees.push({
-              firstName: user.firstName,
-              lastName: user.lastName,
-              username: user.username
-            });
-          }
+      await getUsersByIds(venue.attendees, res, async (attendees) => {
+        await getUsersByIds(venue.owners, res, (owners) => {
+          res.status(200).send({
+            venue: {
+              id: venue._id,
+              address: venue.address,
+              attendees,
+              googleMapsLink: venue.googleMapsLink,
+              name: venue.name,
+              owners,
+              songHistory: venue.songHistory,
+              votes: venue.votes || 0
+            }
+          });
         });
-      }
-
-      res.status(200).send({
-        venue: {
-          id: venue._id,
-          address: venue.address,
-          attendees,
-          googleMapsLink: venue.googleMapsLink,
-          name: venue.name,
-          songHistory: venue.songHistory,
-          votes: venue.votes || 0
-        }
       });
     } else {
       res.status(400).send({
@@ -196,11 +195,16 @@ router.post('/check-in', authenticate, async (req, res) => {
                     }
                   });
 
-                  res.status(200).send({
-                    attendees: venue.attendees,
-                    id: venue._id,
-                    name: venue.name,
-                    votes: venue.votes || 0
+                  await getUsersByIds(venue.attendees, res, async (attendees) => {
+                    await getUsersByIds(venue.owners, res, (owners) => {
+                      res.status(200).send({
+                        attendees,
+                        id: venue._id,
+                        name: venue.name,
+                        owners,
+                        votes: venue.votes || 0
+                      });
+                    })
                   });
                 }
               });

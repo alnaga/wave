@@ -79,6 +79,21 @@ const VenueInfo = (props) => {
 
                 <div className="p-3">
                   <div className="mb-3">
+                    <label>
+                      Owners
+                    </label>
+                    {
+                      venueInfo.owners.map((owner) => {
+                        return (
+                          <div key={owner.username}>
+                            { owner.firstName } { owner.lastName } ({ owner.username }}
+                          </div>
+                        );
+                      })
+                    }
+                  </div>
+
+                  <div className="mb-3">
                     <label> Address </label>
 
                     {
