@@ -19,7 +19,7 @@ const resultMarket = 'GB';
  * Utility function to fetch the Spotify access token for a given venue from the database and pass
  * its Spotify Access token to the callback provided.
  * @param venueId {String} - ID of the venue whose Spotify token is required.
- * @param res {Response<any, Record<string, any>>} - Response object of the calling endpoint.
+ * @param res {Object} - Response object of the calling endpoint.
  * @param callback {Function} - The callback into which the access token will be passed.
  */
 const getSpotifyAccessToken = async (venueId, res, callback) => {
@@ -36,9 +36,8 @@ const getSpotifyAccessToken = async (venueId, res, callback) => {
       // If the access token has expired, it is refreshed and then the new access token is fetched and passed
       // to the callback function.
       if (venue.spotifyTokens.accessTokenExpiresAt < Date.now()) {
-        await refreshSpotifyToken(venueId, venue.spotifyTokens.refreshToken);
-        await Venue.findOne({ _id: venueId }, (error, updatedVenue) => {
-          callback(updatedVenue.toObject().spotifyTokens.accessToken);
+        await refreshSpotifyToken(venueId, venue.spotifyTokens.refreshToken, async (refreshedAccessToken) => {
+          callback(refreshedAccessToken);
         });
       } else {
         callback(venue.toObject().spotifyTokens.accessToken);
@@ -47,7 +46,7 @@ const getSpotifyAccessToken = async (venueId, res, callback) => {
   })
 };
 
-const refreshSpotifyToken = async (venueId, refreshToken) => {
+const refreshSpotifyToken = async (venueId, refreshToken, callback) => {
   console.log('Refreshing Spotify Access Token', new Date().toISOString());
   const spotifyResponse = await axios.post('https://accounts.spotify.com/api/token', null, {
     headers: {
@@ -73,7 +72,9 @@ const refreshSpotifyToken = async (venueId, refreshToken) => {
             refreshToken
           }
         }
-      })
+      });
+
+      callback(newAccessToken);
     }
   }
 };
