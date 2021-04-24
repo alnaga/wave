@@ -79,9 +79,7 @@ const VenueInfo = (props) => {
 
                 <div className="p-3">
                   <div className="mb-3">
-                    <label>
-                      Owners
-                    </label>
+                    <label> Owner(s) </label>
                     {
                       venueInfo.owners.map((owner) => {
                         return (
@@ -91,6 +89,13 @@ const VenueInfo = (props) => {
                         );
                       })
                     }
+                  </div>
+
+                  <div className="mb-3">
+                    <label> Description </label>
+                    <div>
+                      { venueInfo.description }
+                    </div>
                   </div>
 
                   <div className="mb-3">

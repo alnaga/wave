@@ -43,7 +43,7 @@
     width: 100%;
   }
 
-  input {
+  input, textarea {
     background-color: $input-background-colour;
     color: white;
     border: 1px solid $line-separator-colour;

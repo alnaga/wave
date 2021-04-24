@@ -27,6 +27,7 @@ const VenueRegistration = (props) => {
     addressLine2: '',
     city: '',
     county: '',
+    description: '',
     spotifyConsent: true,
     googleMapsLink: '',
     postcode: '',
@@ -59,6 +60,8 @@ const VenueRegistration = (props) => {
     
     if (!data.name) {
       setError('Please enter a name for your venue.');
+    } else if (!data.description) {
+      setError('Please enter a description for your venue.');
     } else if (!data.addressLine1) {
       setError('Please enter an address for your venue.');
     } else if (!data.postcode) {
@@ -66,7 +69,7 @@ const VenueRegistration = (props) => {
     } else if (!data.city) {
       setError('Please enter the city your venue is in.');
     } else if (!data.county) {
-      setError('Please enter the county your venue is in.')
+      setError('Please enter the county your venue is in.');
     } else if (!data.spotifyConsent) {
       setError('Consent to use your Spotify account is required to register your venue.');
     } else {
@@ -104,6 +107,17 @@ const VenueRegistration = (props) => {
               placeholder="Venue Name"
               required
               value={data.name}
+            />
+          </div>
+
+          <div className="mb-3 form-section">
+            <label htmlFor="venue-name" className="mb-1"> Description * </label>
+            <textarea
+              name="venue-description"
+              onChange={handleFormChange('description')}
+              placeholder="Description"
+              required
+              value={data.description}
             />
           </div>
 
