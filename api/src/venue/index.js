@@ -135,14 +135,11 @@ router.post('/', authenticate, async (req, res) => {
 router.post('/check-in', authenticate, async (req, res) => {
   const { accessToken, venueId } = req.body;
 
+  // Find the user from the access token the request was made with.
   await Token.findOne({ accessToken }, async (error, token) => {
     if (error) {
       res.status(500).send({
         message: 'Internal server error occurred while checking into venue.'
-      });
-    } else if (token && new Date(token.accessTokenExpiresAt).getTime() < Date.now()) {
-      res.status(401).send({
-        message: 'Access token expired.'
       });
     } else if (!token) {
       res.status(400).send({
@@ -222,10 +219,6 @@ router.post('/check-out', authenticate, async (req, res) => {
     if (error) {
       res.status(500).send({
         message: 'Internal server error occurred while checking out.'
-      });
-    } else if (token && new Date(token.accessTokenExpiresAt).getTime() < Date.now()) {
-      res.status(401).send({
-        message: 'Access token expired.'
       });
     } else if (!token) {
       res.status(400).send({
