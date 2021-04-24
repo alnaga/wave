@@ -117,10 +117,12 @@ router.post('/', authenticate, async (req, res) => {
             venue: {
               _id: venue._id,
               address: venue.address,
+              attendees: venue.attendees,
               googleMapsLink: venue.googleMapsLink,
               name: venue.name,
               owners: [ user ],
-              songHistory: venue.songHistory
+              songHistory: venue.songHistory,
+              votes: venue.votes
             },
             message: 'Business registration successful!'
           });

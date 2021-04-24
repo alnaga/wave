@@ -28,12 +28,13 @@ const getSpotifyAccessToken = async (venueId, res) => {
         message: 'Invalid venue ID.'
       });
     } else {
-      spotifyAccessToken = venue.spotifyTokens.accessToken;
       if (venue.spotifyTokens.accessTokenExpiresAt < Date.now()) {
         await refreshSpotifyToken(venueId, venue.spotifyTokens.refreshToken);
         await Venue.findOne({ _id: venueId }, (error, updatedVenue) => {
           spotifyAccessToken = updatedVenue.spotifyTokens.accessToken;
         });
+      } else {
+        spotifyAccessToken = venue.spotifyTokens.accessToken;
       }
     }
   });

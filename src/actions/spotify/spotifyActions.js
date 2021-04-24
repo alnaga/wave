@@ -242,7 +242,7 @@ export const getTrackSearchResults = async (dispatch, accessToken, spotifyAccess
  * Gets the currently playing song within a venue.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API Access Token
- * @param spotifyAccessToken {String} - Spotify API Access Token
+ * @param venueId {String} - The ID of the target venue.
  * @returns 1 if successful, 0 if failed
  */
 export const getCurrentSong = async (dispatch, accessToken, venueId) => {
