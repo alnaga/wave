@@ -86,7 +86,7 @@ const VenueInfo = (props) => {
                       venueInfo.owners.map((owner) => {
                         return (
                           <div key={owner.username}>
-                            { owner.firstName } { owner.lastName } ({ owner.username }}
+                            { owner.firstName } { owner.lastName }
                           </div>
                         );
                       })
