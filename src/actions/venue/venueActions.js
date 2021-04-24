@@ -1,5 +1,6 @@
 import axios from 'axios';
 import {
+  SET_CURRENT_SONG,
   SET_CURRENT_VENUE,
   SET_VENUE_INFO,
   SET_VENUE_SEARCH_RESULTS,
@@ -59,6 +60,11 @@ export const checkOut = async (dispatch, accessToken, venueId) => {
   if (response) {
     if (response.status === 200) {
       sessionStorage.removeItem('currentVenue');
+
+      dispatch({
+        type: SET_CURRENT_SONG,
+        payload: undefined
+      });
 
       dispatch({
         type: SET_CURRENT_VENUE,
