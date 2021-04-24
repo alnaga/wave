@@ -1,3 +1,5 @@
+export const CLEAR = 'CLEAR';
+
 export const CLEAR_HISTORY = 'CLEAR_HISTORY';
 export const SET_HISTORY = 'SET_HISTORY';
 

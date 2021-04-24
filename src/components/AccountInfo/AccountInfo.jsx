@@ -107,7 +107,7 @@ const AccountInfo = () => {
                     App Settings
                   </Link>
 
-                  <Link to="/delete" className="mb-2">
+                  <Link to="/account/delete" className="mb-2">
                     Delete account
                   </Link>
 

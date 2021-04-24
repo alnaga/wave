@@ -1,10 +1,18 @@
 import axios from 'axios';
 
 import {
+  CLEAR,
   SET_ACCOUNT_INFO,
   SET_WAVE_TOKENS,
   TOKENS_EXPIRED
 } from '../../constants';
+
+const clearSessionStorage = async () => {
+  await sessionStorage.removeItem('currentVenue');
+  await sessionStorage.removeItem('history');
+  await sessionStorage.removeItem('spotifyTokens');
+  await sessionStorage.removeItem('waveTokens');
+};
 
 /**
  * Utility function that saves the incoming authentication tokens to sessionStorage and then
@@ -37,6 +45,28 @@ export const getAccountInfo = async (dispatch, accessToken, username) => {
     return 1
   } else if (response && response.status === 401) {
     return TOKENS_EXPIRED;
+  } else {
+    return 0;
+  }
+};
+
+export const deleteAccount = async (dispatch, accessToken) => {
+  const response = await axios.delete(`http://localhost:8081/account`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      await clearSessionStorage();
+      dispatch({
+        type: CLEAR
+      });
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    }
   } else {
     return 0;
   }

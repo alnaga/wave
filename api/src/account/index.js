@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import axios from 'axios';
 import bcrypt from 'bcrypt';
+import { Token } from '../models/token';
 import { User } from '../models/user';
 import { Venue } from '../models/venue';
 
@@ -8,6 +9,75 @@ import { authenticate } from '../util';
 import { AUTHORISATION } from '../constants';
 
 const router = Router();
+
+router.delete('/', authenticate, async (req, res) => {
+  const accessToken = req.headers.authorization.split('Bearer ')[1];
+
+  if (accessToken) {
+    await Token.findOne({ accessToken }, async (error, token) => {
+      if (error) {
+        res.status(500).send({
+          message: 'Internal server error occurred while deleting account.'
+        });
+      } else if (!token) {
+        res.status(400).send({
+          message: 'Invalid access token.'
+        })
+      } else {
+        // We need to find the user so we can check whether we need to delete any venues.
+        await User.findOne({ username: token.user.username }, async (error, user) => {
+          if (error) {
+
+          } else if (!user) {
+
+          } else {
+            // Find all the venues with the user listed as an owner and delete them if that is the only owner.
+            await Venue.find({ owners: user._id }, async (error, venues) => {
+              if (venues.length > 0) {
+                for (let venue of venues) {
+                  if (venue.owners.length === 1) {
+                    await Venue.deleteOne({ _id: venue._id }, (error, result) => {
+                      if (error || result.nModified === 0) {
+                        res.status(500).send({
+                          message: 'Internal server error occurred while deleting user\'s own venues.'
+                        });
+                      }
+                    })
+                  }
+                }
+              }
+            });
+
+            // We need to check whether the user is checked into any venues, and check them out if they are.
+            await Venue.find({ attendees: user._id }, async (error, venues) => {
+              if (venues.length > 0) {
+                for (let venue of venues) {
+                  await Venue.updateOne({ _id: venue._id }, {
+                    $pull: {
+                      attendees: user._id
+                    }
+                  });
+                }
+              }
+            });
+
+            await User.deleteOne({ _id: user._id }, (error, result) => {
+              if (error || result.nModified === 0) {
+                res.status(500).send({
+                  message: 'Internal server error occurred while deleting user.'
+                });
+              } else {
+                res.status(200).send({
+                  message: 'Account deleted successfully.'
+                });
+              }
+            })
+          }
+        });
+      }
+    });
+  }
+});
 
 router.get('/', authenticate, async (req, res) => {
   const { username } = req.query;

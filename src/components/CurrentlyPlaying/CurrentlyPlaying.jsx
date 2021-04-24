@@ -62,6 +62,7 @@ const CurrentlyPlaying = () => {
       } else if (!currentVenue && pollCurrentSongInterval) {
         clearInterval(pollCurrentSongInterval);
         setPollCurrentSongInterval();
+        setSongProgress(0);
       }
 
       return () => {
@@ -125,7 +126,18 @@ const CurrentlyPlaying = () => {
               </>
             ) : (
               <div id="no-song">
-                No song playing.
+                {
+                  currentVenue
+                    ? (
+                      <>
+                        No song playing.
+                      </>
+                    ) : (
+                      <>
+                        Not checked into a venue.
+                      </>
+                    )
+                }
               </div>
             )
         }

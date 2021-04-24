@@ -1,6 +1,7 @@
 import React, {createContext, useContext, useReducer} from 'react';
 
 import {
+  CLEAR,
   CLEAR_HISTORY,
   SET_ACCOUNT_INFO,
   SET_ALBUM_INFO,
@@ -53,6 +54,8 @@ export const initialState = {
 
 const appReducer = (state, action) => {
   switch(action.type) {
+    case CLEAR:
+      return initialState;
     case CLEAR_HISTORY:
       return {
         ...state,
