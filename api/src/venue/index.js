@@ -200,6 +200,7 @@ router.post('/check-in', authenticate, async (req, res) => {
                   });
 
                   res.status(200).send({
+                    attendees: venue.attendees,
                     id: venue._id,
                     name: venue.name,
                     votes: venue.votes || 0

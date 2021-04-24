@@ -14,7 +14,7 @@ import './VenueInfo.scss';
 const VenueInfo = (props) => {
   const dispatch = useAppDispatch();
   const { currentVenue, tokens, venueInfo } = useAppState();
-
+  
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
@@ -119,7 +119,7 @@ const VenueInfo = (props) => {
                             }
                           </div>
                         ) : (
-                          <div>
+                          <div id="no-attendees">
                             No users have currently checked into this venue. Why not be the first to start playing?
                           </div>
                         )
