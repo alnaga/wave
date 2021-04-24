@@ -1,8 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import classNames from 'classnames';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faPlay } from '@fortawesome/free-solid-svg-icons';
 
 import QueueSongButton from '../QueueTrackButton/QueueTrackButton';
 
+import { useAppState } from '../../context/context';
 import { formatSongLength } from '../../util';
 
 import './SongList.scss';
@@ -13,12 +17,20 @@ const SongList = (props) => {
     showArtist = true,
   } = props;
 
+  const { currentSong } = useAppState();
+
   return (
     <div id="song-list">
       {
         tracks.map((track) => {
           return (
-            <div className="result" key={track.id}>
+            <div
+              className={classNames({
+                'result': true,
+                'current': currentSong && currentSong.item.id === track.id
+              })}
+              key={track.id}
+            >
               <div className="result-left">
                 {
                   track.album
@@ -34,24 +46,32 @@ const SongList = (props) => {
                     )
                 }
 
-                <div className="ml-3">
+                <div className="ml-3 d-flex align-items-center">
                   {
-                    track.album
-                      ? (
-                        <Link to={`/album/${track.album.id}`}>
-                          <div className="result-name" title={track.name}>
-                            { track.name }
-                          </div>
-                        </Link>
-                      ) : (
-                        <div className="result-name">
-                          { track.name }
-                        </div>
+                    currentSong && currentSong.item.id === track.id
+                      && (
+                        <FontAwesomeIcon icon={faPlay} className="mr-2" />
                       )
                   }
 
-                  {
-                    showArtist
+                  <div>
+                    {
+                      track.album
+                        ? (
+                          <Link to={`/album/${track.album.id}`}>
+                            <div className="result-name" title={track.name}>
+                              { track.name }
+                            </div>
+                          </Link>
+                        ) : (
+                          <div className="result-name">
+                            { track.name }
+                          </div>
+                        )
+                    }
+
+                    {
+                      showArtist
                       && (
                         <div className="result-artist">
                           <Link to={`/artist/${track.artists[0].id}`}>
@@ -59,7 +79,9 @@ const SongList = (props) => {
                           </Link>
                         </div>
                       )
-                  }
+                    }
+                  </div>
+
                 </div>
               </div>
 

@@ -21,6 +21,16 @@
       background-color: $background-colour;
     }
 
+    &.current {
+      a {
+        color: $wave-colour-light;
+        font-weight: 600;
+      }
+
+      color: $wave-colour-light;
+      font-weight: 600;
+    }
+
     .result-artist, .result-name {
       min-width: 0;
       overflow: hidden;
