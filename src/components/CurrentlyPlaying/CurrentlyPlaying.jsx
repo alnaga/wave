@@ -36,7 +36,7 @@ const CurrentlyPlaying = () => {
       && await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.current.id);
+      await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
     }
   }
 
