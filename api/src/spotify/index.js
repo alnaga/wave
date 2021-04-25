@@ -224,15 +224,27 @@ router.get('/song', authenticate, async (req, res) => {
           // and reset the vote count.
           let votes = venue.votes;
 
-          if (venue.currentSong !== spotifyResponse.data.item.id) {
+          if (spotifyResponse.status === 200) {
+            if (venue.currentSong !== spotifyResponse.data.item.id) {
+              votes = 0;
+              await Venue.updateOne({ _id: venueId }, {
+                $set: {
+                  currentSong: spotifyResponse.data.item.id,
+                  votes: 0
+                }
+              });
+            }
+          } else {
             votes = 0;
             await Venue.updateOne({ _id: venueId }, {
               $set: {
-                currentSong: spotifyResponse.data.item.id,
+                currentSong: undefined,
                 votes: 0
               }
             });
           }
+
+
 
           res.status(spotifyResponse.status).send({
             ...spotifyResponse.data,
