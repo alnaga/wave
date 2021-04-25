@@ -37,9 +37,7 @@ const AccountInfo = () => {
 
   useEffect(() => {
     (async () => {
-      if (!accountInfo.username) {
-        await handleGetAccountInfo();
-      }
+      await handleGetAccountInfo();
     })();
   }, []);
 

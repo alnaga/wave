@@ -26,6 +26,84 @@ const getUsersByIds = async (userIds, res, callback) => {
   callback(await Promise.all(users));
 }
 
+const getUserByAccessToken = async (accessToken, res, callback) => {
+  await Token.findOne({ accessToken }, async (error, token) => {
+    if (error) {
+      res.status(500).send({
+        message: 'Internal server error.'
+      });
+    } else if (!token) {
+      res.status(400).send({
+        message: 'Invalid access token.'
+      });
+    } else {
+      await User.findOne({ username: token.user.username }, (error, user) => {
+        if (error) {
+          res.status(500).send({
+            message: 'Internal server error'
+          });
+        } else if (!user) {
+          res.status(400).send({
+            message: 'Invalid user.'
+          });
+        } else {
+          callback(user);
+        }
+      })
+    }
+  });
+};
+
+router.delete('/', authenticate, async (req, res) => {
+  const { venueId } = req.query;
+  const accessToken = req.headers.authorization.split('Bearer ')[1];
+
+  if (venueId) {
+    await getUserByAccessToken(accessToken, res, async (user) => {
+      await Venue.findOne({ _id: venueId }, async (error, venue) => {
+        if (error) {
+          res.status(500).send({
+            message: 'Internal server error occurred while deleting venue.'
+          });
+        } else if (!venue.owners.includes(user._id)) {
+          res.status(401).send({
+            message: 'User making request is not authorised to delete venue.'
+          });
+        } else {
+          await User.find({ venues: venueId }, async (error, owners) => {
+            console.log(owners);
+            const removingVenueFromOwners = await owners.map(async (owner) => {
+              console.log('removing', venue._id, 'from', owner.username);
+              return User.updateOne({ _id: owner._id }, {
+                $pull: {
+                  venues: venue._id
+                }
+              });
+            });
+
+            await Promise.all(removingVenueFromOwners);
+            await Venue.deleteOne({ _id: venueId }, (error, result) => {
+              if (error || result.nModified === 0) {
+                res.status(500).send({
+                  message: 'Internal server error occurred while deleting venue.'
+                });
+              } else {
+                res.status(200).send({
+                  message: 'Venue deleted successfully.'
+                });
+              }
+            });
+          });
+        }
+      });
+    });
+  } else {
+    res.status(400).send({
+      message: 'Missing venue ID.'
+    });
+  }
+});
+
 router.get('/', authenticate, async (req, res) => {
   const { id } = req.query;
 
@@ -58,6 +136,80 @@ router.get('/', authenticate, async (req, res) => {
       });
     }
   });
+});
+
+router.patch('/', authenticate, async (req, res) => {
+  const { venueData, venueId } = req.body;
+  const accessToken = req.headers.authorization.split('Bearer ')[1];
+  
+  if (venueData && venueId) {
+    await getUserByAccessToken(accessToken, res, async (user) => {
+      await Venue.findOne({ _id: venueId }, async (error, venue) => {
+        if (error) {
+          res.status(500).send({
+            message: 'Internal server error occurred while updating venue details.'
+          });
+        } else if (!venue) {
+          res.status(400).send({
+            message: 'Invalid venue ID.'
+          });
+        } else {
+          if (!venue.owners.includes(user._id)) {
+            res.status(401).send({
+              message: 'User making request is not authorised to change venue details.'
+            });
+          } else {
+            const {
+              name,
+              description,
+              addressLine1,
+              addressLine2,
+              city,
+              county,
+              postcode,
+              googleMapsLink
+            } = venueData;
+            if (!name || !description || !addressLine1 || !city || !county || !postcode) {
+              res.status(400).send({
+                message: 'Missing fields in update request.'
+              });
+            } else {
+              const address = {
+                addressLine1,
+                addressLine2,
+                city,
+                county,
+                postcode
+              };
+
+              await Venue.updateOne({ _id: venueId }, {
+                $set: {
+                  name,
+                  description,
+                  address,
+                  googleMapsLink
+                }
+              }, (error, result) => {
+                if (error) {
+                  res.status(500).send({
+                    message: 'Internal server error occurred while updating venue details.'
+                  });
+                } else {
+                  res.status(200).send({
+                    message: 'Venue details updated successfully.'
+                  });
+                }
+              });
+            }
+          }
+        }
+      })
+    });
+  } else {
+    res.status(400).send({
+      message: 'Missing venue data or venue ID.'
+    });
+  }
 });
 
 router.post('/', authenticate, async (req, res) => {

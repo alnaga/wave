@@ -44,6 +44,10 @@
   }
 
   input, textarea {
+    &:focus {
+      outline: none;
+    }
+
     background-color: $input-background-colour;
     color: white;
     border: 1px solid $line-separator-colour;

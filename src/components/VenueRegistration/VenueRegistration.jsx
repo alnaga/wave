@@ -127,7 +127,7 @@ const VenueRegistration = (props) => {
               className="mb-2"
               name="address-line-1"
               onChange={handleFormChange('addressLine1')}
-              placeholder="Address Line 1"
+              placeholder="Address Line 1 *"
               required
               value={data.addressLine1}
             />
@@ -143,7 +143,7 @@ const VenueRegistration = (props) => {
               className="mb-2"
               name="city"
               onChange={handleFormChange('city')}
-              placeholder="City"
+              placeholder="City *"
               required
               value={data.city}
             />
@@ -152,7 +152,7 @@ const VenueRegistration = (props) => {
               className="mb-2"
               name="county"
               onChange={handleFormChange('county')}
-              placeholder="County"
+              placeholder="County *"
               required
               value={data.county}
             />
@@ -160,7 +160,7 @@ const VenueRegistration = (props) => {
             <input
               name="postcode"
               onChange={handleFormChange('postcode')}
-              placeholder="Postcode"
+              placeholder="Postcode *"
               required
               value={data.postcode}
             />

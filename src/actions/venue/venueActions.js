@@ -80,6 +80,24 @@ export const checkOut = async (dispatch, accessToken, venueId) => {
   }
 };
 
+export const deleteVenue = async (dispatch, accessToken, venueId) => {
+  const response = await axios.delete(`http://localhost:8081/venue?venueId=${venueId}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    }
+  } else {
+    return 0;
+  }
+};
+
 /**
  * Attempts to fetch data about a given venue.
  * @param dispatch {Function}
@@ -164,6 +182,27 @@ export const registerVenue = async (dispatch, accessToken, venueData, ownerUsern
     return 1;
   } else if (response && response.status === 401) {
     return TOKENS_EXPIRED;
+  } else {
+    return 0;
+  }
+};
+
+export const updateVenueDetails = async (dispatch, accessToken, venueId, venueData) => {
+  const response = await axios.patch('http://localhost:8081/venue', {
+    venueData,
+    venueId
+  }, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    }
   } else {
     return 0;
   }

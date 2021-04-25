@@ -1,5 +1,7 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { withRouter } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
 import ScreenHeader from '../ScreenHeader/ScreenHeader';
@@ -7,13 +9,27 @@ import ScreenHeader from '../ScreenHeader/ScreenHeader';
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { checkIn, checkOut, getVenueData } from '../../actions/venue/venueActions';
+import { checkIn, checkOut, deleteVenue, getVenueData, updateVenueDetails } from '../../actions/venue/venueActions';
 
 import './VenueInfo.scss';
 
 const VenueInfo = (props) => {
   const dispatch = useAppDispatch();
-  const { currentVenue, tokens, venueInfo } = useAppState();
+  const { tokens, venueInfo } = useAppState();
+
+  const [ showDeleteConfirmation, setShowDeleteConfirmation ] = useState(false);
+
+  const [ editData, setEditData ] = useState({
+    name: '',
+    description: '',
+    addressLine1: '',
+    addressLine2: '',
+    city: '',
+    county: '',
+    postcode: '',
+    googleMapsLink: ''
+  });
+  const [ editMode, setEditMode ] = useState(false);
   
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
@@ -52,6 +68,51 @@ const VenueInfo = (props) => {
     await handleGetVenueInfo();
   };
 
+  const handleCompareEditData = () => {
+    return (
+      editData.name === venueInfo.name
+      && editData.description === venueInfo.description
+      && editData.addressLine1 === venueInfo.address.addressLine1
+      && editData.addressLine2 === venueInfo.address.addressLine2
+      && editData.city === venueInfo.address.city
+      && editData.county === venueInfo.address.county
+      && editData.postcode === venueInfo.address.postcode
+      && editData.googleMapsLink === venueInfo.googleMapsLink
+    );
+  };
+
+  const handleDeleteVenue = async () => {
+    const firstDeleteAttempt = await deleteVenue(dispatch, tokensRef.current.wave.accessToken, venueInfo.id);
+    let secondDeleteAttempt = 0;
+
+    if (
+      tokensRef.current.wave.accessToken
+      && firstDeleteAttempt === TOKENS_EXPIRED
+    ) {
+      await refreshExpiredTokens(dispatch, tokensRef.current);
+      secondDeleteAttempt = await updateVenueDetails(dispatch, tokensRef.current.wave.accessToken, venueInfo.id);
+    }
+
+    if (firstDeleteAttempt === 1 || secondDeleteAttempt === 1) {
+      props.history.goBack();
+    }
+  };
+
+  const handleEditField = (field) => (event) => {
+    let value;
+
+    if (field === 'spotifyConsent') {
+      value = event.target.checked;
+    } else {
+      value = event.target.value;
+    }
+
+    setEditData((prevState) => ({
+      ...prevState,
+      [field]: value
+    }));
+  };
+  
   const handleGetVenueInfo = async () => {
     if (
       tokensRef.current.wave.accessToken
@@ -62,6 +123,46 @@ const VenueInfo = (props) => {
     }
   };
 
+  const handleToggleEditMode = async () => {
+    setEditMode(!editMode);
+  };
+
+  const handleToggleShowDeleteConfirmation = () => {
+    setShowDeleteConfirmation(!showDeleteConfirmation);
+  };
+  
+  const handleUpdateVenueDetails = async () => {
+    if (handleCompareEditData()) {
+      setEditMode(false);
+    } else {
+      if (
+        tokensRef.current.wave.accessToken
+        && await updateVenueDetails(dispatch, tokensRef.current.wave.accessToken, venueInfo.id, editData) === TOKENS_EXPIRED
+      ) {
+        await refreshExpiredTokens(dispatch, tokensRef.current);
+        await updateVenueDetails(dispatch, tokensRef.current.wave.accessToken, venueInfo.id, editData);
+      }
+
+      setEditMode(false);
+      await handleGetVenueInfo();
+    }
+  };
+
+  useEffect(() => {
+    if (venueInfo) {
+      setEditData({
+        name: venueInfo.name,
+        description: venueInfo.description,
+        addressLine1: venueInfo.address.addressLine1,
+        addressLine2: venueInfo.address.addressLine2,
+        city: venueInfo.address.city,
+        county: venueInfo.address.county,
+        postcode: venueInfo.address.postcode,
+        googleMapsLink: venueInfo.googleMapsLink
+      });
+    }
+  }, [venueInfo])
+  
   useEffect(() => {
     (async () => {
       await handleGetVenueInfo();
@@ -75,91 +176,237 @@ const VenueInfo = (props) => {
           venueInfo
             && (
               <>
-                <ScreenHeader title={venueInfo.name} />
+                <ScreenHeader
+                  title={editMode ? 'Update Venue Details' : venueInfo.name}
+                />
 
                 <div className="p-3">
-                  <div className="mb-3">
-                    <label> Owner(s) </label>
-                    {
-                      venueInfo.owners.map((owner) => {
-                        return (
-                          <div key={owner.username}>
-                            { owner.firstName } { owner.lastName }
-                          </div>
-                        );
-                      })
-                    }
-                  </div>
-
-                  <div className="mb-3">
-                    <label> Description </label>
-                    <div>
-                      { venueInfo.description }
-                    </div>
-                  </div>
-
-                  <div className="mb-3">
-                    <label> Address </label>
-
-                    {
-                      displayAddress().map((line, index) => {
-                        return (
-                          <div key={index}>
-                            { line }
-                          </div>
-                        );
-                      })
-                    }
-                  </div>
-
                   {
-                    venueInfo.googleMapsLink
+                    editMode
                     && (
-                      <div className="mb-3">
-                        <a href={venueInfo.googleMapsLink} target="_blank"> Google Maps Link </a>
+                      <div className="mb-3 d-flex flex-column">
+                        <label> Venue Name * </label>
+
+                        <input
+                          name="venue-name"
+                          className="mt-1"
+                          onChange={handleEditField('name')}
+                          placeholder="Venue Name"
+                          value={editData.name}
+                        />
                       </div>
                     )
                   }
 
-                  <div className="mb-3">
-                    <label> Checked In Users </label>
+
+                  <div className="mb-3 d-flex justify-content-between">
+                    <div>
+                      <label> Owner(s) </label>
+                      {
+                        venueInfo.owners.map((owner) => {
+                          return (
+                            <div key={owner.username}>
+                              { owner.firstName } { owner.lastName }
+                            </div>
+                          );
+                        })
+                      }
+                    </div>
 
                     {
-                      venueInfo.attendees.length > 0
-                        ? (
-                          <div className="list mt-1">
-                            {
-                              venueInfo.attendees.map((attendee) => {
-                                return (
-                                  <div className="list-item" key={attendee.username}>
-                                    { attendee.username }
-                                  </div>
-                                )
-                              })
-                            }
+                      // If the user is an owner of the venue, display the button to enable/disable edit mode so they can make changes.
+                      (tokens.wave.user.username && venueInfo.owners.find((owner) => owner.username === tokens.wave.user.username))
+                        && (
+                          <div className="ui-button" onClick={handleToggleEditMode} title="Edit venue details">
+                            <FontAwesomeIcon icon={faEdit} />
                           </div>
+                        )
+                    }
+
+                  </div>
+
+                  <div className="mb-3 d-flex flex-column">
+                    <label> Description {editMode && '*'} </label>
+                    {
+                      editMode
+                        ? (
+                          <textarea
+                            name="venue-description"
+                            className="mt-1"
+                            onChange={handleEditField('description')}
+                            placeholder="Description"
+                            value={editData.description}
+                          />
                         ) : (
-                          <div id="no-attendees">
-                            No users have currently checked into this venue. Why not be the first to start playing?
+                          <div>
+                            { venueInfo.description }
                           </div>
                         )
                     }
                   </div>
 
+                  <div className="mb-3 d-flex flex-column">
+                    <label> Address {editMode && '*'} </label>
+
+                    {
+                      editMode
+                        ? (
+                          <>
+                            <input
+                              className="mb-2 mt-1"
+                              name="address-line-1"
+                              onChange={handleEditField('addressLine1')}
+                              placeholder="Address Line 1 *"
+                              required
+                              value={editData.addressLine1}
+                            />
+                            <input
+                              className="mb-2"
+                              name="address-line-2"
+                              onChange={handleEditField('addressLine2')}
+                              placeholder="Address Line 2"
+                              value={editData.addressLine2}
+                            />
+
+                            <input
+                              className="mb-2"
+                              name="city"
+                              onChange={handleEditField('city')}
+                              placeholder="City *"
+                              required
+                              value={editData.city}
+                            />
+
+                            <input
+                              className="mb-2"
+                              name="county"
+                              onChange={handleEditField('county')}
+                              placeholder="County *"
+                              required
+                              value={editData.county}
+                            />
+
+                            <input
+                              name="postcode"
+                              onChange={handleEditField('postcode')}
+                              placeholder="Postcode *"
+                              required
+                              value={editData.postcode}
+                            />
+                          </>
+                        ) : (
+                          <>
+                            {
+                              displayAddress().map((line, index) => {
+                                return (
+                                  <div key={index}>
+                                    { line }
+                                  </div>
+                                );
+                              })
+                            }
+                          </>
+                        )
+                    }
+                  </div>
+
                   {
-                    (venueInfo.attendees.length > 0 && venueInfo.attendees.find((attendee) => attendee.username === tokensRef.current.wave.user.username))
+                    editMode
                       ? (
-                        <button
-                          onClick={handleCheckOut}
-                        >
-                          Check Out
-                        </button>
+                        <div className="mb-3 d-flex flex-column">
+                          <label> Google Maps Link </label>
+
+                          <input
+                            className="mb-2 mt-1"
+                            name="google-maps-link"
+                            onChange={handleEditField('googleMapsLink')}
+                            placeholder="Google Maps Link"
+                            required
+                            value={editData.googleMapsLink}
+                          />
+                        </div>
                       ) : (
-                        <button
-                          onClick={handleCheckIn}
-                        >
-                          Check In
-                        </button>
+                        <>
+                          {
+                            venueInfo.googleMapsLink
+                            && (
+                              <div className="mb-3">
+                                <a href={venueInfo.googleMapsLink} target="_blank"> Google Maps Link </a>
+                              </div>
+                            )
+                          }
+                        </>
+                      )
+                  }
+
+                  {
+                    !editMode
+                      && (
+                        <div className="mb-3">
+                          <label> Checked In Users </label>
+
+                          {
+                            venueInfo.attendees.length > 0
+                              ? (
+                                <div className="list mt-1">
+                                  {
+                                    venueInfo.attendees.map((attendee) => {
+                                      return (
+                                        <div className="list-item" key={attendee.username}>
+                                          { attendee.username }
+                                        </div>
+                                      )
+                                    })
+                                  }
+                                </div>
+                              ) : (
+                                <div id="no-attendees">
+                                  No users have currently checked into this venue. Why not be the first to start playing?
+                                </div>
+                              )
+                          }
+                        </div>
+                      )
+                  }
+
+                  {
+                    editMode
+                      ? (
+                        <>
+                          <button onClick={handleUpdateVenueDetails}>
+                            {
+                              handleCompareEditData()
+                                ? (
+                                  'Cancel'
+                                ) : (
+                                  'Save Changes'
+                                )
+                            }
+                          </button>
+
+                          <button className="mt-3" onClick={showDeleteConfirmation ? handleDeleteVenue : handleToggleShowDeleteConfirmation}>
+                            {
+                              showDeleteConfirmation
+                                ? 'Confirm Venue Deletion'
+                                : 'Delete Venue'
+                            }
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          {
+                            (venueInfo.attendees.length > 0 && venueInfo.attendees.find((attendee) => attendee.username === tokensRef.current.wave.user.username))
+                              ? (
+                                <button onClick={handleCheckOut}>
+                                  Check Out
+                                </button>
+                              ) : (
+                                <button onClick={handleCheckIn}>
+                                  Check In
+                                </button>
+                              )
+                          }
+                        </>
                       )
                   }
                 </div>
