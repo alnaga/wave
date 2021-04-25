@@ -149,7 +149,7 @@ const VenueInfo = (props) => {
   };
 
   useEffect(() => {
-    if (venueInfo) {
+    if (venueInfo && venueInfo.name) {
       setEditData({
         name: venueInfo.name,
         description: venueInfo.description,
@@ -162,7 +162,7 @@ const VenueInfo = (props) => {
       });
     }
   }, [venueInfo])
-  
+
   useEffect(() => {
     (async () => {
       await handleGetVenueInfo();
@@ -173,7 +173,7 @@ const VenueInfo = (props) => {
     <ScreenContainer>
       <div id="venue-info">
         {
-          venueInfo
+          (venueInfo && venueInfo.name)
             && (
               <>
                 <ScreenHeader
