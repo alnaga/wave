@@ -8,6 +8,7 @@ import {
   SET_TRACK_SEARCH_RESULTS,
   SET_SPOTIFY_TOKENS,
   SET_VENUE_INFO,
+  SET_VOTES,
   TOKENS_EXPIRED
 } from '../../constants';
 
@@ -256,6 +257,11 @@ export const getCurrentSong = async (dispatch, accessToken, venueId) => {
     dispatch({
       type: SET_CURRENT_SONG,
       payload: response.data
+    });
+
+    dispatch({
+      type: SET_VOTES,
+      payload: response.data.votes
     });
 
     return 1;

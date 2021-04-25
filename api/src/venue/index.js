@@ -3,56 +3,9 @@ import { User } from '../models/user';
 import { Token } from '../models/token';
 import { Venue } from '../models/venue';
 
-import { authenticate } from '../util';
+import { authenticate, getUserByAccessToken, getUsersByIds } from '../util';
 
 const router = Router();
-
-const getUsersByIds = async (userIds, res, callback) => {
-  const users = await userIds.map(async (userId) => {
-    return User.findOne({ _id: userId }, (error) => {
-      if (error) {
-        res.status(500).send({
-          message: 'Internal server error.'
-        });
-      }
-    }).select({
-      _id: 0,
-      firstName: 1,
-      lastName: 1,
-      username: 1
-    });
-  });
-
-  callback(await Promise.all(users));
-}
-
-const getUserByAccessToken = async (accessToken, res, callback) => {
-  await Token.findOne({ accessToken }, async (error, token) => {
-    if (error) {
-      res.status(500).send({
-        message: 'Internal server error.'
-      });
-    } else if (!token) {
-      res.status(400).send({
-        message: 'Invalid access token.'
-      });
-    } else {
-      await User.findOne({ username: token.user.username }, (error, user) => {
-        if (error) {
-          res.status(500).send({
-            message: 'Internal server error'
-          });
-        } else if (!user) {
-          res.status(400).send({
-            message: 'Invalid user.'
-          });
-        } else {
-          callback(user);
-        }
-      })
-    }
-  });
-};
 
 router.delete('/', authenticate, async (req, res) => {
   const { venueId } = req.query;
@@ -71,9 +24,7 @@ router.delete('/', authenticate, async (req, res) => {
           });
         } else {
           await User.find({ venues: venueId }, async (error, owners) => {
-            console.log(owners);
             const removingVenueFromOwners = await owners.map(async (owner) => {
-              console.log('removing', venue._id, 'from', owner.username);
               return User.updateOne({ _id: owner._id }, {
                 $pull: {
                   venues: venue._id

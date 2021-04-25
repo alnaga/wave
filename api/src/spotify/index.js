@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Router } from 'express';
 
-import { authenticate } from '../util';
+import { authenticate, getUsersByIds } from '../util';
 import { Venue } from '../models/venue';
 import {
   AUTHORISATION,
@@ -41,6 +41,30 @@ const getSpotifyAccessToken = async (venueId, res, callback) => {
         });
       } else {
         callback(venue.toObject().spotifyTokens.accessToken);
+      }
+    }
+  })
+};
+
+const getVenueById = async (venueId, res, callback) => {
+  await Venue.findOne({ _id: venueId }, async (error, venue) => {
+    if (error) {
+      res.status(500).send({
+        message: 'Internal server error.'
+      });
+    } else if (!venue) {
+      res.status(400).send({
+        message: 'Invalid venue ID.'
+      });
+    } else {
+      // If the access token has expired, it is refreshed and then the new access token is fetched and passed
+      // to the callback function.
+      if (venue.spotifyTokens.accessTokenExpiresAt < Date.now()) {
+        await refreshSpotifyToken(venueId, venue.spotifyTokens.refreshToken, async (refreshedAccessToken) => {
+          callback(refreshedAccessToken);
+        });
+      } else {
+        callback(venue.toObject());
       }
     }
   })
@@ -272,17 +296,34 @@ router.get('/search', async (req, res) => {
 router.get('/song', authenticate, async (req, res) => {
   const { venueId } = req.query;
 
-  await getSpotifyAccessToken(venueId, res, async (spotifyAccessToken) => {
-    if (spotifyAccessToken) {
+  await getVenueById(venueId, res, async (venue) => {
+    if (venue.spotifyTokens.accessToken) {
       const spotifyResponse = await axios.get(`https://api.spotify.com/v1/me/player`, {
         headers: {
-          "Authorization": `Bearer ${spotifyAccessToken}`
+          "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
         }
       }).catch((error) => error.response);
 
       if (spotifyResponse) {
         if (spotifyResponse.status === 200 || spotifyResponse.status === 204) {
-          res.status(spotifyResponse.status).send(spotifyResponse.data)
+          // If the song has changed since the last time this endpoint was queried, update the current song
+          // and reset the vote count.
+          let votes = venue.votes;
+
+          if (venue.currentSong !== spotifyResponse.data.item.id) {
+            votes = 0;
+            await Venue.updateOne({ _id: venueId }, {
+              $set: {
+                currentSong: spotifyResponse.data.item.id,
+                votes: 0
+              }
+            });
+          }
+
+          res.status(spotifyResponse.status).send({
+            ...spotifyResponse.data,
+            votes
+          })
         } else {
           res.status(spotifyResponse.status).send({
             message: 'Current song request to Spotify API failed.'
@@ -424,9 +465,19 @@ router.post('/vote', async (req, res) => {
           skipped = true;
         }
 
-        res.status(200).send({
-          venue: updatedVenue,
-          skipped
+        await getUsersByIds(updatedVenue.attendees, res, async (attendees) => {
+          await getUsersByIds(updatedVenue.owners, res, async (owners) => {
+            const venue = {
+              ...updatedVenue.toObject(),
+              attendees,
+              owners
+            };
+
+            res.status(200).send({
+              venue,
+              skipped
+            });
+          });
         });
       } else {
         console.error('Could not find venue.');

@@ -14,6 +14,7 @@ import {
   SET_SPOTIFY_TOKENS,
   SET_VENUE_INFO,
   SET_VENUE_SEARCH_RESULTS,
+  SET_VOTES,
   SET_WAVE_TOKENS
 } from '../constants';
 
@@ -123,6 +124,14 @@ const appReducer = (state, action) => {
         searchResults: {
           tracks: state.searchResults.tracks,
           venues: action.payload
+        }
+      };
+    case SET_VOTES:
+      return {
+        ...state,
+        venueInfo: {
+          ...state.venueInfo,
+          votes: action.payload
         }
       };
     case SET_WAVE_TOKENS:

@@ -17,6 +17,7 @@ export const SET_WAVE_TOKENS = 'SET_WAVE_TOKENS';
 
 export const TOKENS_EXPIRED = 'TOKENS_EXPIRED';
 
+export const SET_VOTES = 'SET_VOTES';
 export const VOTE_DOWN = 'VOTE_DOWN';
 export const VOTE_UP = 'VOTE_UP';
 
