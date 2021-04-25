@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Router } from 'express';
 
-import { authenticate, getUsersByIds } from '../util';
+import { authenticate, getUsersByIds, getVenueById } from '../util';
 import { Venue } from '../models/venue';
 import {
   AUTHORISATION,
@@ -15,93 +15,7 @@ const router = Router();
 // The application is currently only concerned with the UK.
 const resultMarket = 'GB';
 
-/**
- * Utility function to fetch the Spotify access token for a given venue from the database and pass
- * its Spotify Access token to the callback provided.
- * @param venueId {String} - ID of the venue whose Spotify token is required.
- * @param res {Object} - Response object of the calling endpoint.
- * @param callback {Function} - The callback into which the access token will be passed.
- */
-const getSpotifyAccessToken = async (venueId, res, callback) => {
-  await Venue.findOne({ _id: venueId }, async (error, venue) => {
-    if (error) {
-      res.status(500).send({
-        message: 'Internal server error.'
-      });
-    } else if (!venue) {
-      res.status(400).send({
-        message: 'Invalid venue ID.'
-      });
-    } else {
-      // If the access token has expired, it is refreshed and then the new access token is fetched and passed
-      // to the callback function.
-      if (venue.spotifyTokens.accessTokenExpiresAt < Date.now()) {
-        await refreshSpotifyToken(venueId, venue.spotifyTokens.refreshToken, async (refreshedAccessToken) => {
-          callback(refreshedAccessToken);
-        });
-      } else {
-        callback(venue.toObject().spotifyTokens.accessToken);
-      }
-    }
-  })
-};
 
-const getVenueById = async (venueId, res, callback) => {
-  await Venue.findOne({ _id: venueId }, async (error, venue) => {
-    if (error) {
-      res.status(500).send({
-        message: 'Internal server error.'
-      });
-    } else if (!venue) {
-      res.status(400).send({
-        message: 'Invalid venue ID.'
-      });
-    } else {
-      // If the access token has expired, it is refreshed and then the new access token is fetched and passed
-      // to the callback function.
-      if (venue.spotifyTokens.accessTokenExpiresAt < Date.now()) {
-        await refreshSpotifyToken(venueId, venue.spotifyTokens.refreshToken, async (refreshedAccessToken) => {
-          callback(refreshedAccessToken);
-        });
-      } else {
-        callback(venue.toObject());
-      }
-    }
-  })
-};
-
-const refreshSpotifyToken = async (venueId, refreshToken, callback) => {
-  console.log('Refreshing Spotify Access Token', new Date().toISOString());
-  const spotifyResponse = await axios.post('https://accounts.spotify.com/api/token', null, {
-    headers: {
-      "Authorization": `Basic ${AUTHORISATION}`,
-      "Content-Type": 'application/x-www-form-urlencoded'
-    },
-    params: {
-      "grant_type": "refresh_token",
-      "refresh_token": refreshToken
-    }
-  });
-
-  if (spotifyResponse) {
-    if (spotifyResponse.status === 200) {
-      const newAccessToken = spotifyResponse.data.access_token;
-      const newTokenExpiresAt = Date.now() + (spotifyResponse.data.expires_in * 1000);
-
-      await Venue.updateOne({ _id: venueId }, {
-        $set: {
-          spotifyTokens: {
-            accessToken: newAccessToken,
-            accessTokenExpiresAt: newTokenExpiresAt,
-            refreshToken
-          }
-        }
-      });
-
-      callback(newAccessToken);
-    }
-  }
-};
 
 const skipTrack = async (accessToken) => {
   const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
@@ -346,11 +260,11 @@ router.get('/song', authenticate, async (req, res) => {
 router.post('/song', authenticate, async (req, res) => {
   const { trackUri, venueId } = req.body;
 
-  await getSpotifyAccessToken(venueId, res, async (spotifyAccessToken) => {
-    if (spotifyAccessToken) {
+  await getVenueById(venueId, res, async (venue) => {
+    if (venue.spotifyTokens.accessToken) {
       const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${trackUri}`, null, {
         headers: {
-          "Authorization": `Bearer ${spotifyAccessToken}`
+          "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
         }
       }).catch((error) => error.response);
 

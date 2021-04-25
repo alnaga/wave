@@ -8,6 +8,7 @@ import DeleteAccount from '../DeleteAccount/DeleteAccount';
 import Home from '../Home/Home';
 import LoginRegister from '../LoginRegister/LoginRegister';
 import NotFound from '../NotFound/NotFound';
+import Settings from '../Settings/Settings';
 import TrackSearchResults from '../TrackSearchResults/TrackSearchResults';
 import VenueInfo from '../VenueInfo/VenueInfo';
 import VenueRegistration from '../VenueRegistration/VenueRegistration';
@@ -28,6 +29,7 @@ const Dashboard = () => {
           <Route exact path="/login" component={LoginRegister} />
           <Route exact path="/register" component={LoginRegister} />
           <Route exact path="/register-venue" component={VenueRegistration} />
+          <Route exact path="/settings" component={Settings} />
           <Route exact path="/tracks/search/:query" component={TrackSearchResults} />
           <Route exact path="/venues/search/:query" component={VenueSearchResults} />
           <Route exact path="/venue/:venueId" component={VenueInfo} />
