@@ -227,6 +227,8 @@ router.post('/', authenticate, async (req, res) => {
     spotifyTokens
   } = req.body;
 
+
+
   const address = {
     addressLine1,
     addressLine2,
@@ -235,56 +237,62 @@ router.post('/', authenticate, async (req, res) => {
     postcode
   }
 
-  await User.findOne({
-    username: ownerUsername
-  }, async (error, user) => {
-    if (error) {
-      res.status(500).send({
-        message: 'Internal server error during business registration.'
-      });
-    } else {
-      const newVenue = new Venue({
-        address,
-        attendees: [],
-        description,
-        googleMapsLink,
-        name,
-        owners: [ user._id ],
-        spotifyConsent,
-        spotifyTokens,
-        votes: 0
-      });
+  if (!spotifyTokens) {
+    res.status(400).send({
+      message: 'Missing Spotify tokens.'
+    });
+  } else {
+    await User.findOne({
+      username: ownerUsername
+    }, async (error, user) => {
+      if (error) {
+        res.status(500).send({
+          message: 'Internal server error during business registration.'
+        });
+      } else {
+        const newVenue = new Venue({
+          address,
+          attendees: [],
+          description,
+          googleMapsLink,
+          name,
+          owners: [ user._id ],
+          spotifyConsent,
+          spotifyTokens,
+          votes: 0
+        });
 
-      await newVenue.save(async (error, venue) => {
-        if (error) {
-          res.status(500).send({
-            message: 'Internal server error during business registration.'
-          });
-        } else {
-          await User.updateOne({ _id: user._id }, {
-            $addToSet: {
-              venues: venue._id
-            }
-          });
+        await newVenue.save(async (error, venue) => {
+          if (error) {
+            res.status(500).send({
+              message: 'Internal server error during business registration.'
+            });
+          } else {
+            await User.updateOne({ _id: user._id }, {
+              $addToSet: {
+                venues: venue._id
+              }
+            });
 
-          res.status(200).send({
-            venue: {
-              _id: venue._id,
-              address: venue.address,
-              attendees: venue.attendees,
-              description: venue.description,
-              googleMapsLink: venue.googleMapsLink,
-              name: venue.name,
-              owners: [ user ],
-              songHistory: venue.songHistory,
-              votes: venue.votes
-            },
-            message: 'Business registration successful!'
-          });
-        }
-      });
-    }
-  });
+            res.status(200).send({
+              venue: {
+                _id: venue._id,
+                address: venue.address,
+                attendees: venue.attendees,
+                description: venue.description,
+                googleMapsLink: venue.googleMapsLink,
+                name: venue.name,
+                owners: [ user ],
+                songHistory: venue.songHistory,
+                votes: venue.votes
+              },
+              message: 'Business registration successful!'
+            });
+          }
+        });
+      }
+    });
+  }
 });
 
 router.post('/check-in', authenticate, async (req, res) => {

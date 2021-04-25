@@ -1,5 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { withRouter } from 'react-router-dom';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 
 import Error from '../Error/Error';
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
@@ -28,7 +30,7 @@ const VenueRegistration = (props) => {
     city: '',
     county: '',
     description: '',
-    spotifyConsent: true,
+    spotifyConsent: false,
     googleMapsLink: '',
     postcode: '',
     name: ''
@@ -92,120 +94,138 @@ const VenueRegistration = (props) => {
 
   return (
     <ScreenContainer>
-      <form id="venue-registration">
-        <ScreenHeader
-          title="Venue Registration"
-          subtitle="Please enter the details for your venue below:"
-        />
+      {
+        !tokens.spotify.accessToken
+          ? (
+            <>
+              <ScreenHeader
+                title="Venue Registration"
+                subtitle="Linking your account with Spotify is required to register a venue."
+              />
 
-        <div id="venue-registration-body" className="p-3">
-          <div className="mb-3 form-section">
-            <label htmlFor="venue-name" className="mb-1"> Venue Name * </label>
-            <input
-              name="venue-name"
-              onChange={handleFormChange('name')}
-              placeholder="Venue Name"
-              required
-              value={data.name}
-            />
-          </div>
+              <div className="p-3">
+                To link your account with Spotify, please click the
+                <FontAwesomeIcon className="ml-1 mr-1" icon={faSpotify} size="lg" />
+                in the navigation bar.
+              </div>
+            </>
+          ) : (
+            <form id="venue-registration">
+              <ScreenHeader
+                title="Venue Registration"
+                subtitle="Please enter the details for your venue below:"
+              />
 
-          <div className="mb-3 form-section">
-            <label htmlFor="venue-name" className="mb-1"> Description * </label>
-            <textarea
-              name="venue-description"
-              onChange={handleFormChange('description')}
-              placeholder="Description"
-              required
-              value={data.description}
-            />
-          </div>
+              <div id="venue-registration-body" className="p-3">
+                <div className="mb-3 form-section">
+                  <label htmlFor="venue-name" className="mb-1"> Venue Name * </label>
+                  <input
+                    name="venue-name"
+                    onChange={handleFormChange('name')}
+                    placeholder="Venue Name"
+                    required
+                    value={data.name}
+                  />
+                </div>
 
-          <div className="mb-3 form-section">
-            <label htmlFor="address-line-1" className="mb-1"> Address * </label>
-            <input
-              className="mb-2"
-              name="address-line-1"
-              onChange={handleFormChange('addressLine1')}
-              placeholder="Address Line 1 *"
-              required
-              value={data.addressLine1}
-            />
-            <input
-              className="mb-2"
-              name="address-line-2"
-              onChange={handleFormChange('addressLine2')}
-              placeholder="Address Line 2"
-              value={data.addressLine2}
-            />
+                <div className="mb-3 form-section">
+                  <label htmlFor="venue-name" className="mb-1"> Description * </label>
+                  <textarea
+                    name="venue-description"
+                    onChange={handleFormChange('description')}
+                    placeholder="Description"
+                    required
+                    value={data.description}
+                  />
+                </div>
 
-            <input
-              className="mb-2"
-              name="city"
-              onChange={handleFormChange('city')}
-              placeholder="City *"
-              required
-              value={data.city}
-            />
+                <div className="mb-3 form-section">
+                  <label htmlFor="address-line-1" className="mb-1"> Address * </label>
+                  <input
+                    className="mb-2"
+                    name="address-line-1"
+                    onChange={handleFormChange('addressLine1')}
+                    placeholder="Address Line 1 *"
+                    required
+                    value={data.addressLine1}
+                  />
+                  <input
+                    className="mb-2"
+                    name="address-line-2"
+                    onChange={handleFormChange('addressLine2')}
+                    placeholder="Address Line 2"
+                    value={data.addressLine2}
+                  />
 
-            <input
-              className="mb-2"
-              name="county"
-              onChange={handleFormChange('county')}
-              placeholder="County *"
-              required
-              value={data.county}
-            />
+                  <input
+                    className="mb-2"
+                    name="city"
+                    onChange={handleFormChange('city')}
+                    placeholder="City *"
+                    required
+                    value={data.city}
+                  />
 
-            <input
-              name="postcode"
-              onChange={handleFormChange('postcode')}
-              placeholder="Postcode *"
-              required
-              value={data.postcode}
-            />
-          </div>
+                  <input
+                    className="mb-2"
+                    name="county"
+                    onChange={handleFormChange('county')}
+                    placeholder="County *"
+                    required
+                    value={data.county}
+                  />
 
-          <div className="mb-3 form-section">
-            <label className="mb-1"> Google Maps Link </label>
-            <input
-              name="google-maps-link"
-              onChange={handleFormChange('googleMapsLink')}
-              placeholder="Google Maps Link"
-              required
-              value={data.googleMapsLink}
-            />
-          </div>
+                  <input
+                    name="postcode"
+                    onChange={handleFormChange('postcode')}
+                    placeholder="Postcode *"
+                    required
+                    value={data.postcode}
+                  />
+                </div>
 
-          <div id="consent" className="form-section">
-            <div>
-              Authorisation with a Spotify account is required in order for Wave to control playback and song queuing.
-              By ticking this box you are giving consent for Wave to use the Spotify account you have
-              currently connected.
-            </div>
+                <div className="mb-3 form-section">
+                  <label className="mb-1"> Google Maps Link </label>
+                  <input
+                    name="google-maps-link"
+                    onChange={handleFormChange('googleMapsLink')}
+                    placeholder="Google Maps Link"
+                    required
+                    value={data.googleMapsLink}
+                  />
+                </div>
 
-            <input
-              className="ml-3"
-              name="spotify-consent"
-              defaultChecked={data.spotifyConsent}
-              onChange={handleFormChange('spotifyConsent')}
-              required
-              type="checkbox"
-            />
-          </div>
+                <div id="consent" className="form-section">
+                  <div>
+                    Authorisation with a Spotify account is required in order for Wave to control playback and song queuing.
+                    By ticking this box you are giving consent for Wave to use the Spotify account you have
+                    currently connected.
+                  </div>
 
-          <Error
-            className="mt-3"
-            message={error}
-            onDismiss={handleDismissError}
-            show={error}
-          />
+                  <input
+                    className="ml-3"
+                    name="spotify-consent"
+                    defaultChecked={data.spotifyConsent}
+                    onChange={handleFormChange('spotifyConsent')}
+                    required
+                    type="checkbox"
+                  />
+                </div>
 
-          <button className="mt-3" type="submit" onClick={handleSubmit}>
-            Submit
-          </button>
-        </div>
-      </form>
+                <Error
+                  className="mt-3"
+                  message={error}
+                  onDismiss={handleDismissError}
+                  show={error}
+                />
+
+                <button className="mt-3" type="submit" onClick={handleSubmit}>
+                  Submit
+                </button>
+              </div>
+            </form>
+          )
+      }
     </ScreenContainer>
   );
 };
