@@ -19,6 +19,8 @@ const VenueInfo = (props) => {
 
   const [ showDeleteConfirmation, setShowDeleteConfirmation ] = useState(false);
 
+  const [ dataChanged, setDataChanged ] = useState(false);
+
   const [ editData, setEditData ] = useState({
     name: '',
     description: '',
@@ -68,19 +70,6 @@ const VenueInfo = (props) => {
     await handleGetVenueInfo();
   };
 
-  const handleCompareEditData = () => {
-    return (
-      editData.name === venueInfo.name
-      && editData.description === venueInfo.description
-      && editData.addressLine1 === venueInfo.address.addressLine1
-      && editData.addressLine2 === venueInfo.address.addressLine2
-      && editData.city === venueInfo.address.city
-      && editData.county === venueInfo.address.county
-      && editData.postcode === venueInfo.address.postcode
-      && editData.googleMapsLink === venueInfo.googleMapsLink
-    );
-  };
-
   const handleDeleteVenue = async () => {
     const firstDeleteAttempt = await deleteVenue(dispatch, tokensRef.current.wave.accessToken, venueInfo.id);
     let secondDeleteAttempt = 0;
@@ -100,6 +89,10 @@ const VenueInfo = (props) => {
 
   const handleEditField = (field) => (event) => {
     let value;
+
+    if (!dataChanged) {
+      setDataChanged(true);
+    }
 
     if (field === 'spotifyConsent') {
       value = event.target.checked;
@@ -132,7 +125,7 @@ const VenueInfo = (props) => {
   };
   
   const handleUpdateVenueDetails = async () => {
-    if (handleCompareEditData()) {
+    if (!dataChanged) {
       setEditMode(false);
     } else {
       if (
@@ -149,7 +142,7 @@ const VenueInfo = (props) => {
   };
 
   useEffect(() => {
-    if (venueInfo && venueInfo.name && !editData.name) {
+    if (venueInfo && venueInfo.name && !dataChanged) {
       setEditData({
         name: venueInfo.name,
         description: venueInfo.description,
@@ -375,11 +368,11 @@ const VenueInfo = (props) => {
                         <>
                           <button onClick={handleUpdateVenueDetails}>
                             {
-                              handleCompareEditData()
+                              dataChanged
                                 ? (
-                                  'Cancel'
-                                ) : (
                                   'Save Changes'
+                                ) : (
+                                  'Cancel'
                                 )
                             }
                           </button>
