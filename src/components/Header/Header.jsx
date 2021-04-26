@@ -34,21 +34,28 @@ const Header = () => {
 
         <div className="d-flex flex-grow-1 align-items-center justify-content-end">
           {
-            (wave.accessToken && currentVenue)
-              ? (
-                <SearchBar
-                  className="ml-3 mr-3"
-                  resultsPage="/tracks/search"
-                  searchType="tracks"
-                  placeholder="Search for a song/artist"
-                />
-              ) : (
-                <SearchBar
-                  className="ml-3 mr-3"
-                  resultsPage="/venues/search"
-                  searchType="venues"
-                  placeholder="Search for a venue"
-                />
+            wave.accessToken
+              && (
+                <>
+                  {
+                    (currentVenue)
+                      ? (
+                        <SearchBar
+                          className="ml-3 mr-3"
+                          resultsPage="/tracks/search"
+                          searchType="tracks"
+                          placeholder="Search for a song/artist"
+                        />
+                      ) : (
+                        <SearchBar
+                          className="ml-3 mr-3"
+                          resultsPage="/venues/search"
+                          searchType="venues"
+                          placeholder="Search for a venue"
+                        />
+                      )
+                  }
+                </>
               )
           }
 

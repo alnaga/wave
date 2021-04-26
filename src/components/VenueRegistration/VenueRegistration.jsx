@@ -105,8 +105,9 @@ const VenueRegistration = (props) => {
 
               <div className="p-3">
                 To link your account with Spotify, please click the
-                <FontAwesomeIcon className="ml-1 mr-1" icon={faSpotify} size="lg" />
-                in the navigation bar.
+                <FontAwesomeIcon className="ml-2 mr-2" icon={faSpotify} size="lg" />
+                in the navigation bar. This enables Wave to communicate with Spotify's servers
+                to queue songs and get information about artists and songs.
               </div>
             </>
           ) : (

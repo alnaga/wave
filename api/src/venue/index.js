@@ -313,7 +313,14 @@ router.post('/check-in', authenticate, async (req, res) => {
                   await getUsersByIds(venue.attendees, res, async (attendees) => {
                     await getUsersByIds(venue.owners, res, (owners) => {
                       res.status(200).send({
-                        attendees,
+                        attendees: [
+                          ...attendees,
+                          {
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            username: user.username
+                          }
+                        ],
                         id: venue._id,
                         name: venue.name,
                         owners,
