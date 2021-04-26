@@ -44,12 +44,17 @@
 
     .result-left {
       > div {
+        > div {
+          overflow: hidden;
+        }
         min-width: 0;
       }
 
       align-items: center;
       display: flex;
       min-width: 0;
+      overflow: hidden;
+      white-space: nowrap;
     }
     
     align-items: center;
