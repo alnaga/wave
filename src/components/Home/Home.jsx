@@ -11,8 +11,6 @@ import { useAppState } from '../../context/context';
 const Home = () => {
   const { currentVenue, tokens } = useAppState();
   
-  console.log(tokens)
-
   return (
     <ScreenContainer>
       <ScreenHeader title="Welcome to Wave!" />
@@ -50,11 +48,8 @@ const Home = () => {
                             ) : (
                               <div>
                                 To queue a song, type in a song or artist name in the search bar and click the
-                                <FontAwesomeIcon
-                                  className="add-to-queue"
-                                  icon={faPlusCircle}
-                                  size="2x"
-                                />
+                                <FontAwesomeIcon className="ml-2 mr-2" icon={faPlusCircle} size="lg" />
+                                icon for the result you want to choose.
                               </div>
                             )
                         }

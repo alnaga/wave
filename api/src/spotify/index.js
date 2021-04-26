@@ -242,8 +242,6 @@ router.get('/song', authenticate, async (req, res) => {
             });
           }
 
-
-
           res.status(spotifyResponse.status).send({
             ...spotifyResponse.data,
             votes
@@ -279,7 +277,7 @@ router.post('/song', authenticate, async (req, res) => {
       }).catch((error) => error.response);
 
       if (spotifyResponse) {
-        if (spotifyResponse.status === 200) {
+        if (spotifyResponse.status === 200 || spotifyResponse.status === 204) {
           res.status(200).send({
             message: 'Song queued successfully.'
           });
@@ -382,7 +380,7 @@ router.post('/vote', async (req, res) => {
         let skipped = false;
 
         // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
-        if (updatedVenue.votes < (-updatedVenue.attendees / 2)) {
+        if (updatedVenue.votes < (-updatedVenue.attendees.length / 2)) {
           await skipTrack(accessToken);
           await Venue.updateOne({ uri: venue }, { votes: 0 });
           updatedVenue.votes = 0;
