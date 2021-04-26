@@ -44,6 +44,8 @@ const CurrentlyPlaying = () => {
     if (currentSong) {
       const { item, progress_ms } = currentSong;
       setSongProgress((progress_ms / item.duration_ms) * 100);
+    } else {
+      setSongProgress(0);
     }
   }, [ currentSong ]);
   

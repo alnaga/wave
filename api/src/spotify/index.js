@@ -15,8 +15,6 @@ const router = Router();
 // The application is currently only concerned with the UK.
 const resultMarket = 'GB';
 
-
-
 const skipTrack = async (accessToken) => {
   const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
     headers: {

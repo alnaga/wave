@@ -253,21 +253,37 @@ export const getCurrentSong = async (dispatch, accessToken, venueId) => {
     }
   }).catch((error) => error.response);
 
-  if (response && response.status === 200) {
-    dispatch({
-      type: SET_CURRENT_SONG,
-      payload: response.data
-    });
+  if (response) {
+    if (response.status === 200) {
+      dispatch({
+        type: SET_CURRENT_SONG,
+        payload: response.data
+      });
 
-    dispatch({
-      type: SET_VOTES,
-      payload: response.data.votes
-    });
+      dispatch({
+        type: SET_VOTES,
+        payload: response.data.votes
+      });
 
-    return 1;
-  } else if (response && response.status === 401) {
-    return TOKENS_EXPIRED;
-  } else return 0;
+      return 1;
+    } else if (response.status === 204) {
+      dispatch({
+        type: SET_CURRENT_SONG,
+        payload: undefined
+      });
+
+      dispatch({
+        type: SET_VOTES,
+        payload: 0
+      });
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
 };
 
 /**
