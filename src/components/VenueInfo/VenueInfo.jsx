@@ -149,7 +149,7 @@ const VenueInfo = (props) => {
   };
 
   useEffect(() => {
-    if (venueInfo && venueInfo.name) {
+    if (venueInfo && venueInfo.name && !editData.name) {
       setEditData({
         name: venueInfo.name,
         description: venueInfo.description,
