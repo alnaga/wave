@@ -129,8 +129,8 @@ const appReducer = (state, action) => {
     case SET_VOTES:
       return {
         ...state,
-        venueInfo: {
-          ...state.venueInfo,
+        currentVenue: {
+          ...state.currentVenue,
           votes: action.payload
         }
       };

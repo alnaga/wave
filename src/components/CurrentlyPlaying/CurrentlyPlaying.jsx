@@ -22,6 +22,9 @@ const CurrentlyPlaying = () => {
 
   const [ pollCurrentSongInterval, setPollCurrentSongInterval ] = useState();
 
+  const currentSongRef = useRef(null);
+  currentSongRef.current = currentSong;
+
   const currentVenueRef = useRef(null);
   currentVenueRef.current = currentVenue;
 
@@ -31,8 +34,8 @@ const CurrentlyPlaying = () => {
   const handleFetchCurrentSong = async () => {
     if (
       tokensRef.current.wave.accessToken
-      && currentVenue
-      && currentVenue.id
+      && currentVenueRef.current
+      && currentVenueRef.current.id
       && await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
@@ -48,11 +51,9 @@ const CurrentlyPlaying = () => {
       setSongProgress(0);
     }
   }, [ currentSong ]);
-  
+
   useEffect(() => {
     (async () => {
-      await handleFetchCurrentSong();
-
       // This checks to see whether there is a venue the user is currently checked into
       // and whether the client is polling the current song.
       // When the user checks out of a venue it will stop polling the current song to save
@@ -60,7 +61,7 @@ const CurrentlyPlaying = () => {
       if (currentVenue && !pollCurrentSongInterval) {
         setPollCurrentSongInterval(setInterval(async () => {
           await handleFetchCurrentSong();
-        }, 5000))
+        }, 5000));
       } else if (!currentVenue && pollCurrentSongInterval) {
         clearInterval(pollCurrentSongInterval);
         setPollCurrentSongInterval();
@@ -73,7 +74,13 @@ const CurrentlyPlaying = () => {
         }
       };
     })();
-  }, [ , currentVenue]);
+  }, [currentVenue]);
+
+  useEffect(() => {
+    (async () => {
+      await handleFetchCurrentSong()
+    })();
+  }, []);
 
   return (
     <>

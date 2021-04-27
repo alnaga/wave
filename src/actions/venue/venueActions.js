@@ -224,8 +224,10 @@ export const voteTrack = async (dispatch, accessToken, venueId, vote) => {
 
   if (response) {
     if (response.status === 200) {
+      sessionStorage.setItem('currentVenue', JSON.stringify(response.data.venue));
+
       dispatch({
-        type: SET_VENUE_INFO,
+        type: SET_CURRENT_VENUE,
         payload: response.data.venue
       });
 

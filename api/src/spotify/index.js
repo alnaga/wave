@@ -323,7 +323,6 @@ router.get('/venue', authenticate, async (req, res) => {
             attendees: 0,
             name: data.display_name,
             uri: data.uri,
-            songHistory: [],
             votes: 0
           });
 
@@ -369,7 +368,10 @@ router.post('/vote', async (req, res) => {
         votes: voteValue
       }
     },
-    { new: true },
+    {
+      new: true,
+      useFindAndModify: false
+    },
     async (error, updatedVenue) => {
       if (error) {
         console.error('Error occurred while updating vote value.', error);
@@ -391,9 +393,14 @@ router.post('/vote', async (req, res) => {
           await getUsersByIds(updatedVenue.owners, res, async (owners) => {
             const venue = {
               ...updatedVenue.toObject(),
-              attendees,
+              _id: undefined,
               id: updatedVenue._id,
-              owners
+              attendees,
+              currentSong: undefined,
+              googleMapsLink: undefined,
+              owners,
+              spotifyConsent: undefined,
+              spotifyTokens: undefined
             };
 
             res.status(200).send({

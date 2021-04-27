@@ -9,6 +9,7 @@ import ScreenHeader from '../ScreenHeader/ScreenHeader';
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
+import { getCurrentSong } from '../../actions/spotify/spotifyActions';
 import { checkIn, checkOut, deleteVenue, getVenueData, updateVenueDetails } from '../../actions/venue/venueActions';
 
 import './VenueInfo.scss';
@@ -55,6 +56,7 @@ const VenueInfo = (props) => {
       await checkIn(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId);
     }
 
+    await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId);
     await handleGetVenueInfo();
   };
 
