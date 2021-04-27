@@ -209,6 +209,25 @@ export const getArtistInfo = async (dispatch, accessToken, spotifyAccessToken, a
   }
 };
 
+export const getVenueRecommendations = async (dispatch, accessToken, spotifyAccessToken) => {
+  const response = await axios.get(`http://localhost:8081/spotify/recommendations?spotifyAccessToken=${spotifyAccessToken}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      console.log(response.data);
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    }
+  } else {
+    return 0;
+  }
+};
+
 /**
  * Carries out a search on the Spotify API for songs matching the user's query and returns the list.
  * @param dispatch {Function} - Application Dispatch

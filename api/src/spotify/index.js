@@ -1,7 +1,13 @@
 import axios from 'axios';
 import { Router } from 'express';
 
-import { authenticate, getUserByAccessToken, getUsersByIds, getVenueById } from '../util';
+import {
+  authenticate,
+  getUserByAccessToken,
+  getUsersByIds,
+  getVenueById,
+  refreshSpotifyToken
+} from '../util';
 import { Venue } from '../models/venue';
 import {
   AUTHORISATION,
@@ -14,6 +20,95 @@ const router = Router();
 
 // The application is currently only concerned with the UK.
 const resultMarket = 'GB';
+
+const getArtistInfo = async (res, artistId, accessToken) => {
+  const artistResponse = await axios.get(`https://api.spotify.com/v1/artists/${artistId}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (artistResponse) {
+    let artistAlbumsResponse = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums?market=${resultMarket}`, {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`
+      }
+    }).catch((error) => error.response);
+
+    if (artistAlbumsResponse) {
+      let { items } = artistAlbumsResponse.data;
+
+      // If there are multiple pages of albums, keep fetching and adding them to the items list until there are no more.
+      // while (artistAlbumsResponse.data.next !== null) {
+      //   artistAlbumsResponse = await axios.get(artistAlbumsResponse.data.next, {
+      //     headers: {
+      //       'Authorization': `Bearer ${accessToken}`
+      //     }
+      //   }).catch((error) => error.response);
+      //
+      //   if (artistAlbumsResponse) {
+      //     items.push(...artistAlbumsResponse.data.items);
+      //   }
+      // }
+
+      return {
+        albums: {
+          ...artistAlbumsResponse.data,
+          items
+        },
+        ...artistResponse.data
+      }
+
+      // res.status(artistResponse.status).send({
+      //   albums: {
+      //     ...artistAlbumsResponse.data,
+      //     items
+      //   },
+      //   ...artistResponse.data
+      // });
+    } else {
+      res.status(500).send({
+        message: 'Internal server error occurred while fetching artist albums.'
+      });
+    }
+  } else {
+    res.status(500).send({
+      message: 'Internal server error occurred while fetching artist information.'
+    });
+  }
+};
+
+const getNextPage = async (res, nextPageUrl, spotifyAccessToken) => {
+  const spotifyResponse = await axios.get(nextPageUrl, {
+    headers: {
+      'Authorization': `Bearer ${spotifyAccessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (spotifyResponse) {
+    if (spotifyResponse.status === 200 || spotifyResponse.status === 204) {
+      return spotifyResponse.data
+    } else if (spotifyResponse.status === 401) {
+      res.status(401).send({
+        message: 'Spotify API access token expired.'
+      });
+    }
+  } else {
+    res.status(500).send({
+      message: 'Internal server error occurred while fetching next page.'
+    });
+  }
+};
+
+const getVenueSpotifyToken = async (venue, callback) => {
+  if (venue.spotifyTokens.accessTokenExpiresAt < Date.now()) {
+    await refreshSpotifyToken(venue._id, venue.spotifyTokens.refreshToken, async (refreshedAccessToken) => {
+      return callback(refreshedAccessToken);
+    });
+  } else {
+    return callback(venue.spotifyTokens.accessToken);
+  }
+}
 
 const skipTrack = async (accessToken) => {
   const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
@@ -89,18 +184,19 @@ router.get('/artist', authenticate, async (req, res) => {
     if (artistAlbumsResponse) {
       let { items } = artistAlbumsResponse.data;
 
+      // TODO: Add a next button on the album list to save on performance
       // If there are multiple pages of albums, keep fetching and adding them to the items list until there are no more.
-      while (artistAlbumsResponse.data.next !== null) {
-        artistAlbumsResponse = await axios.get(artistAlbumsResponse.data.next, {
-          headers: {
-            'Authorization': `Bearer ${accessToken}`
-          }
-        }).catch((error) => error.response);
-
-        if (artistAlbumsResponse) {
-          items.push(...artistAlbumsResponse.data.items);
-        }
-      }
+      // while (artistAlbumsResponse.data.next !== null) {
+      //   artistAlbumsResponse = await axios.get(artistAlbumsResponse.data.next, {
+      //     headers: {
+      //       'Authorization': `Bearer ${accessToken}`
+      //     }
+      //   }).catch((error) => error.response);
+      //
+      //   if (artistAlbumsResponse) {
+      //     items.push(...artistAlbumsResponse.data.items);
+      //   }
+      // }
 
       res.status(artistResponse.status).send({
         albums: {
@@ -275,6 +371,128 @@ router.post('/tokens', async (req, res) => {
   });
 
   res.status(spotifyResponse.status).send(spotifyResponse.data);
+});
+
+router.get('/recommendations', authenticate, async (req, res) => {
+  const { spotifyAccessToken } = req.query;
+
+  // Fetch the user's top artists from Spotify
+  let spotifyResponse = await axios.get(`https://api.spotify.com/v1/me/top/artists`, {
+    headers: {
+      'Authorization': `Bearer ${spotifyAccessToken}`
+    }
+  }).catch((error) => error.response);
+  
+  if (spotifyResponse) {
+    if (spotifyResponse.status === 200) {
+      let topArtistResults = spotifyResponse.data.items;
+
+      // Fetch data from all pages until all results have been gathered.
+      if (spotifyResponse.data.next) {
+        let nextPageResults = spotifyResponse.data;
+        do {
+          nextPageResults = await getNextPage(res, nextPageResults.next, spotifyAccessToken);
+          topArtistResults = topArtistResults.concat(nextPageResults.items);
+        } while (nextPageResults.next);
+      }
+
+      // Create a list of genres artists are related to and keep track of the occurrences of each.
+      let preferredGenres = []
+      for (let artist of topArtistResults) {
+        for (let genre of artist.genres) {
+          const genreIndex = preferredGenres.findIndex((target) => target.name === genre);
+
+          if (genreIndex === -1) {
+            preferredGenres.push({
+              name: genre,
+              occurrences: 1
+            });
+          } else {
+            preferredGenres[genreIndex].occurrences = preferredGenres[genreIndex].occurrences + 1;
+          }
+        }
+      }
+
+      // Sort the user's preferred genres in descending order.
+      preferredGenres = preferredGenres.sort((genre, otherGenre) => otherGenre.occurrences - genre.occurrences);
+
+      await Venue.find({}, async (error, venues) => {
+        const gettingVenuesMusicTaste = await venues.map(async (venue) => {
+          return getVenueSpotifyToken(venue, async (venueSpotifyAccessToken) => {
+            const onRepeatPlaylistResponse = await axios.get(`https://api.spotify.com/v1/search?q=${encodeURIComponent('On Repeat')}&type=playlist`, {
+              headers: {
+                "Authorization": `Bearer ${venueSpotifyAccessToken}`
+              }
+            }).catch((error) => error.response);
+
+            if (onRepeatPlaylistResponse) {
+              const playlists = onRepeatPlaylistResponse.data.playlists.items;
+
+              const onRepeatPlaylist = playlists.find((playlist) => playlist.name === 'On Repeat' && playlist.owner.display_name === 'Spotify');
+
+              if (onRepeatPlaylist) {
+                const onRepeatTracksResponse = await axios.get(`https://api.spotify.com/v1/playlists/${onRepeatPlaylist.id}/tracks`, {
+                  headers: {
+                    'Authorization': `Bearer ${venueSpotifyAccessToken}`
+                  }
+                }).catch((error) => error.response);
+
+                if (onRepeatTracksResponse) {
+                  const onRepeatItems = onRepeatTracksResponse.data.items;
+
+                  const calculateMatchPoints = await onRepeatItems.map(async (item) => {
+                    const trackArtist = item.track.artists[0];
+                    const trackArtistInfo = await getArtistInfo(res, trackArtist.id, venueSpotifyAccessToken);
+
+                    const artistIsTopListened = topArtistResults.find((userTopArtist) => userTopArtist.id === trackArtistInfo.id);
+
+                    if (artistIsTopListened) {
+                      return 10;
+                    } else {
+                      if (trackArtistInfo.genres) {
+                        for (let artistGenre of trackArtistInfo.genres) {
+                          if (preferredGenres.find((match) => match.name === artistGenre)) {
+                            return 1;
+                          }
+                        }
+                      }
+                    }
+                  });
+
+                  const matches = await Promise.all(calculateMatchPoints);
+
+                  const score = matches.reduce((a, b) => {
+                    if (a != NaN && b != NaN) {
+                      return a + b;
+                    }
+                  });
+
+                  return {
+                    venueId: venue._id,
+                    score
+                  };
+                }
+              }
+            }
+          })
+        });
+
+        const finalScores = await Promise.all(gettingVenuesMusicTaste);
+
+        res.status(200).send({
+          data: finalScores
+        });
+      });
+    } else if (spotifyResponse.status === 401) {
+      res.status(401).send({
+        message: 'Spotify API access token expired.'
+      });
+    }
+  } else {
+    res.status(500).send({
+      message: 'Internal server error occurred while getting venue recommendations.'
+    });
+  }
 });
 
 // Fetches a new access token from the Spotify API using the refresh token.
