@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlusCircle, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
@@ -43,7 +44,37 @@ const Home = () => {
                           !currentVenue
                             ? (
                               <div>
-                                To find a venue to connect to, type in a venue name in the search bar.
+                                <div>
+                                  To find a venue to connect to, type in a venue name in the search bar.
+                                </div>
+
+                                <div className="mt-3">
+                                  {
+                                    tokens.spotify.accessToken
+                                      ? (
+                                        <Link to="/recommendations">
+                                          <button
+                                            title="Get a list of venues whose music taste is similar to your own"
+                                          >
+                                            Find venues most suited to me
+                                          </button>
+                                        </Link>
+
+                                      ) : (
+                                        <div>
+                                          If you link your Wave account to your Spotify account, you'll be able
+                                          to get suggestions for venues that most closely match your music taste!
+                                          <br />
+                                          <br />
+                                          To connect to Spotify, click the
+                                          <FontAwesomeIcon className="ml-2 mr-2" icon={faSpotify} size="lg" />
+                                          icon in the navigation bar and follow the instructions to authorise Wave
+                                          to use your Spotify data.
+                                        </div>
+                                      )
+                                  }
+
+                                </div>
                               </div>
                             ) : (
                               <div>

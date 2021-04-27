@@ -8,6 +8,7 @@ import DeleteAccount from '../DeleteAccount/DeleteAccount';
 import Home from '../Home/Home';
 import LoginRegister from '../LoginRegister/LoginRegister';
 import NotFound from '../NotFound/NotFound';
+import Recommendations from '../Recommendations/Recommendations';
 import Settings from '../Settings/Settings';
 import TrackSearchResults from '../TrackSearchResults/TrackSearchResults';
 import VenueInfo from '../VenueInfo/VenueInfo';
@@ -27,6 +28,7 @@ const Dashboard = () => {
           <Route exact path="/album/:albumId" component={AlbumInfo} />
           <Route exact path="/artist/:artistId" component={ArtistInfo} />
           <Route exact path="/login" component={LoginRegister} />
+          <Route exact path="/recommendations" component={Recommendations} />
           <Route exact path="/register" component={LoginRegister} />
           <Route exact path="/register-venue" component={VenueRegistration} />
           <Route exact path="/settings" component={Settings} />
