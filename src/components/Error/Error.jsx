@@ -3,7 +3,7 @@ import classNames from 'classnames';
 
 import './Error.scss';
 
-const Error = ({ className, message, onDismiss, show }) => (
+const Error = ({ className, message, dismissible = true, onDismiss, show }) => (
   <>
     {
       show
@@ -12,13 +12,24 @@ const Error = ({ className, message, onDismiss, show }) => (
             'error': true,
             [className]: className
           })}>
-            <div className="p-3 pr-0">
+            <div
+              className={classNames({
+                'p-3': true,
+                'pr-0': dismissible
+              })}
+            >
               { message }
             </div>
 
-            <div className="dismiss pl-3 pr-3" onClick={onDismiss}>
-              &times;
-            </div>
+            {
+              dismissible
+                && (
+                  <div className="dismiss pl-3 pr-3" onClick={onDismiss}>
+                    &times;
+                  </div>
+                )
+            }
+
           </div>
         )
     }

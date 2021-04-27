@@ -188,6 +188,7 @@ const VenueInfo = (props) => {
                     && (
                       <Error
                         className="mb-3"
+                        dismissible={false}
                         message="In order to queue songs, you must select an output device. Please check into this venue and then click the headphone icon in the status bar to select a device."
                         show={true}
                       />
