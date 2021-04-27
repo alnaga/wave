@@ -352,7 +352,7 @@ router.post('/check-out', authenticate, async (req, res) => {
         message: 'Invalid access token.'
       });
     } else {
-      const userCheckingOut = await User.findOne({ username: token.user.username }, async (error, user) => {
+      await User.findOne({ username: token.user.username }, async (error, user) => {
         if (error) {
           res.status(500).send({
             message: 'Internal server error occurred while checking out.'
@@ -371,14 +371,14 @@ router.post('/check-out', authenticate, async (req, res) => {
               res.status(400).send({
                 message: 'Invalid venue ID.'
               });
-            } else if (venue && !venue.attendees.includes(userCheckingOut._id)) {
+            } else if (venue && !venue.attendees.includes(user._id)) {
               res.status(400).send({
                 message: 'User not checked in.'
               });
             } else {
               await Venue.updateOne({ _id: venueId }, {
                 $pull: {
-                  attendees: `${userCheckingOut._id}`
+                  attendees: `${user._id}`
                 }
               }, async (error, result) => {
                 if (error || result.modifiedCount === 0) {
@@ -386,7 +386,7 @@ router.post('/check-out', authenticate, async (req, res) => {
                     message: 'Internal server error occurred while checking out.'
                   });
                 } else {
-                  await User.updateOne({ _id: userCheckingOut._id }, {
+                  await User.updateOne({ _id: user._id }, {
                     $set: {
                       currentVenue: undefined
                     }
