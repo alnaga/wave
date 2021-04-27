@@ -12,7 +12,7 @@ import './Vote.scss';
 
 const Vote = () => {
   const dispatch = useAppDispatch();
-  const { currentVenue, tokens } = useAppState();
+  const { currentSong, currentVenue, tokens } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
@@ -42,7 +42,7 @@ const Vote = () => {
   return (
     <>
       {
-        currentVenue
+        (currentVenue && currentSong)
           && (
             <div id="vote">
               <span className="vote-button" onClick={handleVote(VOTE_DOWN)}>
