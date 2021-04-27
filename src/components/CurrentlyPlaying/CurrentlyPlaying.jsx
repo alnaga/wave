@@ -248,7 +248,7 @@ const CurrentlyPlaying = () => {
               </>
             ) : (
               <>
-                Not checked into a venue.
+                Not checked into a venue
               </>
             )
         }
