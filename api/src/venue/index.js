@@ -74,6 +74,7 @@ router.get('/', authenticate, async (req, res) => {
               description: venue.description,
               googleMapsLink: venue.googleMapsLink,
               name: venue.name,
+              outputDeviceId: venue.outputDeviceId,
               owners,
               songHistory: venue.songHistory,
               votes: venue.votes || 0

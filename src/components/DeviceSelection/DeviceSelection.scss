@@ -17,6 +17,11 @@
           background-color: $background-colour;
         }
 
+        &.active {
+          color: $wave-colour-main;
+          font-weight: 600;
+        }
+
         align-items: center;
         border-bottom: 1px solid $line-separator-colour;
         cursor: pointer;

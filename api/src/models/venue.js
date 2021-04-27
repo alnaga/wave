@@ -10,6 +10,7 @@ export const Venue = mongoose.model('venue', mongoose.Schema({
   description: String,
   googleMapsLink: String,
   name: String,
+  outputDeviceId: String,
   owners: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'

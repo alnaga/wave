@@ -14,7 +14,7 @@ import './DeviceSelection.scss';
 
 const DeviceSelection = () => {
   const dispatch = useAppDispatch();
-  const { devices, tokens } = useAppState();
+  const { currentVenue, devices, tokens } = useAppState();
 
   const [ showList, setShowList ] = useState(true);
   const showListRef = useRef(null);
@@ -37,6 +37,9 @@ const DeviceSelection = () => {
     }
   };
 
+  console.log(currentVenue)
+  console.log(devices);
+
   const handleGetDevices = async () => {
     if (
       tokensRef.current.wave.accessToken
@@ -52,10 +55,11 @@ const DeviceSelection = () => {
     if (
       tokensRef.current.wave.accessToken
       && tokensRef.current.spotify.accessToken
-      && await selectUserDevice(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, device) === TOKENS_EXPIRED
+      && currentVenue
+      && await selectUserDevice(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, currentVenue.id, device) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await selectUserDevice(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, device);
+      await selectUserDevice(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, currentVenue.id, device);
     }
 
     await handleGetDevices();

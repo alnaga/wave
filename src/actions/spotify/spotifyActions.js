@@ -7,7 +7,6 @@ import {
   SET_DEVICES,
   SET_TRACK_SEARCH_RESULTS,
   SET_SPOTIFY_TOKENS,
-  SET_VENUE_INFO,
   SET_VOTES,
   TOKENS_EXPIRED
 } from '../../constants';
@@ -126,25 +125,30 @@ export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) 
  * @param device {Object} - The Spotify Device Object
  * @returns 1 if successful, 0 if failed
  */
-export const selectUserDevice = async (dispatch, accessToken, spotifyAccessToken, device) => {
+export const selectUserDevice = async (dispatch, accessToken, spotifyAccessToken, venueId, device) => {
   const response = await axios.put(`http://localhost:8081/spotify/devices?accessToken=${spotifyAccessToken}`, {
-    device
+    device,
+    venueId
   }, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
   }).catch((error) => error.response);
 
-  if (response && response.status === 200) {
-    dispatch({
-      type: SET_DEVICES,
-      payload: []
-    });
+  if (response) {
+    if (response.status === 200) {
+      dispatch({
+        type: SET_DEVICES,
+        payload: []
+      });
 
-    return 1;
-  } else if (response && response.status === 401) {
-    return TOKENS_EXPIRED;
-  } else return 0;
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    }
+  } else {
+    return 0;
+  }
 };
 
 /**
@@ -287,6 +291,58 @@ export const getCurrentSong = async (dispatch, accessToken, venueId) => {
 };
 
 /**
+ * Attempts to pause the currently playing track on the Spotify API.
+ * @param dispatch {Function} - Application Dispatch
+ * @param accessToken {String} - Wave API access Token
+ * @param venueId {String} - The ID of the target venue.
+ */
+export const pauseTrack = async (dispatch, accessToken, venueId) => {
+  const response = await axios.put('http://localhost:8081/spotify/pause', {
+    venueId
+  }, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    }
+  } else {
+    return 0;
+  }
+}
+
+/**
+ * Attempts to resume the currently playing track on the Spotify API.
+ * @param dispatch {Function} - Application Dispatch
+ * @param accessToken {String} - Wave API access Token
+ * @param venueId {String} - The ID of the target venue.
+ */
+export const playTrack = async (dispatch, accessToken, venueId) => {
+  const response = await axios.put('http://localhost:8081/spotify/play', {
+    venueId
+  }, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    }
+  } else {
+    return 0;
+  }
+};
+
+/**
  * Adds a song to the venue's current queue.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API Access Token
@@ -311,14 +367,30 @@ export const queueTrack = async (dispatch, accessToken, venueId, trackUri) => {
   } else return 0;
 };
 
-export const togglePauseTrack = async (dispatch, accessToken, venueId) => {
-  const response = await axios.post('http://localhost:8081', {
-
+/**
+ * Attempts to skip the currently playing track on the Spotify API.
+ * @param dispatch {Function} - Application Dispatch
+ * @param accessToken {String} - Wave API access Token
+ * @param venueId {String} - The ID of the target venue.
+ */
+export const skipTrack = async (dispatch, accessToken, venueId) => {
+  const response = await axios.post('http://localhost:8081/spotify/skip', {
+    venueId
   }, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
   }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    }
+  } else {
+    return 0;
+  }
 };
 
 /**

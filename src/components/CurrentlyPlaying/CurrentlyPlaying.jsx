@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import ProgressBar from '@ramonak/react-progress-bar';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPause, faPlay, faStoreAlt } from '@fortawesome/free-solid-svg-icons';
+import { faPause, faPlay, faStepForward, faStoreAlt } from '@fortawesome/free-solid-svg-icons';
 
 import DeviceSelection from '../DeviceSelection/DeviceSelection';
 import Vote from '../Vote/Vote';
@@ -10,7 +10,7 @@ import Vote from '../Vote/Vote';
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED, WAVE_COLOUR_DARK } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { getCurrentSong } from '../../actions/spotify/spotifyActions';
+import { getCurrentSong, pauseTrack, playTrack, skipTrack } from '../../actions/spotify/spotifyActions';
 
 import './CurrentlyPlaying.scss';
 
@@ -42,6 +42,69 @@ const CurrentlyPlaying = () => {
       await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
     }
   }
+
+  const handlePauseTrack = async () => {
+    let pauseResult = await pauseTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+
+    if (
+      tokensRef.current.wave.accessToken
+      && currentVenueRef.current
+      && currentVenueRef.current.id
+      && pauseResult === TOKENS_EXPIRED
+    ) {
+      await refreshExpiredTokens(dispatch, tokensRef.current);
+      pauseResult = await pauseTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+    }
+
+    // If skipping was successful, wait for Spotify to carry out the skip and then fetch the new song.
+    if (pauseResult === 1) {
+      setTimeout(async () => {
+        await handleFetchCurrentSong();
+      }, 250);
+    }
+  }
+
+  const handlePlayTrack = async () => {
+    let playResult = await playTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+
+    if (
+      tokensRef.current.wave.accessToken
+      && currentVenueRef.current
+      && currentVenueRef.current.id
+      && playResult === TOKENS_EXPIRED
+    ) {
+      await refreshExpiredTokens(dispatch, tokensRef.current);
+      playResult = await playTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+    }
+
+    // If skipping was successful, wait for Spotify to carry out the skip and then fetch the new song.
+    if (playResult === 1) {
+      setTimeout(async () => {
+        await handleFetchCurrentSong();
+      }, 250);
+    }
+  }
+
+  const handleSkipTrack = async () => {
+    let skipResult = await skipTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+
+    if (
+      tokensRef.current.wave.accessToken
+      && currentVenueRef.current
+      && currentVenueRef.current.id
+      && skipResult === TOKENS_EXPIRED
+    ) {
+      await refreshExpiredTokens(dispatch, tokensRef.current);
+      skipResult = await skipTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+    }
+
+    // If skipping was successful, wait for Spotify to carry out the skip and then fetch the new song.
+    if (skipResult === 1) {
+      setTimeout(async () => {
+        await handleFetchCurrentSong();
+      }, 250);
+    }
+  };
 
   useEffect(() => {
     if (currentSong) {
@@ -110,12 +173,6 @@ const CurrentlyPlaying = () => {
                             <img src={currentSong.item.album.images[0].url} alt={`Album Artwork for ${currentSong.item.album.name}`} />
                           </Link>
 
-                          {
-                            currentSong.is_playing
-                              ? <FontAwesomeIcon id="mobile-play-icon" className="ml-3" icon={faPlay} />
-                              : <FontAwesomeIcon id="mobile-play-icon" className="ml-3" icon={faPause} />
-                          }
-
                           <div className="ml-3 mr-3">
                             <div id="song-title">
                               <Link to={`/album/${currentSong.item.album.id}`}>
@@ -131,20 +188,7 @@ const CurrentlyPlaying = () => {
                           </div>
                         </div>
 
-                        <div id="song-controls" className="d-flex justify-content-end align-items-center pr-3">
-                          <Vote />
 
-                          <Link to={`/venue/${currentVenue.id}`}>
-                            <FontAwesomeIcon className="ml-3 ui-button" icon={faStoreAlt} size="lg" />
-                          </Link>
-
-                          {
-                            currentVenue.owners && currentVenue.owners.find((owner) => owner.username === tokens.wave.user.username)
-                              && (
-                                <DeviceSelection />
-                              )
-                          }
-                        </div>
                       </>
                     ) : (
                       <>
@@ -152,6 +196,41 @@ const CurrentlyPlaying = () => {
                       </>
                     )
                 }
+
+                <div id="song-controls" className="d-flex justify-content-end align-items-center pr-3">
+                  <Vote />
+
+                  <Link to={`/venue/${currentVenue.id}`}>
+                    <FontAwesomeIcon className="ml-3 ui-button" icon={faStoreAlt} size="lg" />
+                  </Link>
+
+                  {
+                    currentVenue.owners && currentVenue.owners.find((owner) => owner.username === tokens.wave.user.username)
+                    && (
+                      <>
+                        {
+                          currentSong
+                            && (
+                              <>
+                                {
+                                  currentSong.is_playing
+                                    ? (
+                                      <FontAwesomeIcon className="ml-3 ui-button" icon={faPause} size="lg" onClick={handlePauseTrack} />
+                                    ) : (
+                                      <FontAwesomeIcon className="ml-3 ui-button" icon={faPlay} size="lg" onClick={handlePlayTrack} />
+                                    )
+                                }
+
+                                <FontAwesomeIcon className="ml-3 ui-button" icon={faStepForward} size="lg" onClick={handleSkipTrack} />
+                              </>
+                            )
+                        }
+
+                        <DeviceSelection />
+                      </>
+                    )
+                  }
+                </div>
               </>
             ) : (
               <>

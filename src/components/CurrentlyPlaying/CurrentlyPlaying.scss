@@ -23,20 +23,6 @@
     height: $currently-playing-height
   }
 
-  #mobile-play-icon {
-    @media only screen and (max-width: 320px) {
-      display: none;
-    }
-
-    @include media-breakpoint-only(xs) {
-      display: block;
-    }
-
-    @include media-breakpoint-up(sm) {
-      display: none;
-    }
-  }
-
   #artist-name {
     a {
       color: rgba(255, 255, 255, 0.66);

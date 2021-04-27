@@ -3,6 +3,7 @@ import { withRouter } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
+import Error from '../Error/Error';
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
 import ScreenHeader from '../ScreenHeader/ScreenHeader';
 
@@ -178,6 +179,22 @@ const VenueInfo = (props) => {
 
                 <div className="p-3">
                   {
+                    // If the user is an owner of the venue, display the button to enable/disable edit mode so they can make changes.
+                    (
+                      tokens.wave.user.username
+                      && venueInfo.owners.find((owner) => owner.username === tokens.wave.user.username)
+                      && !venueInfo.outputDeviceId
+                    )
+                    && (
+                      <Error
+                        className="mb-3"
+                        message="In order to queue songs, you must select an output device. Please click the headphone icon in the song bar to select a device."
+                        show={true}
+                      />
+                    )
+                  }
+
+                  {
                     editMode
                     && (
                       <div className="mb-3 d-flex flex-column">
@@ -193,7 +210,6 @@ const VenueInfo = (props) => {
                       </div>
                     )
                   }
-
 
                   <div className="mb-3 d-flex justify-content-between">
                     <div>
