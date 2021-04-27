@@ -15,8 +15,6 @@ const Recommendations = () => {
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
-  console.log(recommendations);
-
   const handleGetVenueRecommendations = async () => {
     if (
       tokensRef.current.wave.accessToken
