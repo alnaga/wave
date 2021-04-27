@@ -212,23 +212,29 @@ export const updateVenueDetails = async (dispatch, accessToken, venueId, venueDa
  * Submits a vote for the currently playing song in a venue.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Spotify API Access Token
- * @param venue {String} - The ID of the target venue
+ * @param venueId {String} - The ID of the target venue
  * @param vote {String} - The vote value (VOTE_UP or VOTE_DOWN).
  * @returns 1 if successful, 0 if failed
  */
-export const voteTrack = async (dispatch, accessToken, venue, vote) => {
+export const voteTrack = async (dispatch, accessToken, venueId, vote) => {
   const response = await axios.post(`http://localhost:8081/spotify/vote?accessToken=${accessToken}`, {
-    venue,
+    venueId,
     vote
   }).catch((error) => error.response);
 
-  if (response && response.status === 200) {
-    dispatch({
-      type: SET_VENUE_INFO,
-      payload: response.data.venue
-    });
+  if (response) {
+    if (response.status === 200) {
+      dispatch({
+        type: SET_VENUE_INFO,
+        payload: response.data.venue
+      });
 
-    const { skipped } = response.data;
-    return { skipped };
+      const { skipped } = response.data;
+      return { skipped };
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    } else {
+      return 0;
+    }
   } else return 0;
 };

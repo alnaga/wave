@@ -1,9 +1,9 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faThumbsDown, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 
 import { refreshExpiredTokens } from '../../util';
-import { TOKENS_EXPIRED, VOTE_DOWN, VOTE_UP } from '../../constants';
+import { TOKENS_EXPIRED, VOTE_DOWN, VOTE_UP} from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getCurrentSong } from '../../actions/spotify/spotifyActions';
 import { voteTrack } from '../../actions/venue/venueActions';
@@ -19,7 +19,18 @@ const Vote = () => {
 
   const handleVote = (vote) => async () => {
     if (tokensRef.current.spotify.accessToken) {
-      const { skipped } = await voteTrack(dispatch, tokensRef.current.spotify.accessToken, venueInfo.uri, vote);
+      const firstVoteAttempt = await voteTrack(dispatch, tokensRef.current.spotify.accessToken, venueInfo.id, vote);
+      let secondVoteAttempt = 0;
+      let { skipped } = firstVoteAttempt;
+
+      if (
+        tokensRef.current.wave.accessToken
+        && firstVoteAttempt === TOKENS_EXPIRED
+      ) {
+        await refreshExpiredTokens(dispatch, tokensRef.current);
+        secondVoteAttempt = await voteTrack(dispatch, tokensRef.current.spotify.accessToken, venueInfo.id, vote);
+        skipped = secondVoteAttempt.skipped;
+      }
 
       if (skipped) {
         // Spotify has a short delay before skipping, so to avoid getting the same song as pre-skip, we wait.
@@ -29,19 +40,6 @@ const Vote = () => {
       }
     }
   };
-
-  useEffect(() => {
-    // (async () => {
-    //   if (
-    //     tokensRef.current.spotify.accessToken
-    //     && !venueInfo
-    //     && await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
-    //   ) {
-    //     await refreshExpiredTokens(dispatch, tokensRef.current);
-    //     await getVenue(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
-    //   }
-    // })();
-  }, []);
 
   return (
     <>

@@ -311,29 +311,12 @@ export const queueTrack = async (dispatch, accessToken, venueId, trackUri) => {
   } else return 0;
 };
 
+export const togglePauseTrack = async (dispatch, accessToken, venueId) => {
+  const response = await axios.post('http://localhost:8081', {
 
-// /**
-//  * Fetches the data for the current venue.
-//  * @param dispatch {Function} - Application Dispatch
-//  * @param accessToken {String} - Wave API Access Token
-//  * @param spotifyAccessToken {String} - Spotify API Access Token
-//  * @returns 1 if successful, 0 if failed
-//  */
-// export const getVenue = async (dispatch, accessToken, spotifyAccessToken) => {
-//   const response = await axios.get(`http://localhost:8081/spotify/venue?accessToken=${spotifyAccessToken}`, {
-//     headers: {
-//       'Authorization': `Bearer ${accessToken}`
-//     }
-//   }).catch((error) => error.response);
-//
-//   if (response && response.status === 200) {
-//     dispatch({
-//       type: SET_VENUE_INFO,
-//       payload: response.data
-//     });
-//
-//     return 1;
-//   } else if (response && response.status === 401) {
-//     return TOKENS_EXPIRED;
-//   } else return 0;
-// };
+  }, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+};

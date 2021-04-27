@@ -351,7 +351,7 @@ router.get('/venue', authenticate, async (req, res) => {
 });
 
 router.post('/vote', async (req, res) => {
-  const { venue, vote } = req.body;
+  const { venueId, vote } = req.body;
   const { accessToken } = req.query;
 
   let voteValue = 0;
@@ -363,7 +363,7 @@ router.post('/vote', async (req, res) => {
   }
   
   Venue.findOneAndUpdate(
-    { uri: venue },
+    { _id: venueId },
     {
       $inc: {
         votes: voteValue
@@ -382,7 +382,7 @@ router.post('/vote', async (req, res) => {
         // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
         if (updatedVenue.votes < (-updatedVenue.attendees.length / 2)) {
           await skipTrack(accessToken);
-          await Venue.updateOne({ uri: venue }, { votes: 0 });
+          await Venue.updateOne({ _id: venueId }, { votes: 0 });
           updatedVenue.votes = 0;
           skipped = true;
         }
@@ -392,6 +392,7 @@ router.post('/vote', async (req, res) => {
             const venue = {
               ...updatedVenue.toObject(),
               attendees,
+              id: updatedVenue._id,
               owners
             };
 
