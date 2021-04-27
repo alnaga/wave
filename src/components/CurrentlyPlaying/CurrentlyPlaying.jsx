@@ -196,7 +196,7 @@ const CurrentlyPlaying = () => {
                 <div id="song-controls" className="d-flex justify-content-end align-items-center pr-3">
                   <Vote />
 
-                  <Link to={`/venue/${currentVenue.id}`}>
+                  <Link to={`/venue/${currentVenue.id}`} title={`Go to ${currentVenue.name}'s page`}>
                     <FontAwesomeIcon className="ml-3 ui-button" icon={faStoreAlt} size="lg" />
                   </Link>
 
