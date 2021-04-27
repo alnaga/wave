@@ -188,7 +188,7 @@ const CurrentlyPlaying = () => {
                       </div>
                     ) : (
                       <div className="d-flex flex-grow-1 ml-3 mr-3">
-                        No song playing.
+                        No song playing
                       </div>
                     )
                 }
