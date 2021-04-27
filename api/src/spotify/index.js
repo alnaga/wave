@@ -468,7 +468,7 @@ router.get('/recommendations', authenticate, async (req, res) => {
                   });
 
                   return {
-                    venueId: venue._id,
+                    venue,
                     score
                   };
                 }
