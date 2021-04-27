@@ -42,12 +42,13 @@ export const checkIn = async (dispatch, accessToken, venueId) => {
 
 /**
  * Attempts to check the user out of a given venue.
- * @param dispatch {Function}
- * @param accessToken {String}
- * @param venueId {String}
+ * @param dispatch {Function} - Application Dispatch
+ * @param accessToken {String} - Wave API Access Token
+ * @param venueId {String} - The ID of the target venue
+ * @param venueDeleted {Boolean} - When a venue is deleted, the check out endpoint will return a 400, this overrides that and deletes the context values anyway
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
-export const checkOut = async (dispatch, accessToken, venueId) => {
+export const checkOut = async (dispatch, accessToken, venueId, venueDeleted) => {
   const response = await axios.post(`http://localhost:8081/venue/check-out`, {
     accessToken,
     venueId
@@ -58,7 +59,7 @@ export const checkOut = async (dispatch, accessToken, venueId) => {
   }).catch((error) => error.response);
 
   if (response) {
-    if (response.status === 200) {
+    if (response.status === 200 || venueDeleted) {
       sessionStorage.removeItem('currentVenue');
 
       dispatch({

@@ -60,13 +60,13 @@ const VenueInfo = (props) => {
     await handleGetVenueInfo();
   };
 
-  const handleCheckOut = async () => {
+  const handleCheckOut = async (override = false) => {
     if (
       tokensRef.current.wave.accessToken
-      && await checkOut(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId) === TOKENS_EXPIRED
+      && await checkOut(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId, override) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await checkOut(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId);
+      await checkOut(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId, override);
     }
 
     await handleGetVenueInfo();
@@ -85,6 +85,7 @@ const VenueInfo = (props) => {
     }
 
     if (firstDeleteAttempt === 1 || secondDeleteAttempt === 1) {
+      await handleCheckOut(true);
       props.history.goBack();
     }
   };
