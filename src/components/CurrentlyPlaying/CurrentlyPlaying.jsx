@@ -215,13 +215,31 @@ const CurrentlyPlaying = () => {
                                 {
                                   currentSong.is_playing
                                     ? (
-                                      <FontAwesomeIcon className="ml-3 ui-button" icon={faPause} size="lg" onClick={handlePauseTrack} />
+                                      <FontAwesomeIcon
+                                        className="ml-3 ui-button"
+                                        icon={faPause}
+                                        size="lg"
+                                        onClick={handlePauseTrack}
+                                        title="Pause the current track"
+                                      />
                                     ) : (
-                                      <FontAwesomeIcon className="ml-3 ui-button" icon={faPlay} size="lg" onClick={handlePlayTrack} />
+                                      <FontAwesomeIcon
+                                        className="ml-3 ui-button"
+                                        icon={faPlay}
+                                        size="lg"
+                                        onClick={handlePlayTrack}
+                                        title="Resume the current track"
+                                      />
                                     )
                                 }
 
-                                <FontAwesomeIcon className="ml-3 ui-button" icon={faStepForward} size="lg" onClick={handleSkipTrack} />
+                                <FontAwesomeIcon
+                                  className="ml-3 ui-button"
+                                  icon={faStepForward}
+                                  size="lg"
+                                  onClick={handleSkipTrack}
+                                  title="Skip the current track"
+                                />
                               </>
                             )
                         }

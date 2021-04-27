@@ -16,7 +16,7 @@ const DeviceSelection = () => {
   const dispatch = useAppDispatch();
   const { currentVenue, devices, tokens } = useAppState();
 
-  const [ showList, setShowList ] = useState(true);
+  const [ showList, setShowList ] = useState(false);
   const showListRef = useRef(null);
   showListRef.current = showList;
 
