@@ -90,7 +90,7 @@ const SongList = (props) => {
                   { formatSongLength(track.duration_ms) }
                 </div>
 
-                <div className="ml-3">
+                <div className="ml-3 d-flex align-items-center">
                   <QueueSongButton track={track} />
                 </div>
               </div>
