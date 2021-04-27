@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
@@ -6,12 +6,25 @@ import { faArrowCircleRight } from '@fortawesome/free-solid-svg-icons';
 import './VenueList.scss';
 
 const VenueList = (props) => {
-  const { venues } = props;
+  const { scores, venues } = props;
+
+  const [ maxScore, setMaxScore ] = useState(1);
+
+  useEffect(() => {
+    if (scores) {
+      setMaxScore(Math.max.apply(Math, scores));
+    }
+  }, [scores]);
 
   return (
     <div id="venue-list">
       {
-        venues.map((venue) => {
+        venues.map((venue, index) => {
+          let matchPercentage = (scores[index] / maxScore) * 100;
+          if (matchPercentage % 1 !== 0) {
+            matchPercentage = matchPercentage.toFixed(1);
+          }
+
           return (
             <Link
               to={`/venue/${venue._id}`}
@@ -19,11 +32,24 @@ const VenueList = (props) => {
               key={venue._id}
               title={`Go to ${venue.name}'s page`}
             >
-              <div>
+              <div className="venue-name">
                 { venue.name }
               </div>
 
-              <FontAwesomeIcon icon={faArrowCircleRight} size="lg" />
+              <div className="d-flex justify-content-between align-items-center">
+                {
+                  scores
+                  && (
+                    <div className="venue-score ml-3 mr-3">
+                      Match: {matchPercentage}%
+                    </div>
+                  )
+                }
+
+                <FontAwesomeIcon icon={faArrowCircleRight} size="lg" />
+              </div>
+
+
             </Link>
           );
         })

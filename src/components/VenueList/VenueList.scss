@@ -3,12 +3,27 @@
 #venue-list {
   .result {
     svg {
-      color: $wave-colour-light;
+      color: $wave-colour-main-transparent;
     }
 
     &:hover {
       background-color: $background-colour;
       text-decoration: none;
+    }
+
+    .venue-name {
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .venue-score {
+      background-color: $wave-colour-main-transparent;
+      border-radius: 16px;
+      font-size: 14px;
+      padding: 0 8px;
+      white-space: nowrap;
     }
 
     border-bottom: 1px solid $line-separator-colour;

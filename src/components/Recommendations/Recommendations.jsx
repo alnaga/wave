@@ -1,7 +1,8 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
 import ScreenHeader from '../ScreenHeader/ScreenHeader';
+import VenueList from '../VenueList/VenueList';
 
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
@@ -35,36 +36,24 @@ const Recommendations = () => {
   return (
     <ScreenContainer>
       <ScreenHeader
-        title="Our Recommendations"
+        title="Recommendations"
       />
 
-      {
-        recommendations.length > 0
-          ? (
-            <div>
-              {
-                recommendations.map((recommendation) => {
-                  return (
-                    <div key={recommendation.venue._id}>
-                      <div>
-                        { recommendation.venue.name }
-                      </div>
-
-                      <div>
-                        { recommendation.score }
-                      </div>
-                    </div>
-                  );
-                })
-              }
-            </div>
-          ) : (
-            <div>
-              No recommendations.
-            </div>
-          )
-      }
-
+      <div id="recommendations">
+        {
+          recommendations.length > 0
+            ? (
+              <VenueList
+                scores={recommendations.map((recommendation) => recommendation.score)}
+                venues={recommendations.map((recommendation) => recommendation.venue)}
+              />
+            ) : (
+              <div className="p-3">
+                No recommendations were found.
+              </div>
+            )
+        }
+      </div>
     </ScreenContainer>
   );
 };
