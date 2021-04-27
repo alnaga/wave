@@ -52,14 +52,19 @@ const Home = () => {
                                   {
                                     tokens.spotify.accessToken
                                       ? (
-                                        <Link to="/recommendations">
-                                          <button
-                                            title="Get a list of venues whose music taste is similar to your own"
-                                          >
-                                            Find venues most suited to me
-                                          </button>
-                                        </Link>
+                                        <>
+                                          <div className="mb-3">
+                                            Or tap the button below to get a list of venues tailored to your music taste!
+                                          </div>
 
+                                          <Link to="/recommendations">
+                                            <button
+                                              title="Get a list of venues whose music taste is similar to your own"
+                                            >
+                                              Find venues most suited to me
+                                            </button>
+                                          </Link>
+                                        </>
                                       ) : (
                                         <div>
                                           If you link your Wave account to your Spotify account, you'll be able
