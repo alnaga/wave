@@ -10,10 +10,12 @@ import { getVenueRecommendations } from '../../actions/spotify/spotifyActions';
 
 const Recommendations = () => {
   const dispatch = useAppDispatch();
-  const { tokens } = useAppState();
+  const { recommendations, tokens } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
+
+  console.log(recommendations);
 
   const handleGetVenueRecommendations = async () => {
     if (
@@ -37,6 +39,27 @@ const Recommendations = () => {
       <ScreenHeader
         title="Our Recommendations"
       />
+
+      {
+        recommendations.length > 0
+          ? (
+            <div>
+              {
+                recommendations.map((recommendation) => {
+                  return (
+                    <div key={recommendation.venue._id}>
+                      { recommendation.venue.name }
+                    </div>
+                  );
+                })
+              }
+            </div>
+          ) : (
+            <div>
+              No recommendations.
+            </div>
+          )
+      }
 
     </ScreenContainer>
   );

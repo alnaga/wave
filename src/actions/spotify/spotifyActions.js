@@ -6,6 +6,7 @@ import {
   SET_CURRENT_SONG,
   SET_DEVICES,
   SET_TRACK_SEARCH_RESULTS,
+  SET_RECOMMENDATIONS,
   SET_SPOTIFY_TOKENS,
   SET_VOTES,
   TOKENS_EXPIRED
@@ -218,7 +219,11 @@ export const getVenueRecommendations = async (dispatch, accessToken, spotifyAcce
 
   if (response) {
     if (response.status === 200) {
-      console.log(response.data);
+      dispatch({
+        type: SET_RECOMMENDATIONS,
+        payload: response.data.recommendations
+      });
+
       return 1;
     } else if (response.status === 401) {
       return TOKENS_EXPIRED;

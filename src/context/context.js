@@ -11,6 +11,7 @@ import {
   SET_DEVICES,
   SET_HISTORY,
   SET_TRACK_SEARCH_RESULTS,
+  SET_RECOMMENDATIONS,
   SET_SPOTIFY_TOKENS,
   SET_VENUE_INFO,
   SET_VENUE_SEARCH_RESULTS,
@@ -33,6 +34,7 @@ export const initialState = {
   currentVenue: JSON.parse(sessionStorage.getItem('currentVenue')) || undefined,
   devices: [],
   history: JSON.parse(sessionStorage.getItem('history')) || [],
+  recommendations: [],
   searchResults: {
     tracks: [],
     venues: []
@@ -96,6 +98,11 @@ const appReducer = (state, action) => {
       return {
         ...state,
         history: action.payload
+      };
+    case SET_RECOMMENDATIONS:
+      return {
+        ...state,
+        recommendations: action.payload
       };
     case SET_SPOTIFY_TOKENS:
       return {

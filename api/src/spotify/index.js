@@ -480,7 +480,7 @@ router.get('/recommendations', authenticate, async (req, res) => {
         const finalScores = await Promise.all(gettingVenuesMusicTaste);
 
         res.status(200).send({
-          data: finalScores
+          recommendations: finalScores
         });
       });
     } else if (spotifyResponse.status === 401) {
