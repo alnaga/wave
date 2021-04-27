@@ -80,6 +80,12 @@ export const checkOut = async (dispatch, accessToken, venueId) => {
   }
 };
 
+/**
+ * Queries the Wave API to delete a venue from its database.
+ * @param dispatch - Application Dispatch
+ * @param accessToken - Wave API Access Token
+ * @param venueId - The ID of the target venue.
+ */
 export const deleteVenue = async (dispatch, accessToken, venueId) => {
   const response = await axios.delete(`http://localhost:8081/venue?venueId=${venueId}`, {
     headers: {
@@ -187,6 +193,13 @@ export const registerVenue = async (dispatch, accessToken, venueData, ownerUsern
   }
 };
 
+/**
+ * queries the Wave API to update the details of a venue.
+ * @param dispatch - Application Dispatch
+ * @param accessToken - Wave API Access Token
+ * @param venueId - The ID of the target venue.
+ * @param venueData - The new details of the venue.
+ */
 export const updateVenueDetails = async (dispatch, accessToken, venueId, venueData) => {
   const response = await axios.patch('http://localhost:8081/venue', {
     venueData,

@@ -17,11 +17,8 @@
           background-color: $background-colour;
         }
 
-        &:not(:last-child) {
-          border-bottom: 1px solid $line-separator-colour;
-        }
-
         align-items: center;
+        border-bottom: 1px solid $line-separator-colour;
         cursor: pointer;
         display: flex;
         min-height: 56px;
@@ -46,7 +43,7 @@
   #tab {
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;
-    border-top: 12px solid white;
+    border-top: 12px solid $screen-background-colour;
     height: 0;
     position: absolute;
     top: -12px;

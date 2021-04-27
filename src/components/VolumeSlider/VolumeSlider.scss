@@ -1,0 +1,33 @@
+@import '../../variables';
+
+.volume-slider {
+  input {
+    &:disabled {
+      opacity: 0.5;
+    }
+
+    &::-webkit-slider-thumb {
+      &:hover {
+        background-color: $wave-colour-dark;
+      }
+
+      -webkit-appearance: none;
+      appearance: none;
+      background-color: $wave-colour-main;
+      border-radius: 24px;
+      cursor: pointer;
+      height: 24px;
+      transition: background-color .1s ease-in-out;
+      width: 24px;
+    }
+
+    -webkit-appearance: none;
+    appearance: none;
+    background-color: $line-separator-colour;
+    border-radius: 16px;
+    height: 12px;
+    width: 100%;
+  }
+
+  width: 100%;
+}

@@ -3,6 +3,8 @@ import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faHeadphones, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 
+import VolumeSlider from '../VolumeSlider/VolumeSlider';
+
 import { TOKENS_EXPIRED } from '../../constants';
 import { refreshExpiredTokens } from '../../util';
 import { useAppDispatch, useAppState } from '../../context/context';
@@ -14,7 +16,7 @@ const DeviceSelection = () => {
   const dispatch = useAppDispatch();
   const { devices, tokens } = useAppState();
 
-  const [ showList, setShowList ] = useState(false);
+  const [ showList, setShowList ] = useState(true);
   const showListRef = useRef(null);
   showListRef.current = showList;
 
@@ -120,12 +122,14 @@ const DeviceSelection = () => {
                           }
                         </>
                       ) : (
-                        <>
+                        <div className="p-3">
                           No devices available.
-                        </>
+                        </div>
                       )
                   }
                 </div>
+
+                <VolumeSlider />
               </div>
 
               <div id="tab" />

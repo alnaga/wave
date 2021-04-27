@@ -320,3 +320,34 @@ export const togglePauseTrack = async (dispatch, accessToken, venueId) => {
     }
   }).catch((error) => error.response);
 };
+
+/**
+ * Queries the Spotify API to change the current volume on the venue's account.
+ * @param dispatch {Function} - Application Dispatch
+ * @param accessToken {String} - Wave API Access Token
+ * @param venueId {String }- The ID of the target venue
+ * @param volume {String }- Desired volume (0 - 100)
+ */
+export const updateVolume = async (dispatch, accessToken, venueId, volume) => {
+  const response = await axios.put('http://localhost:8081/spotify/volume', {
+    venueId,
+    volume
+  }, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
+};

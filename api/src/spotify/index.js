@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Router } from 'express';
 
-import { authenticate, getUsersByIds, getVenueById } from '../util';
+import { authenticate, getUserByAccessToken, getUsersByIds, getVenueById } from '../util';
 import { Venue } from '../models/venue';
 import {
   AUTHORISATION,
@@ -299,6 +299,7 @@ router.post('/song', authenticate, async (req, res) => {
   });
 });
 
+// Gets details about a venue and returns them to the client.
 router.get('/venue', authenticate, async (req, res) => {
   const { accessToken } = req.query;
   
@@ -349,6 +350,43 @@ router.get('/venue', authenticate, async (req, res) => {
   }
 });
 
+router.put('/volume', authenticate, async (req, res) => {
+  const { venueId, volume } = req.body;
+  const accessToken = req.headers.authorization.split('Bearer ')[1];
+
+  let volumePercent = volume;
+  if (volumePercent > 100) volumePercent = 100;
+
+  await getUserByAccessToken(accessToken, res, async (user) => {
+    await Venue.findOne({ _id: venueId }, async (error, venue) => {
+      if (!venue.owners.includes(user._id)) {
+        res.status(401).send({
+          message: 'User making the request is not authorised to adjust volume.'
+        });
+      } else {
+        const spotifyResponse = await axios.put(`https://api.spotify.com/v1/me/player/volume?volume_percent=${volumePercent}`,  null, {
+          headers: {
+            'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
+          }
+        }).catch((error) => error.response);
+
+        if (spotifyResponse) {
+          if (spotifyResponse.status === 204) {
+            res.status(204).send({
+              message: 'Volume changed successfully.'
+            });
+          }
+        } else {
+          res.status(500).send({
+            message: 'Volume change request to Spotify API failed.'
+          })
+        }
+      }
+    });
+  });
+});
+
+// Casts a vote for the currently playing song in a venue.
 router.post('/vote', async (req, res) => {
   const { venueId, vote } = req.body;
   const { accessToken } = req.query;

@@ -356,7 +356,7 @@ const VenueInfo = (props) => {
                                 </div>
                               ) : (
                                 <div id="no-attendees">
-                                  No users have currently checked into this venue. Why not be the first to start playing?
+                                  No users are currently checked in at this venue. Why not be the first to start playing?
                                 </div>
                               )
                           }
