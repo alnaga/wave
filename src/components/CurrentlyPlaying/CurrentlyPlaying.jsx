@@ -167,33 +167,29 @@ const CurrentlyPlaying = () => {
                 {
                   currentSong && currentSong.item
                     ? (
-                      <>
-                        <div id="song-info" className="d-flex flex-grow-1 align-items-center">
-                          <Link to={`/album/${currentSong.item.album.id}`}>
-                            <img src={currentSong.item.album.images[0].url} alt={`Album Artwork for ${currentSong.item.album.name}`} />
-                          </Link>
+                      <div id="song-info" className="d-flex flex-grow-1 align-items-center">
+                        <Link to={`/album/${currentSong.item.album.id}`}>
+                          <img src={currentSong.item.album.images[0].url} alt={`Album Artwork for ${currentSong.item.album.name}`} />
+                        </Link>
 
-                          <div className="ml-3 mr-3">
-                            <div id="song-title">
-                              <Link to={`/album/${currentSong.item.album.id}`}>
-                                { currentSong.item.name }
-                              </Link>
-                            </div>
+                        <div className="ml-3 mr-3">
+                          <div id="song-title">
+                            <Link to={`/album/${currentSong.item.album.id}`}>
+                              { currentSong.item.name }
+                            </Link>
+                          </div>
 
-                            <div id="artist-name">
-                              <Link to={`/artist/${currentSong.item.artists[0].id}`}>
-                                { currentSong.item.artists[0].name }
-                              </Link>
-                            </div>
+                          <div id="artist-name">
+                            <Link to={`/artist/${currentSong.item.artists[0].id}`}>
+                              { currentSong.item.artists[0].name }
+                            </Link>
                           </div>
                         </div>
-
-
-                      </>
+                      </div>
                     ) : (
-                      <>
+                      <div className="d-flex flex-grow-1 ml-3 mr-3">
                         No song playing.
-                      </>
+                      </div>
                     )
                 }
 

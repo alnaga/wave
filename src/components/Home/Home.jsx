@@ -45,7 +45,8 @@ const Home = () => {
                             ? (
                               <div>
                                 <div>
-                                  To find a venue to connect to, type in a venue name in the search bar.
+                                  To connect to a venue, type in a venue's name in the search bar, then select one of
+                                  the options in the list and tap the 'Check In' button.
                                 </div>
 
                                 <div className="mt-3">
