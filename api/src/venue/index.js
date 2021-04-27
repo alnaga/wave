@@ -261,7 +261,7 @@ router.post('/check-in', authenticate, async (req, res) => {
         message: 'Invalid access token.'
       });
     } else {
-      const userCheckingIn = await User.findOne({ username: token.user.username }, async (error, user) => {
+      await User.findOne({ username: token.user.username }, async (error, user) => {
         if (error) {
           res.status(500).send({
             message: 'Internal server error occurred while checking into venue.'
@@ -280,14 +280,14 @@ router.post('/check-in', authenticate, async (req, res) => {
               res.status(400).send({
                 message: 'Invalid venue ID.'
               });
-            } else if (venue && venue.attendees.includes(userCheckingIn._id)) {
+            } else if (venue && venue.attendees.includes(user._id)) {
               res.status(400).send({
                 message: 'User already checked in.'
               });
             } else {
               await Venue.updateOne({ _id: venueId }, {
                 $addToSet: {
-                  attendees: userCheckingIn._id
+                  attendees: user._id
                 }
               }, async (error, result) => {
                 if (error || result.modifiedCount === 0) {
@@ -297,15 +297,15 @@ router.post('/check-in', authenticate, async (req, res) => {
                 } else {
                   // If the user is already checked in at another venue, check them out before checking them into
                   // the new one.
-                  if (userCheckingIn.currentVenue !== venueId) {
-                    await Venue.updateOne({ _id: userCheckingIn.currentVenue }, {
+                  if (user.currentVenue !== venueId) {
+                    await Venue.updateOne({ _id: user.currentVenue }, {
                       $pull: {
-                        attendees: userCheckingIn._id
+                        attendees: user._id
                       }
                     });
                   }
 
-                  await User.updateOne({ _id: userCheckingIn._id }, {
+                  await User.updateOne({ _id: user._id }, {
                     $set: {
                       currentVenue: venue._id
                     }
