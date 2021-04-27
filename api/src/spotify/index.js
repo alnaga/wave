@@ -461,9 +461,13 @@ router.get('/recommendations', authenticate, async (req, res) => {
 
                   const matches = await Promise.all(calculateMatchPoints);
 
-                  const score = matches.reduce((a, b) => {
-                    if (a != NaN && b != NaN) {
-                      return a + b;
+                  let score = 0;
+
+                  // TODO: Fix weird behaviour where the sum is not always the correct
+
+                  matches.forEach((matchScore) => {
+                    if (matchScore) {
+                      score += matchScore;
                     }
                   });
 

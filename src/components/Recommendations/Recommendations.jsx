@@ -46,7 +46,13 @@ const Recommendations = () => {
                 recommendations.map((recommendation) => {
                   return (
                     <div key={recommendation.venue._id}>
-                      { recommendation.venue.name }
+                      <div>
+                        { recommendation.venue.name }
+                      </div>
+
+                      <div>
+                        { recommendation.score }
+                      </div>
                     </div>
                   );
                 })
