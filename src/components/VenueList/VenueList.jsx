@@ -20,8 +20,9 @@ const VenueList = (props) => {
     <div id="venue-list">
       {
         venues.map((venue, index) => {
+          let matchPercentage = undefined;
           if (scores) {
-            let matchPercentage = (scores[index] / maxScore) * 100;
+            matchPercentage = (scores[index] / maxScore) * 100;
             if (matchPercentage % 1 !== 0) {
               matchPercentage = matchPercentage.toFixed(1);
             }
@@ -40,7 +41,7 @@ const VenueList = (props) => {
 
               <div className="d-flex justify-content-between align-items-center">
                 {
-                  scores
+                  (scores && matchPercentage !== undefined && matchPercentage !== null)
                   && (
                     <div className="venue-score ml-3 mr-3">
                       Match: {matchPercentage}%

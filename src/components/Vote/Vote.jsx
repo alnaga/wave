@@ -18,8 +18,8 @@ const Vote = () => {
   tokensRef.current = tokens;
 
   const handleVote = (vote) => async () => {
-    if (tokensRef.current.spotify.accessToken) {
-      const firstVoteAttempt = await voteTrack(dispatch, tokensRef.current.spotify.accessToken, currentVenue.id, vote);
+    if (tokensRef.current.wave.accessToken) {
+      const firstVoteAttempt = await voteTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, vote);
       let { skipped } = firstVoteAttempt;
 
       if (
@@ -27,7 +27,7 @@ const Vote = () => {
         && firstVoteAttempt === TOKENS_EXPIRED
       ) {
         await refreshExpiredTokens(dispatch, tokensRef.current);
-        skipped = await voteTrack(dispatch, tokensRef.current.spotify.accessToken, currentVenue.id, vote).skipped;
+        skipped = await voteTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, vote).skipped;
       }
 
       if (skipped) {

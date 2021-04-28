@@ -154,14 +154,14 @@ export const selectUserDevice = async (dispatch, accessToken, venueId, device) =
 
 /**
  * Queries the Wave API to fetch information about a given album from the Spotify API.
- * @param dispatch {Function}
- * @param accessToken {String}
- * @param spotifyAccessToken {String}
- * @param albumId {String}
+ * @param dispatch {Function} - Application Dispatch
+ * @param accessToken {String} - Wave API Access Token
+ * @param venueId {String} - The ID of the current venue.
+ * @param albumId {String} - The ID of the album to fetch.
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if one of the access tokens have expired.
  */
-export const getAlbumInfo = async (dispatch, accessToken, spotifyAccessToken, albumId) => {
-  const response = await axios.get(`http://localhost:8081/spotify/album?accessToken=${spotifyAccessToken}&albumId=${albumId}`, {
+export const getAlbumInfo = async (dispatch, accessToken, venueId, albumId) => {
+  const response = await axios.get(`http://localhost:8081/spotify/album?venueId=${venueId}&albumId=${albumId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -181,14 +181,14 @@ export const getAlbumInfo = async (dispatch, accessToken, spotifyAccessToken, al
 
 /**
  * Queries the Wave API to fetch information about a given artist from the Spotify API.
- * @param dispatch {Function}
- * @param accessToken {String}
- * @param spotifyAccessToken {String}
- * @param artistId {String}
+ * @param dispatch {Function} - Application Dispatch
+ * @param accessToken {String} - Wave API Access Token
+ * @param venueId {String} - The ID of the current venue.
+ * @param artistId {String} - The ID of the desired artist.
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if one of the access tokens have expired.
  */
-export const getArtistInfo = async (dispatch, accessToken, spotifyAccessToken, artistId) => {
-  const response = await axios.get(`http://localhost:8081/spotify/artist?accessToken=${spotifyAccessToken}&artistId=${artistId}`, {
+export const getArtistInfo = async (dispatch, accessToken, venueId, artistId) => {
+  const response = await axios.get(`http://localhost:8081/spotify/artist?venueId=${venueId}&artistId=${artistId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }

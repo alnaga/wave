@@ -13,7 +13,7 @@ import './AlbumInfo.scss';
 
 const AlbumInfo = (props) => {
   const { albumId } = props.match.params;
-  const { albumInfo, tokens } = useAppState();
+  const { albumInfo, currentVenue, tokens } = useAppState();
   const dispatch = useAppDispatch();
 
   const tokensRef = useRef(null);
@@ -22,12 +22,13 @@ const AlbumInfo = (props) => {
   const handleGetAlbumInfo = async () => {
     if (
       tokensRef.current.wave.accessToken
-      && tokensRef.current.spotify.accessToken
       && albumId
-      && await getAlbumInfo(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, albumId) === TOKENS_EXPIRED
+      && currentVenue
+      && currentVenue.id
+      && await getAlbumInfo(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, albumId) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getAlbumInfo(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, albumId);
+      await getAlbumInfo(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, albumId);
     }
   };
 

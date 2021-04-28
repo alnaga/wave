@@ -143,78 +143,94 @@ router.get('/authorise', (req, res) => {
 
 // Fetches album information from Spotify's API and forwards the result of the request to the user.
 router.get('/album', authenticate, async (req, res) => {
-  const { accessToken, albumId } = req.query;
+  const { albumId, venueId } = req.query;
 
-  const spotifyResponse = await axios.get(`https://api.spotify.com/v1/albums/${albumId}`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`
-    }
-  }).catch((error) => error.response);
+  await getVenueById(venueId, res, async (venue) => {
+    if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
+      const spotifyResponse = await axios.get(`https://api.spotify.com/v1/albums/${albumId}`, {
+        headers: {
+          'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
+        }
+      }).catch((error) => error.response);
 
-  if (spotifyResponse) {
-    if (spotifyResponse.status === 200) {
-      res.status(200).send(spotifyResponse.data);
+      if (spotifyResponse) {
+        if (spotifyResponse.status === 200) {
+          res.status(200).send(spotifyResponse.data);
+        } else {
+          res.status(spotifyResponse.status).send(spotifyResponse.data);
+        }
+      } else {
+        res.status(500).send({
+          message: 'Internal server error occurred while fetching album information.'
+        });
+      }
     } else {
-      res.status(spotifyResponse.status).send(spotifyResponse.data);
+      res.status(400).send({
+        message: 'Venue has not linked their Spotify account.'
+      });
     }
-  } else {
-    res.status(500).send({
-      message: 'Internal server error occurred while fetching album information.'
-    });
-  }
+  });
 });
 
 // Fetches information about an artist from Spotify's API and forwards the result of the request to the user.
 router.get('/artist', authenticate, async (req, res) => {
-  const { accessToken, artistId } = req.query;
+  const { artistId, venueId } = req.query;
 
-  const artistResponse = await axios.get(`https://api.spotify.com/v1/artists/${artistId}`, {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`
-    }
-  }).catch((error) => error.response);
+  await getVenueById(venueId, res, async (venue) => {
+    if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
+      const artistResponse = await axios.get(`https://api.spotify.com/v1/artists/${artistId}`, {
+        headers: {
+          'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
+        }
+      }).catch((error) => error.response);
 
-  if (artistResponse) {
-    let artistAlbumsResponse = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums?market=${resultMarket}`, {
-      headers: {
-        'Authorization': `Bearer ${accessToken}`
+      if (artistResponse) {
+        let artistAlbumsResponse = await axios.get(`https://api.spotify.com/v1/artists/${artistId}/albums?market=${resultMarket}`, {
+          headers: {
+            'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
+          }
+        }).catch((error) => error.response);
+
+        if (artistAlbumsResponse) {
+          let { items } = artistAlbumsResponse.data;
+
+          // TODO: Add a next button on the album list to save on performance
+          // If there are multiple pages of albums, keep fetching and adding them to the items list until there are no more.
+          // while (artistAlbumsResponse.data.next !== null) {
+          //   artistAlbumsResponse = await axios.get(artistAlbumsResponse.data.next, {
+          //     headers: {
+          //       'Authorization': `Bearer ${accessToken}`
+          //     }
+          //   }).catch((error) => error.response);
+          //
+          //   if (artistAlbumsResponse) {
+          //     items.push(...artistAlbumsResponse.data.items);
+          //   }
+          // }
+
+          res.status(artistResponse.status).send({
+            albums: {
+              ...artistAlbumsResponse.data,
+              items
+            },
+            ...artistResponse.data
+          });
+        } else {
+          res.status(500).send({
+            message: 'Internal server error occurred while fetching artist albums.'
+          });
+        }
+      } else {
+        res.status(500).send({
+          message: 'Internal server error occurred while fetching artist information.'
+        });
       }
-    }).catch((error) => error.response);
-
-    if (artistAlbumsResponse) {
-      let { items } = artistAlbumsResponse.data;
-
-      // TODO: Add a next button on the album list to save on performance
-      // If there are multiple pages of albums, keep fetching and adding them to the items list until there are no more.
-      // while (artistAlbumsResponse.data.next !== null) {
-      //   artistAlbumsResponse = await axios.get(artistAlbumsResponse.data.next, {
-      //     headers: {
-      //       'Authorization': `Bearer ${accessToken}`
-      //     }
-      //   }).catch((error) => error.response);
-      //
-      //   if (artistAlbumsResponse) {
-      //     items.push(...artistAlbumsResponse.data.items);
-      //   }
-      // }
-
-      res.status(artistResponse.status).send({
-        albums: {
-          ...artistAlbumsResponse.data,
-          items
-        },
-        ...artistResponse.data
-      });
     } else {
-      res.status(500).send({
-        message: 'Internal server error occurred while fetching artist albums.'
+      res.status(400).send({
+        message: 'Venue has not linked their Spotify account.'
       });
     }
-  } else {
-    res.status(500).send({
-      message: 'Internal server error occurred while fetching artist information.'
-    });
-  }
+  });
 });
 
 // Fetches the available playback devices from Spotify.
@@ -828,9 +844,9 @@ router.put('/volume', authenticate, async (req, res) => {
 });
 
 // Casts a vote for the currently playing song in a venue.
-router.post('/vote', async (req, res) => {
+router.post('/vote', authenticate, async (req, res) => {
   const { venueId, vote } = req.body;
-  const { accessToken } = req.query;
+  const accessToken = req.headers.authorization.split('Bearer ')[1];
 
   let voteValue = 0;
 
@@ -839,63 +855,69 @@ router.post('/vote', async (req, res) => {
   } else if (vote === VOTE_DOWN) {
     voteValue = -1;
   }
-  
-  Venue.findOneAndUpdate(
-    { _id: venueId },
-    {
-      $inc: {
-        votes: voteValue
-      }
-    },
-    {
-      new: true,
-      useFindAndModify: false
-    },
-    async (error, updatedVenue) => {
-      if (error) {
-        console.error('Error occurred while updating vote value.', error);
-        res.status(500).send({
-          message: 'Internal server error.'
-        });
-      } else if (updatedVenue) {
-        let skipped = false;
 
-        // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
-        if (updatedVenue.votes < (-updatedVenue.attendees.length / 2)) {
-          await skipTrack(accessToken);
-          await Venue.updateOne({ _id: venueId }, { votes: 0 });
-          updatedVenue.votes = 0;
-          skipped = true;
-        }
-
-        await getUsersByIds(updatedVenue.attendees, res, async (attendees) => {
-          await getUsersByIds(updatedVenue.owners, res, async (owners) => {
-            const venue = {
-              ...updatedVenue.toObject(),
-              _id: undefined,
-              id: updatedVenue._id,
-              attendees,
-              currentSong: undefined,
-              googleMapsLink: undefined,
-              owners,
-              spotifyConsent: undefined,
-              spotifyTokens: undefined
-            };
-
-            res.status(200).send({
-              venue,
-              skipped
-            });
-          });
+  await getUserByAccessToken(accessToken, res, async (user) => {
+    await Venue.findOne({ _id: venueId }, async (error, venue) => {
+      if (!venue.attendees.includes) {
+        res.status(400).send({
+          message: 'User casting vote is not checked into the target venue.'
         });
       } else {
-        console.error('Could not find venue.');
-        res.status(500).send({
-          message: 'Internal server error.'
+        Venue.updateOne({ _id: venueId }, {
+          $inc: {
+            votes: voteValue
+          }
+        }, async (error, result) => {
+          if (error) {
+            res.status(500).send({
+              message: 'Internal server error.'
+            });
+          } else if (result.nModified === 1) {
+            let skipped = false;
+
+            let newVotes = venue.votes + voteValue;
+
+            // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
+            if (newVotes < (-venue.attendees.length / 2)) {
+              await skipTrack(venue.spotifyTokens.accessToken);
+              await Venue.updateOne({ _id: venueId }, {
+                $set: {
+                  votes: 0
+                }
+              });
+              newVotes = 0;
+              skipped = true;
+            }
+
+            await getUsersByIds(venue.attendees, res, async (attendees) => {
+              await getUsersByIds(venue.owners, res, async (owners) => {
+                res.status(200).send({
+                  venue: {
+                    ...venue.toObject(),
+                    _id: undefined,
+                    id: venue._id,
+                    attendees,
+                    currentSong: undefined,
+                    googleMapsLink: undefined,
+                    owners,
+                    spotifyConsent: undefined,
+                    spotifyTokens: undefined,
+                    votes: newVotes
+                  },
+                  skipped
+                });
+              });
+            });
+          } else {
+            console.error('Could not find venue.');
+            res.status(500).send({
+              message: 'Internal server error.'
+            });
+          }
         });
       }
-    }
-  );
+    });
+  });
 });
 
 module.exports = router;

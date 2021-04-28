@@ -231,9 +231,13 @@ export const updateVenueDetails = async (dispatch, accessToken, venueId, venueDa
  * @returns 1 if successful, 0 if failed
  */
 export const voteTrack = async (dispatch, accessToken, venueId, vote) => {
-  const response = await axios.post(`http://localhost:8081/spotify/vote?accessToken=${accessToken}`, {
+  const response = await axios.post(`http://localhost:8081/spotify/vote`, {
     venueId,
     vote
+  }, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
   }).catch((error) => error.response);
 
   if (response) {

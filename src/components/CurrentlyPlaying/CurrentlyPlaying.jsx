@@ -137,7 +137,7 @@ const CurrentlyPlaying = () => {
                   </Link>
 
                   {
-                    currentVenue.owners && currentVenue.owners.find((owner) => owner.username === tokens.wave.user.username)
+                    (tokens.wave.user && currentVenue.owners && currentVenue.owners.find((owner) => owner.username === tokens.wave.user.username))
                     && (
                       <DeviceSelection handleFetchCurrentSong={handleFetchCurrentSong} />
                     )

@@ -9,6 +9,7 @@
     "build:prod": "npm run clean && cross-env NODE_ENV=production npm run build -- --mode=production",
     "clean": "rimraf build",
     "start:dev": "cross-env NODE_ENV=development webpack serve",
+    "start:lan": "cross-env NODE_ENV=development webpack serve --host 0.0.0.0",
     "start:prod": "cross-env NODE_ENV=production webpack serve",
     "test": "jest"
   },

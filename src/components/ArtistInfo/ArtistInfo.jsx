@@ -14,25 +14,22 @@ import './ArtistInfo.scss';
 
 const ArtistInfo = (props) => {
   const { artistId } = props.match.params;
-  const { artistInfo, tokens } = useAppState();
+  const { artistInfo, currentVenue, tokens } = useAppState();
   const dispatch = useAppDispatch();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
-  // if (artistInfo) {
-  //   console.log(artistInfo);
-  // }
-
   const handleGetArtistInfo = async () => {
     if (
       tokensRef.current.wave.accessToken
-      && tokensRef.current.spotify.accessToken
       && artistId
-      && await getArtistInfo(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, artistId) === TOKENS_EXPIRED
+      && currentVenue
+      && currentVenue.id
+      && await getArtistInfo(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, artistId) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getArtistInfo(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, artistId);
+      await getArtistInfo(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, artistId);
     }
   };
 
