@@ -45,16 +45,17 @@ const DeviceSelection = (props) => {
   const handleGetDevices = async () => {
     if (
       tokensRef.current.wave.accessToken
-      && tokensRef.current.spotify.accessToken
-      && await getUserDevices(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
+      && currentVenueRef.current
+      && currentVenueRef.current.id
+      && await getUserDevices(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getUserDevices(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
+      await getUserDevices(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
     }
   };
 
   const handlePauseTrack = async () => {
-    let pauseResult = await pauseTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+    let pauseResult = await pauseTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
 
     if (
       tokensRef.current.wave.accessToken
@@ -63,10 +64,10 @@ const DeviceSelection = (props) => {
       && pauseResult === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      pauseResult = await pauseTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+      pauseResult = await pauseTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
     }
 
-    // If skipping was successful, wait for Spotify to carry out the skip and then fetch the new song.
+    // If pausing was successful, wait for Spotify to carry out the skip and then fetch the new song.
     if (pauseResult === 1) {
       setTimeout(async () => {
         await handleFetchCurrentSong();
@@ -75,7 +76,7 @@ const DeviceSelection = (props) => {
   }
 
   const handlePlayTrack = async () => {
-    let playResult = await playTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+    let playResult = await playTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
 
     if (
       tokensRef.current.wave.accessToken
@@ -84,10 +85,10 @@ const DeviceSelection = (props) => {
       && playResult === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      playResult = await playTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+      playResult = await playTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
     }
 
-    // If skipping was successful, wait for Spotify to carry out the skip and then fetch the new song.
+    // If playing was successful, wait for Spotify to carry out the skip and then fetch the new song.
     if (playResult === 1) {
       setTimeout(async () => {
         await handleFetchCurrentSong();
@@ -96,7 +97,7 @@ const DeviceSelection = (props) => {
   }
 
   const handleSkipTrack = async () => {
-    let skipResult = await skipTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+    let skipResult = await skipTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
 
     if (
       tokensRef.current.wave.accessToken
@@ -105,7 +106,14 @@ const DeviceSelection = (props) => {
       && skipResult === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      skipResult = await skipTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
+      skipResult = await skipTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
+    }
+
+    // If skipping was successful, wait for Spotify to carry out the skip and then fetch the new song.
+    if (skipResult === 1) {
+      setTimeout(async () => {
+        await handleFetchCurrentSong();
+      }, 250);
     }
   }
 
@@ -113,14 +121,17 @@ const DeviceSelection = (props) => {
     if (
       tokensRef.current.wave.accessToken
       && tokensRef.current.spotify.accessToken
-      && currentVenue
-      && await selectUserDevice(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, currentVenue.id, device) === TOKENS_EXPIRED
+      && currentVenueRef.current
+      && currentVenueRef.current.id
+      && await selectUserDevice(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id, device) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await selectUserDevice(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, currentVenue.id, device);
+      await selectUserDevice(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id, device);
     }
 
-    await handleGetDevices();
+    setTimeout(async () => {
+      await handleGetDevices();
+    }, 250);
   };
 
   const handleToggleShowList = () => {
@@ -186,7 +197,7 @@ const DeviceSelection = (props) => {
                           }
                         </>
                       ) : (
-                        <div className="p-3">
+                        <div id="no-devices" className="p-3">
                           No devices available.
                         </div>
                       )

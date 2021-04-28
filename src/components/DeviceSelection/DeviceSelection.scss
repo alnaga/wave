@@ -60,6 +60,10 @@
     width: $device-list-width;
   }
 
+  #no-devices {
+    border-bottom: 1px solid $line-separator-colour;
+  }
+
   #tab {
     border-left: 10px solid transparent;
     border-right: 10px solid transparent;

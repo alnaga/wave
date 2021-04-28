@@ -94,11 +94,11 @@ export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
  * Queries the Wave API to fetch the list of available playback devices from the Spotify API.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API Access Token
- * @param spotifyAccessToken {String} - Spotify API Access Token
+ * @param venueId {String} - The ID of the current venue.
  * @returns 1 if successful, 0 if failed
  */
-export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) => {
-  const response = await axios.get(`http://localhost:8081/spotify/devices?accessToken=${spotifyAccessToken}`, {
+export const getUserDevices = async (dispatch, accessToken, venueId) => {
+  const response = await axios.get(`http://localhost:8081/spotify/devices?venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -122,12 +122,12 @@ export const getUserDevices = async (dispatch, accessToken, spotifyAccessToken) 
  * Updates the chosen playback device in the Spotify API.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API Access Token
- * @param spotifyAccessToken {String} - Spotify API Access Token
+ * @param venueId {String} - The ID of the target venue.
  * @param device {Object} - The Spotify Device Object
  * @returns 1 if successful, 0 if failed
  */
-export const selectUserDevice = async (dispatch, accessToken, spotifyAccessToken, venueId, device) => {
-  const response = await axios.put(`http://localhost:8081/spotify/devices?accessToken=${spotifyAccessToken}`, {
+export const selectUserDevice = async (dispatch, accessToken, venueId, device) => {
+  const response = await axios.put(`http://localhost:8081/spotify/devices`, {
     device,
     venueId
   }, {
@@ -239,25 +239,23 @@ export const getVenueRecommendations = async (dispatch, accessToken, spotifyAcce
  * Carries out a search on the Spotify API for songs matching the user's query and returns the list.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API Access Token
- * @param spotifyAccessToken {String} - Spotify API Access Token
+ * @param venueId {String} - The ID of the current venue.
  * @param query {String} - Search query
  * @returns 1 if successful, 0 if failed
  */
-export const getTrackSearchResults = async (dispatch, accessToken, spotifyAccessToken, query) => {
+export const getTrackSearchResults = async (dispatch, accessToken, venueId, query) => {
   // If the user has not input a query, the request to the API is not made.
   if (!query) {
     return 0;
   }
 
-  const response = await axios.get(`http://localhost:8081/spotify/search?accessToken=${spotifyAccessToken}&query=${query}`, {
+  const response = await axios.get(`http://localhost:8081/spotify/search?query=${query}&venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
   }).catch((error) => error.response);
 
   if (response && response.status === 200) {
-    const results = response.data;
-
     dispatch({
       type: SET_TRACK_SEARCH_RESULTS,
       payload: response.data.tracks.items

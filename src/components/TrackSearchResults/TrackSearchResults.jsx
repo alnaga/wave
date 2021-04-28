@@ -13,7 +13,7 @@ import './TrackSearchResults.scss';
 
 const TrackSearchResults = (props) => {
   const dispatch = useAppDispatch();
-  const { searchResults, tokens } = useAppState();
+  const { currentVenue, searchResults, tokens } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
@@ -23,11 +23,11 @@ const TrackSearchResults = (props) => {
     const query = decodeURIComponent(props.match.params.query);
     if (
       tokensRef.current.wave.accessToken
-      && tokensRef.current.spotify.accessToken
-      && await getTrackSearchResults(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, query) === TOKENS_EXPIRED
+      && currentVenue
+      && await getTrackSearchResults(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, query) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getTrackSearchResults(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken, query);
+      await getTrackSearchResults(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, query);
     }
   }
 
