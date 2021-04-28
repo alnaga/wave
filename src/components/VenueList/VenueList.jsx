@@ -22,7 +22,7 @@ const VenueList = (props) => {
         venues.map((venue, index) => {
           let matchPercentage = undefined;
           if (scores) {
-            matchPercentage = (scores[index] / maxScore) * 100;
+            matchPercentage = (scores[index] / 300) * 100;
             if (matchPercentage % 1 !== 0) {
               matchPercentage = matchPercentage.toFixed(1);
             }
