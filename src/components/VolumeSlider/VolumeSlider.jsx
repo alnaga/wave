@@ -1,4 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faVolumeMute, faVolumeUp } from '@fortawesome/free-solid-svg-icons';
 
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
@@ -11,11 +13,32 @@ const VolumeSlider = () => {
   const dispatch = useAppDispatch();
   const { currentVenue, devices, tokens } = useAppState();
 
+  const [ previousVolume, setPreviousVolume ] = useState(0)
   const [ volumeTimeout, setVolumeTimeout ] = useState();
   const [ volume, setVolume ] = useState(0);
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
+
+  const handleToggleMuteVolume = async () => {
+    if (volume === 0) {
+      setVolume(previousVolume);
+
+      await handleVolumeChange({
+        target: {
+          value: previousVolume
+        }
+      });
+    } else {
+      setPreviousVolume(volume);
+
+      await handleVolumeChange({
+        target: {
+          value: 0
+        }
+      });
+    }
+  }
 
   const handleVolumeChange = async (event) => {
     setVolume(event.target.value);
@@ -46,9 +69,19 @@ const VolumeSlider = () => {
       }
     }
   }, [devices])
-
+  
   return (
-    <div className="volume-slider pl-3 pr-3 pt-2 pb-1">
+    <div className="volume-slider d-flex align-items-center pl-3 pr-3 pt-2 pb-2">
+      {
+        volume > 0
+          ? (
+            <FontAwesomeIcon className="mr-3 ui-button" icon={faVolumeUp} size="lg" onClick={handleToggleMuteVolume} />
+          ) : (
+            <FontAwesomeIcon className="mr-3 ui-button" icon={faVolumeMute} size="lg" onClick={handleToggleMuteVolume} />
+          )
+      }
+
+
       <input
         disabled={devices.length < 1}
         type="range"

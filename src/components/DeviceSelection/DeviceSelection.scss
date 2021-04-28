@@ -12,6 +12,13 @@
     }
 
     #device-list {
+      label {
+        border-bottom: 1px solid $line-separator-colour;
+        font-size: 14px;
+        font-weight: 600;
+        width: 100%;
+      }
+
       .device-option {
         &:hover {
           background-color: $background-colour;
@@ -32,6 +39,14 @@
       }
 
       overflow-y: auto;
+    }
+
+    #playback-controls {
+      align-items: center;
+      border-bottom: 1px solid $line-separator-colour;
+      display: flex;
+      justify-content: center;
+      width: 100%;
     }
 
     background-color: $screen-background-colour;

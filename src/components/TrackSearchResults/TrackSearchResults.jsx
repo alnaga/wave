@@ -19,7 +19,6 @@ const TrackSearchResults = (props) => {
   tokensRef.current = tokens;
 
   // TODO: Implement fetching songs from subsequent pages if there are enough results.
-
   const handleSearch = async () => {
     const query = decodeURIComponent(props.match.params.query);
     if (

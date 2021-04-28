@@ -6,7 +6,6 @@ import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { popHistory } from '../../actions/history/historyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
 
-// TODO: Handle browser forward/back events
 const BackButton = (props) => {
   const dispatch = useAppDispatch();
   const { history } = useAppState();

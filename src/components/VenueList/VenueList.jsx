@@ -20,9 +20,11 @@ const VenueList = (props) => {
     <div id="venue-list">
       {
         venues.map((venue, index) => {
-          let matchPercentage = (scores[index] / maxScore) * 100;
-          if (matchPercentage % 1 !== 0) {
-            matchPercentage = matchPercentage.toFixed(1);
+          if (scores) {
+            let matchPercentage = (scores[index] / maxScore) * 100;
+            if (matchPercentage % 1 !== 0) {
+              matchPercentage = matchPercentage.toFixed(1);
+            }
           }
 
           return (

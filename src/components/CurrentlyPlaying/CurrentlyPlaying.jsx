@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import ProgressBar from '@ramonak/react-progress-bar';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPause, faPlay, faStepForward, faStoreAlt } from '@fortawesome/free-solid-svg-icons';
+import { faStoreAlt } from '@fortawesome/free-solid-svg-icons';
 
 import DeviceSelection from '../DeviceSelection/DeviceSelection';
 import Vote from '../Vote/Vote';
@@ -10,11 +10,10 @@ import Vote from '../Vote/Vote';
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED, WAVE_COLOUR_DARK } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { getCurrentSong, pauseTrack, playTrack, skipTrack } from '../../actions/spotify/spotifyActions';
+import { getCurrentSong } from '../../actions/spotify/spotifyActions';
 
 import './CurrentlyPlaying.scss';
 
-// TODO: Hide bar when there is no song playing.
 const CurrentlyPlaying = () => {
   const dispatch = useAppDispatch();
   const { currentSong, currentVenue, tokens } = useAppState();
@@ -42,69 +41,6 @@ const CurrentlyPlaying = () => {
       await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
     }
   }
-
-  const handlePauseTrack = async () => {
-    let pauseResult = await pauseTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
-
-    if (
-      tokensRef.current.wave.accessToken
-      && currentVenueRef.current
-      && currentVenueRef.current.id
-      && pauseResult === TOKENS_EXPIRED
-    ) {
-      await refreshExpiredTokens(dispatch, tokensRef.current);
-      pauseResult = await pauseTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
-    }
-
-    // If skipping was successful, wait for Spotify to carry out the skip and then fetch the new song.
-    if (pauseResult === 1) {
-      setTimeout(async () => {
-        await handleFetchCurrentSong();
-      }, 250);
-    }
-  }
-
-  const handlePlayTrack = async () => {
-    let playResult = await playTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
-
-    if (
-      tokensRef.current.wave.accessToken
-      && currentVenueRef.current
-      && currentVenueRef.current.id
-      && playResult === TOKENS_EXPIRED
-    ) {
-      await refreshExpiredTokens(dispatch, tokensRef.current);
-      playResult = await playTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
-    }
-
-    // If skipping was successful, wait for Spotify to carry out the skip and then fetch the new song.
-    if (playResult === 1) {
-      setTimeout(async () => {
-        await handleFetchCurrentSong();
-      }, 250);
-    }
-  }
-
-  const handleSkipTrack = async () => {
-    let skipResult = await skipTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
-
-    if (
-      tokensRef.current.wave.accessToken
-      && currentVenueRef.current
-      && currentVenueRef.current.id
-      && skipResult === TOKENS_EXPIRED
-    ) {
-      await refreshExpiredTokens(dispatch, tokensRef.current);
-      skipResult = await skipTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
-    }
-
-    // If skipping was successful, wait for Spotify to carry out the skip and then fetch the new song.
-    if (skipResult === 1) {
-      setTimeout(async () => {
-        await handleFetchCurrentSong();
-      }, 250);
-    }
-  };
 
   useEffect(() => {
     if (currentSong) {
@@ -203,45 +139,7 @@ const CurrentlyPlaying = () => {
                   {
                     currentVenue.owners && currentVenue.owners.find((owner) => owner.username === tokens.wave.user.username)
                     && (
-                      <>
-                        {
-                          currentSong
-                            && (
-                              <>
-                                {
-                                  currentSong.is_playing
-                                    ? (
-                                      <FontAwesomeIcon
-                                        className="ml-3 ui-button"
-                                        icon={faPause}
-                                        size="lg"
-                                        onClick={handlePauseTrack}
-                                        title="Pause the current track"
-                                      />
-                                    ) : (
-                                      <FontAwesomeIcon
-                                        className="ml-3 ui-button"
-                                        icon={faPlay}
-                                        size="lg"
-                                        onClick={handlePlayTrack}
-                                        title="Resume the current track"
-                                      />
-                                    )
-                                }
-
-                                <FontAwesomeIcon
-                                  className="ml-3 ui-button"
-                                  icon={faStepForward}
-                                  size="lg"
-                                  onClick={handleSkipTrack}
-                                  title="Skip the current track"
-                                />
-                              </>
-                            )
-                        }
-
-                        <DeviceSelection />
-                      </>
+                      <DeviceSelection handleFetchCurrentSong={handleFetchCurrentSong} />
                     )
                   }
                 </div>

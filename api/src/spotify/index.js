@@ -463,8 +463,6 @@ router.get('/recommendations', authenticate, async (req, res) => {
 
                   let score = 0;
 
-                  // TODO: Fix weird behaviour where the sum is not always the correct
-
                   matches.forEach((matchScore) => {
                     if (matchScore) {
                       score += matchScore;
@@ -534,66 +532,6 @@ router.get('/search', async (req, res) => {
   });
 });
 
-// Gets the currently playing song for the venue's Spotify account.
-router.get('/song', authenticate, async (req, res) => {
-  const { venueId } = req.query;
-
-  await getVenueById(venueId, res, async (venue) => {
-    if (venue.spotifyTokens.accessToken) {
-      const spotifyResponse = await axios.get(`https://api.spotify.com/v1/me/player`, {
-        headers: {
-          "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
-        }
-      }).catch((error) => error.response);
-
-      if (spotifyResponse) {
-        if (spotifyResponse.status === 200 || spotifyResponse.status === 204) {
-          // If the song has changed since the last time this endpoint was queried, update the current song
-          // and reset the vote count.
-          let votes = venue.votes;
-
-          if (spotifyResponse.status === 200) {
-            if (venue.currentSong !== spotifyResponse.data.item.id) {
-              votes = 0;
-              await Venue.updateOne({ _id: venueId }, {
-                $set: {
-                  currentSong: spotifyResponse.data.item.id,
-                  votes: 0
-                }
-              });
-            }
-          } else {
-            votes = 0;
-            await Venue.updateOne({ _id: venueId }, {
-              $set: {
-                currentSong: undefined,
-                votes: 0
-              }
-            });
-          }
-
-          res.status(spotifyResponse.status).send({
-            ...spotifyResponse.data,
-            votes
-          })
-        } else {
-          res.status(spotifyResponse.status).send({
-            message: 'Current song request to Spotify API failed.'
-          });
-        }
-      } else {
-        res.status(500).send({
-          message: 'Internal server error occurred while fetching current song.'
-        });
-      }
-    } else {
-      res.status(500).send({
-        message: 'Internal server error while fetching current song.'
-      });
-    }
-  });
-});
-
 // Skips the currently playing track in a venue.
 router.post('/skip', authenticate, async (req, res) => {
   const { venueId } = req.body;
@@ -640,13 +578,84 @@ router.post('/skip', authenticate, async (req, res) => {
   });
 });
 
+// Gets the currently playing song for the venue's Spotify account.
+router.get('/song', authenticate, async (req, res) => {
+  const { venueId } = req.query;
+
+  await getVenueById(venueId, res, async (venue) => {
+    if (venue.spotifyTokens.accessToken) {
+      const spotifyResponse = await axios.get(`https://api.spotify.com/v1/me/player`, {
+        headers: {
+          "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
+        }
+      }).catch((error) => error.response);
+
+      if (spotifyResponse) {
+        if (spotifyResponse.status === 200 || spotifyResponse.status === 204) {
+          // If the output device on Spotify is different from the currently stored output device in the database, update it.
+          if (spotifyResponse.data.device && spotifyResponse.data.device.id !== venue.outputDeviceId) {
+            await Venue.updateOne({ _id: venueId }, {
+              $set: {
+                outputDeviceId: spotifyResponse.data.device.id
+              }
+            });
+          }
+
+          // If the song has changed since the last time this endpoint was queried, update the current song
+          // and reset the vote count.
+          let votes = venue.votes;
+
+          if (spotifyResponse.status === 200) {
+            if (venue.currentSong !== spotifyResponse.data.item.id) {
+              votes = 0;
+              await Venue.updateOne({ _id: venueId }, {
+                $set: {
+                  currentSong: spotifyResponse.data.item.id,
+                  votes: 0
+                }
+              });
+            }
+          } else {
+            votes = 0;
+            await Venue.updateOne({ _id: venueId }, {
+              $set: {
+                currentSong: undefined,
+                votes: 0
+              }
+            });
+          }
+
+          res.status(spotifyResponse.status).send({
+            ...spotifyResponse.data,
+            votes
+          })
+        } else {
+          res.status(spotifyResponse.status).send({
+            message: 'Current song request to Spotify API failed.'
+          });
+        }
+      } else {
+        res.status(500).send({
+          message: 'Internal server error occurred while fetching current song.'
+        });
+      }
+    } else {
+      res.status(500).send({
+        message: 'Internal server error while fetching current song.'
+      });
+    }
+  });
+});
+
 // Adds a song to the queue on a venue's Spotify account.
 router.post('/song', authenticate, async (req, res) => {
   const { trackUri, venueId } = req.body;
 
   await getVenueById(venueId, res, async (venue) => {
     if (venue.spotifyTokens.accessToken) {
-      const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${trackUri}`, null, {
+      const deviceId = venue.outputDeviceId;
+
+      const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${trackUri}&device_id=${deviceId}`, null, {
         headers: {
           "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
         }
