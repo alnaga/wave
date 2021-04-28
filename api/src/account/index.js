@@ -150,7 +150,7 @@ router.post('/login', async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
 
         if (match) {
-          const tokenResponse = await axios.post('http://localhost:8081/oauth/token', null, {
+          const tokenResponse = await axios.post('http://192.168.86.214:8081/oauth/token', null, {
             headers: {
               'Authorization': `Basic ${AUTHORISATION}`,
               'Content-Type': 'application/x-www-form-urlencoded'
@@ -186,7 +186,7 @@ router.post('/login', async (req, res) => {
 router.post('/refresh', async (req, res) => {
   const { refresh_token } = req.query;
 
-  const refreshResponse = await axios.post('http://localhost:8081/oauth/token', null, {
+  const refreshResponse = await axios.post('http://192.168.86.214:8081/oauth/token', null, {
     headers: {
       'Authorization': `Basic ${AUTHORISATION}`,
       'Content-Type': 'application/x-www-form-urlencoded'

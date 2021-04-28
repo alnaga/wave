@@ -31,7 +31,7 @@ const saveTokens = async (dispatch, tokens) => {
 }
 
 export const getAccountInfo = async (dispatch, accessToken, username) => {
-  const response = await axios.get(`http://localhost:8081/account?username=${username}`, {
+  const response = await axios.get(`http://192.168.86.214:8081/account?username=${username}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -52,7 +52,7 @@ export const getAccountInfo = async (dispatch, accessToken, username) => {
 };
 
 export const deleteAccount = async (dispatch, accessToken) => {
-  const response = await axios.delete(`http://localhost:8081/account`, {
+  const response = await axios.delete(`http://192.168.86.214:8081/account`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -82,7 +82,7 @@ export const deleteAccount = async (dispatch, accessToken) => {
  */
 export const login = async (dispatch, userData) => {
   try {
-    const response = await axios.post('http://localhost:8081/account/login', userData);
+    const response = await axios.post('http://192.168.86.214:8081/account/login', userData);
 
     if (response.status === 200) {
       saveTokens(dispatch, response.data);
@@ -114,7 +114,7 @@ export const logout = async (dispatch) => {
  */
 export const refreshAccessToken = async (dispatch, refreshToken) => {
   try {
-    const response = await axios.post(`http://localhost:8081/account/refresh?refresh_token=${refreshToken}`);
+    const response = await axios.post(`http://192.168.86.214:8081/account/refresh?refresh_token=${refreshToken}`);
 
     if (response.status === 200) {
       await saveTokens(dispatch, response.data);
@@ -133,7 +133,7 @@ export const refreshAccessToken = async (dispatch, refreshToken) => {
  */
 export const registerAccount = async (dispatch, userData) => {
   try {
-    const response = await axios.post('http://localhost:8081/account/register', userData);
+    const response = await axios.post('http://192.168.86.214:8081/account/register', userData);
 
     if (response.status === 200) {
       await login(dispatch, userData);

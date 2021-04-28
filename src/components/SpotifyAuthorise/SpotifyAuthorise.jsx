@@ -9,7 +9,7 @@ const SpotifyAuthorise = (props) => {
   const dispatch = useAppDispatch();
 
   const handleAuthorise = (event) => {
-    window.location.href = 'http://localhost:8081/spotify/authorise/';
+    window.location.href = 'http://192.168.86.214:8081/spotify/authorise/';
   };
 
   useEffect(() => {
@@ -19,11 +19,11 @@ const SpotifyAuthorise = (props) => {
     (async () => {
       if (authCode && authCode.length) {
         if (await getSpotifyAuthTokens(dispatch, authCode)) {
-          window.location.href = 'http://localhost:8080';
+          window.location.href = 'http://192.168.86.214:8080';
         }
       }
     })();
-  }, []);
+  }, [window.location.href]);
 
   return (
     <div {...props}>

@@ -155,7 +155,8 @@ router.get('/authorise', (req, res) => {
     user-read-currently-playing 
     user-read-email
   `;
-  const redirectUri = 'http://localhost:8080';
+  // const redirectUri = 'http://localhost:8080';
+  const redirectUri = 'http://192.168.86.214:8080';
   res.redirect('https://accounts.spotify.com/authorize' +
     '?response_type=code' +
     `&client_id=${CLIENT_ID}` +
@@ -451,9 +452,9 @@ router.post('/tokens', async (req, res) => {
     params: {
       "grant_type": "authorization_code",
       "code": authCode,
-      "redirect_uri": "http://localhost:8080"
+      "redirect_uri": "http://192.168.86.214:8080"
     }
-  });
+  }).catch((error) => error.response);
 
   res.status(spotifyResponse.status).send(spotifyResponse.data);
 });
