@@ -1,4 +1,6 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
+
 import {
   SET_CURRENT_SONG,
   SET_CURRENT_VENUE,
@@ -26,7 +28,7 @@ export const checkIn = async (dispatch, accessToken, venueId) => {
   
   if (response) {
     if (response.status === 200) {
-      sessionStorage.setItem('currentVenue', JSON.stringify(response.data));
+      Cookies.set('currentVenue', JSON.stringify(response.data));
 
       dispatch({
         type: SET_CURRENT_VENUE,
@@ -60,7 +62,7 @@ export const checkOut = async (dispatch, accessToken, venueId, venueDeleted) => 
 
   if (response) {
     if (response.status === 200 || venueDeleted) {
-      sessionStorage.removeItem('currentVenue');
+      Cookies.remove('currentVenue');
 
       dispatch({
         type: SET_CURRENT_SONG,
@@ -242,7 +244,7 @@ export const voteTrack = async (dispatch, accessToken, venueId, vote) => {
 
   if (response) {
     if (response.status === 200) {
-      sessionStorage.setItem('currentVenue', JSON.stringify(response.data.venue));
+      Cookies.set('currentVenue', JSON.stringify(response.data.venue));
 
       dispatch({
         type: SET_CURRENT_VENUE,

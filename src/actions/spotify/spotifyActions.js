@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 import {
   SET_ALBUM_INFO,
@@ -38,7 +39,7 @@ export const getSpotifyAuthTokens = async (dispatch, authCode) => {
         refreshToken
       };
 
-      sessionStorage.setItem('spotifyTokens', JSON.stringify(spotifyTokens));
+      Cookies.set('spotifyTokens', JSON.stringify(spotifyTokens));
 
       dispatch({
         type: SET_SPOTIFY_TOKENS,
@@ -76,7 +77,7 @@ export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
         refreshToken
       };
 
-      sessionStorage.setItem('spotifyTokens', JSON.stringify(newSpotifyTokens));
+      Cookies.set('spotifyTokens', JSON.stringify(newSpotifyTokens));
 
       dispatch({
         type: SET_SPOTIFY_TOKENS,

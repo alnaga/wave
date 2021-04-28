@@ -1,4 +1,5 @@
 import React, {createContext, useContext, useReducer} from 'react';
+import Cookies from 'js-cookie';
 
 import {
   CLEAR,
@@ -31,21 +32,45 @@ export const initialState = {
   albumInfo: undefined,
   artistInfo: undefined,
   currentSong: undefined,
-  currentVenue: JSON.parse(sessionStorage.getItem('currentVenue')) || undefined,
+  currentVenue: (() => {
+    try {
+      return JSON.parse(Cookies.get('currentVenue'));
+    } catch (error) {
+      return undefined;
+    }
+  })() || undefined,
   devices: [],
-  history: JSON.parse(sessionStorage.getItem('history')) || [],
+  history: (() => {
+    try {
+      return JSON.parse(Cookies.get('history'));
+    } catch (error) {
+      return undefined;
+    }
+  })() || [],
   recommendations: [],
   searchResults: {
     tracks: [],
     venues: []
   },
   tokens: {
-    spotify: JSON.parse(sessionStorage.getItem('spotifyTokens')) || {
+    spotify: (() => {
+      try {
+        return JSON.parse(Cookies.get('spotifyTokens'));
+      } catch (error) {
+        return undefined;
+      }
+    })() || {
       accessToken: undefined,
       accessTokenExpiresAt: undefined,
       refreshToken: undefined
     },
-    wave: JSON.parse(sessionStorage.getItem('waveTokens')) || {
+    wave: (() => {
+      try {
+        return JSON.parse(Cookies.get('waveTokens'));
+      } catch (error) {
+        return undefined;
+      }
+    })() || {
       accessToken: undefined,
       accessTokenExpiresAt: undefined,
       refreshToken: undefined,

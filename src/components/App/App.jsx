@@ -10,13 +10,15 @@ import { useAppDispatch, useAppState } from '../../context/context';
 
 const App = (props) => {
   const dispatch = useAppDispatch();
-  const { history } = useAppState();
+  const { history, tokens } = useAppState();
 
   useEffect(() => {
     if (props.history.location.pathname !== history[history.length - 1]) {
       pushToHistory(dispatch, history, props.history.location.pathname);
     }
   }, [props.history, window.location.pathname]);
+
+  console.log(tokens.wave)
 
   return (
     <div id="app">

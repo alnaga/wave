@@ -1,3 +1,4 @@
+import Cookies from 'js-cookie';
 import { CLEAR_HISTORY, SET_HISTORY } from '../../constants';
 
 /**
@@ -5,7 +6,7 @@ import { CLEAR_HISTORY, SET_HISTORY } from '../../constants';
  * @param dispatch - Application Dispatch
  */
 export const clearHistory = (dispatch) => {
-  sessionStorage.setItem('history', JSON.stringify([]));
+  Cookies.set('history', JSON.stringify([]));
 
   dispatch({
     type: CLEAR_HISTORY
@@ -21,7 +22,7 @@ export const popHistory = (dispatch, history) => {
   const newHistory = history;
   newHistory.pop();
 
-  sessionStorage.setItem('history', JSON.stringify(newHistory));
+  Cookies.set('history', JSON.stringify(newHistory));
 
   dispatch({
     type: SET_HISTORY,
@@ -41,7 +42,7 @@ export const pushToHistory = (dispatch, history, pathname) => {
     pathname
   ];
 
-  sessionStorage.setItem('history', JSON.stringify(newHistory));
+  Cookies.set('history', JSON.stringify(newHistory));
 
   dispatch({
     type: SET_HISTORY,

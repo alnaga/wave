@@ -1,4 +1,5 @@
 import axios from 'axios';
+import Cookies from 'js-cookie';
 
 import {
   CLEAR,
@@ -7,21 +8,21 @@ import {
   TOKENS_EXPIRED
 } from '../../constants';
 
-const clearSessionStorage = async () => {
-  await sessionStorage.removeItem('currentVenue');
-  await sessionStorage.removeItem('history');
-  await sessionStorage.removeItem('spotifyTokens');
-  await sessionStorage.removeItem('waveTokens');
+const clearCookies = async () => {
+  await Cookies.remove('currentVenue');
+  await Cookies.remove('history');
+  await Cookies.remove('spotifyTokens');
+  await Cookies.remove('waveTokens');
 };
 
 /**
- * Utility function that saves the incoming authentication tokens to sessionStorage and then
+ * Utility function that saves the incoming authentication tokens to the cookies and then
  * updates their respective context values.
  * @param dispatch {Function} - Application Dispatch
  * @param tokens {Object} - Response object containing the tokens
  */
 const saveTokens = async (dispatch, tokens) => {
-  sessionStorage.setItem('waveTokens', JSON.stringify(tokens));
+  Cookies.set('waveTokens', JSON.stringify(tokens));
 
   await dispatch({
     type: SET_WAVE_TOKENS,
@@ -59,7 +60,7 @@ export const deleteAccount = async (dispatch, accessToken) => {
 
   if (response) {
     if (response.status === 200) {
-      await clearSessionStorage();
+      await clearCookies();
       dispatch({
         type: CLEAR
       });
