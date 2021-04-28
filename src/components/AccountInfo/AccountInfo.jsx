@@ -10,12 +10,13 @@ import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getAccountInfo, logout } from '../../actions/account/accountActions';
+import { checkOut } from '../../actions/venue/venueActions';
 
 import './AccountInfo.scss';
 
 const AccountInfo = () => {
   const dispatch = useAppDispatch();
-  const { accountInfo, tokens } = useAppState();
+  const { accountInfo, currentVenue, tokens } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
@@ -32,6 +33,15 @@ const AccountInfo = () => {
   };
 
   const handleLogout = async () => {
+    if (
+      tokensRef.current.wave.accessToken
+      && currentVenue
+      && await checkOut(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, false) === TOKENS_EXPIRED
+    ) {
+      await refreshExpiredTokens(dispatch, tokensRef.current);
+      await checkOut(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, false);
+    }
+
     await logout(dispatch);
   };
 
