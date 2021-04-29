@@ -220,7 +220,11 @@ export const getVenueRecommendations = async (dispatch, accessToken, spotifyAcce
 
   if (response) {
     if (response.status === 200) {
-      const recommendations = response.data.recommendations.sort((a, b) => b.score - a.score);
+      const recommendations = response.data.recommendations.sort((a, b) => {
+        if (a && b) {
+          return b.score - a.score;
+        }
+      });
 
       dispatch({
         type: SET_RECOMMENDATIONS,
