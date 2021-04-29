@@ -1,11 +1,12 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, withRouter } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
 import SongList from '../SongList/SongList';
 
 import { refreshExpiredTokens } from '../../util';
-import { TOKENS_EXPIRED } from '../../constants';
+import { MAX_RETRIES, TOKENS_EXPIRED } from '../../constants';
 import { getAlbumInfo } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
 
@@ -16,23 +17,37 @@ const AlbumInfo = (props) => {
   const { albumInfo, currentVenue, tokens } = useAppState();
   const dispatch = useAppDispatch();
 
+  const [ loading, setLoading ] = useState(false);
+  const [ retries, setRetries ] = useState(0);
+
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
   const handleGetAlbumInfo = async () => {
+    setLoading(true);
+
+    let result = await getAlbumInfo(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, albumId);
+
     if (
       tokensRef.current.wave.accessToken
       && albumId
       && currentVenue
       && currentVenue.id
-      && await getAlbumInfo(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, albumId) === TOKENS_EXPIRED
+      && result === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getAlbumInfo(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, albumId);
+      result = await getAlbumInfo(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, albumId);
+    }
+
+    if (!result && retries < MAX_RETRIES) {
+      setRetries(retries + 1);
+
+      await handleGetAlbumInfo();
+    } else {
+      setLoading(false);
     }
   };
 
-  // TODO: Scroll to the top when navigating to this component.
   useEffect(() => {
     (async () => {
       await handleGetAlbumInfo();
@@ -42,37 +57,49 @@ const AlbumInfo = (props) => {
   return (
     <ScreenContainer id="album-info">
       {
-        albumInfo
-        && (
-          <>
-            <div id="album-header" className="p-3">
-              <img
-                alt={`${albumInfo.name} Album Art`}
-                src={albumInfo.images[1].url}
-                title={albumInfo.name}
-              />
-
-              <div className="d-flex flex-column flex-grow-1 ml-3">
-                <div>
-                  { albumInfo.name }
-                </div>
-
-                <div id="album-artist">
-                  <Link to={`/artist/${albumInfo.artists[0].id}`}>
-                    { albumInfo.artists[0].name }
-                  </Link>
-                </div>
-
-                <div id="album-release-date">
-                  { albumInfo.release_date.split('-')[0] }
-                </div>
-              </div>
+        loading
+          ? (
+            <div className="d-flex align-items-center justify-content-center p-3">
+              <Spinner animation="border" role="status" />
             </div>
+          ) : (
+            <>
+              {
+                albumInfo
+                && (
+                  <>
+                    <div id="album-header" className="p-3">
+                      <img
+                        alt={`${albumInfo.name} Album Art`}
+                        src={albumInfo.images[1].url}
+                        title={albumInfo.name}
+                      />
 
-            <SongList showArtist={false} tracks={albumInfo.tracks.items} />
-          </>
-        )
+                      <div className="d-flex flex-column flex-grow-1 ml-3">
+                        <div>
+                          { albumInfo.name }
+                        </div>
+
+                        <div id="album-artist">
+                          <Link to={`/artist/${albumInfo.artists[0].id}`}>
+                            { albumInfo.artists[0].name }
+                          </Link>
+                        </div>
+
+                        <div id="album-release-date">
+                          { albumInfo.release_date.split('-')[0] }
+                        </div>
+                      </div>
+                    </div>
+
+                    <SongList showArtist={false} tracks={albumInfo.tracks.items} />
+                  </>
+                )
+              }
+            </>
+          )
       }
+
     </ScreenContainer>
   );
 };

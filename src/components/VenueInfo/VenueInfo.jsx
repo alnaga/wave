@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { withRouter } from 'react-router-dom';
+import { Spinner } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEdit } from '@fortawesome/free-solid-svg-icons';
 
@@ -8,7 +9,7 @@ import ScreenContainer from '../ScreenContainer/ScreenContainer';
 import ScreenHeader from '../ScreenHeader/ScreenHeader';
 
 import { refreshExpiredTokens } from '../../util';
-import { TOKENS_EXPIRED } from '../../constants';
+import { MAX_RETRIES, TOKENS_EXPIRED } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getCurrentSong } from '../../actions/spotify/spotifyActions';
 import { checkIn, checkOut, deleteVenue, getVenueData, updateVenueDetails } from '../../actions/venue/venueActions';
@@ -18,6 +19,9 @@ import './VenueInfo.scss';
 const VenueInfo = (props) => {
   const dispatch = useAppDispatch();
   const { tokens, venueInfo } = useAppState();
+
+  const [ loading, setLoading ] = useState(false);
+  const [ retries, setRetries ] = useState(0);
 
   const [ showDeleteConfirmation, setShowDeleteConfirmation ] = useState(false);
 
@@ -111,12 +115,24 @@ const VenueInfo = (props) => {
   };
   
   const handleGetVenueInfo = async () => {
+    setLoading(true);
+
+    let result = await getVenueData(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId);
+
     if (
       tokensRef.current.wave.accessToken
-      && await getVenueData(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId) === TOKENS_EXPIRED
+      && result === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getVenueData(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId)
+      result = await getVenueData(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId)
+    }
+
+    if (!result && retries < MAX_RETRIES) {
+      setRetries(retries + 1);
+
+      await handleGetVenueInfo();
+    } else {
+      setLoading(false);
     }
   };
 
@@ -170,259 +186,270 @@ const VenueInfo = (props) => {
     <ScreenContainer>
       <div id="venue-info">
         {
-          (venueInfo && venueInfo.name)
-            && (
+          loading
+            ? (
+              <div className="d-flex align-items-center justify-content-center p-3">
+                <Spinner animation="border" role="status" />
+              </div>
+            ) : (
               <>
-                <ScreenHeader
-                  title={editMode ? 'Update Venue Details' : venueInfo.name}
-                />
-
-                <div className="p-3">
-                  {
-                    // If the user is an owner of the venue, display the button to enable/disable edit mode so they can make changes.
-                    (
-                      tokens.wave.user.username
-                      && venueInfo.owners.find((owner) => owner.username === tokens.wave.user.username)
-                      && !venueInfo.outputDeviceId
-                    )
-                    && (
-                      <Error
-                        className="mb-3"
-                        dismissible={false}
-                        message="In order to queue songs, you must select an output device. Please check into this venue and then click the headphone icon in the status bar to select a device."
-                        show={true}
+                {
+                  (venueInfo && venueInfo.name)
+                  && (
+                    <>
+                      <ScreenHeader
+                        title={editMode ? 'Update Venue Details' : venueInfo.name}
                       />
-                    )
-                  }
 
-                  {
-                    editMode
-                    && (
-                      <div className="mb-3 d-flex flex-column">
-                        <label> Venue Name * </label>
+                      <div className="p-3">
+                        {
+                          // If the user is an owner of the venue, display the button to enable/disable edit mode so they can make changes.
+                          (
+                            tokens.wave.user.username
+                            && venueInfo.owners.find((owner) => owner.username === tokens.wave.user.username)
+                            && !venueInfo.outputDeviceId
+                          )
+                          && (
+                            <Error
+                              className="mb-3"
+                              dismissible={false}
+                              message="In order to queue songs, you must select an output device. Please check into this venue and then click the headphone icon in the status bar to select a device."
+                              show={true}
+                            />
+                          )
+                        }
 
-                        <input
-                          name="venue-name"
-                          className="mt-1"
-                          onChange={handleEditField('name')}
-                          placeholder="Venue Name"
-                          value={editData.name}
-                        />
-                      </div>
-                    )
-                  }
+                        {
+                          editMode
+                          && (
+                            <div className="mb-3 d-flex flex-column">
+                              <label> Venue Name * </label>
 
-                  <div className="mb-3 d-flex justify-content-between">
-                    <div>
-                      <label> Owner(s) </label>
-                      {
-                        venueInfo.owners.map((owner) => {
-                          return (
-                            <div key={owner.username}>
-                              { owner.firstName } { owner.lastName }
+                              <input
+                                name="venue-name"
+                                className="mt-1"
+                                onChange={handleEditField('name')}
+                                placeholder="Venue Name"
+                                value={editData.name}
+                              />
                             </div>
-                          );
-                        })
-                      }
-                    </div>
+                          )
+                        }
 
-                    {
-                      // If the user is an owner of the venue, display the button to enable/disable edit mode so they can make changes.
-                      (tokens.wave.user.username && venueInfo.owners.find((owner) => owner.username === tokens.wave.user.username))
-                        && (
-                          <div className="ui-button" onClick={handleToggleEditMode} title="Edit venue details">
-                            <FontAwesomeIcon icon={faEdit} />
-                          </div>
-                        )
-                    }
-
-                  </div>
-
-                  <div className="mb-3 d-flex flex-column">
-                    <label> Description {editMode && '*'} </label>
-                    {
-                      editMode
-                        ? (
-                          <textarea
-                            name="venue-description"
-                            className="mt-1"
-                            onChange={handleEditField('description')}
-                            placeholder="Description"
-                            value={editData.description}
-                          />
-                        ) : (
+                        <div className="mb-3 d-flex justify-content-between">
                           <div>
-                            { venueInfo.description }
-                          </div>
-                        )
-                    }
-                  </div>
-
-                  <div className="mb-3 d-flex flex-column">
-                    <label> Address {editMode && '*'} </label>
-
-                    {
-                      editMode
-                        ? (
-                          <>
-                            <input
-                              className="mb-2 mt-1"
-                              name="address-line-1"
-                              onChange={handleEditField('addressLine1')}
-                              placeholder="Address Line 1 *"
-                              required
-                              value={editData.addressLine1}
-                            />
-                            <input
-                              className="mb-2"
-                              name="address-line-2"
-                              onChange={handleEditField('addressLine2')}
-                              placeholder="Address Line 2"
-                              value={editData.addressLine2}
-                            />
-
-                            <input
-                              className="mb-2"
-                              name="city"
-                              onChange={handleEditField('city')}
-                              placeholder="City *"
-                              required
-                              value={editData.city}
-                            />
-
-                            <input
-                              className="mb-2"
-                              name="county"
-                              onChange={handleEditField('county')}
-                              placeholder="County *"
-                              required
-                              value={editData.county}
-                            />
-
-                            <input
-                              name="postcode"
-                              onChange={handleEditField('postcode')}
-                              placeholder="Postcode *"
-                              required
-                              value={editData.postcode}
-                            />
-                          </>
-                        ) : (
-                          <>
+                            <label> Owner(s) </label>
                             {
-                              displayAddress().map((line, index) => {
+                              venueInfo.owners.map((owner) => {
                                 return (
-                                  <div key={index}>
-                                    { line }
+                                  <div key={owner.username}>
+                                    { owner.firstName } { owner.lastName }
                                   </div>
                                 );
                               })
                             }
-                          </>
-                        )
-                    }
-                  </div>
+                          </div>
 
-                  {
-                    editMode
-                      ? (
-                        <div className="mb-3 d-flex flex-column">
-                          <label> Google Maps Link </label>
-
-                          <input
-                            className="mb-2 mt-1"
-                            name="google-maps-link"
-                            onChange={handleEditField('googleMapsLink')}
-                            placeholder="Google Maps Link"
-                            required
-                            value={editData.googleMapsLink}
-                          />
-                        </div>
-                      ) : (
-                        <>
                           {
-                            venueInfo.googleMapsLink
+                            // If the user is an owner of the venue, display the button to enable/disable edit mode so they can make changes.
+                            (tokens.wave.user.username && venueInfo.owners.find((owner) => owner.username === tokens.wave.user.username))
                             && (
-                              <div className="mb-3">
-                                <a href={venueInfo.googleMapsLink} target="_blank"> Google Maps Link </a>
+                              <div className="ui-button" onClick={handleToggleEditMode} title="Edit venue details">
+                                <FontAwesomeIcon icon={faEdit} />
                               </div>
                             )
                           }
-                        </>
-                      )
-                  }
 
-                  {
-                    !editMode
-                      && (
-                        <div className="mb-3">
-                          <label> Checked In Users </label>
+                        </div>
 
+                        <div className="mb-3 d-flex flex-column">
+                          <label> Description {editMode && '*'} </label>
                           {
-                            venueInfo.attendees.length > 0
+                            editMode
                               ? (
-                                <div className="list mt-1">
-                                  {
-                                    venueInfo.attendees.map((attendee) => {
-                                      return (
-                                        <div className="list-item" key={attendee.username}>
-                                          { attendee.username }
-                                        </div>
-                                      )
-                                    })
-                                  }
-                                </div>
+                                <textarea
+                                  name="venue-description"
+                                  className="mt-1"
+                                  onChange={handleEditField('description')}
+                                  placeholder="Description"
+                                  value={editData.description}
+                                />
                               ) : (
-                                <div id="no-attendees">
-                                  No users are currently checked in at this venue. Why not be the first to start playing?
+                                <div>
+                                  { venueInfo.description }
                                 </div>
                               )
                           }
                         </div>
-                      )
-                  }
 
-                  {
-                    editMode
-                      ? (
-                        <>
-                          <button onClick={handleUpdateVenueDetails}>
-                            {
-                              dataChanged
-                                ? (
-                                  'Save Changes'
-                                ) : (
-                                  'Cancel'
-                                )
-                            }
-                          </button>
+                        <div className="mb-3 d-flex flex-column">
+                          <label> Address {editMode && '*'} </label>
 
-                          <button className="mt-3" onClick={showDeleteConfirmation ? handleDeleteVenue : handleToggleShowDeleteConfirmation}>
-                            {
-                              showDeleteConfirmation
-                                ? 'Confirm Venue Deletion'
-                                : 'Delete Venue'
-                            }
-                          </button>
-                        </>
-                      ) : (
-                        <>
                           {
-                            (venueInfo.attendees.length > 0 && venueInfo.attendees.find((attendee) => attendee.username === tokensRef.current.wave.user.username))
+                            editMode
                               ? (
-                                <button onClick={handleCheckOut}>
-                                  Check Out
-                                </button>
+                                <>
+                                  <input
+                                    className="mb-2 mt-1"
+                                    name="address-line-1"
+                                    onChange={handleEditField('addressLine1')}
+                                    placeholder="Address Line 1 *"
+                                    required
+                                    value={editData.addressLine1}
+                                  />
+                                  <input
+                                    className="mb-2"
+                                    name="address-line-2"
+                                    onChange={handleEditField('addressLine2')}
+                                    placeholder="Address Line 2"
+                                    value={editData.addressLine2}
+                                  />
+
+                                  <input
+                                    className="mb-2"
+                                    name="city"
+                                    onChange={handleEditField('city')}
+                                    placeholder="City *"
+                                    required
+                                    value={editData.city}
+                                  />
+
+                                  <input
+                                    className="mb-2"
+                                    name="county"
+                                    onChange={handleEditField('county')}
+                                    placeholder="County *"
+                                    required
+                                    value={editData.county}
+                                  />
+
+                                  <input
+                                    name="postcode"
+                                    onChange={handleEditField('postcode')}
+                                    placeholder="Postcode *"
+                                    required
+                                    value={editData.postcode}
+                                  />
+                                </>
                               ) : (
-                                <button onClick={handleCheckIn}>
-                                  Check In
-                                </button>
+                                <>
+                                  {
+                                    displayAddress().map((line, index) => {
+                                      return (
+                                        <div key={index}>
+                                          { line }
+                                        </div>
+                                      );
+                                    })
+                                  }
+                                </>
                               )
                           }
-                        </>
-                      )
-                  }
-                </div>
+                        </div>
+
+                        {
+                          editMode
+                            ? (
+                              <div className="mb-3 d-flex flex-column">
+                                <label> Google Maps Link </label>
+
+                                <input
+                                  className="mb-2 mt-1"
+                                  name="google-maps-link"
+                                  onChange={handleEditField('googleMapsLink')}
+                                  placeholder="Google Maps Link"
+                                  required
+                                  value={editData.googleMapsLink}
+                                />
+                              </div>
+                            ) : (
+                              <>
+                                {
+                                  venueInfo.googleMapsLink
+                                  && (
+                                    <div className="mb-3">
+                                      <a href={venueInfo.googleMapsLink} target="_blank"> Google Maps Link </a>
+                                    </div>
+                                  )
+                                }
+                              </>
+                            )
+                        }
+
+                        {
+                          !editMode
+                          && (
+                            <div className="mb-3">
+                              <label> Checked In Users </label>
+
+                              {
+                                venueInfo.attendees.length > 0
+                                  ? (
+                                    <div className="list mt-1">
+                                      {
+                                        venueInfo.attendees.map((attendee) => {
+                                          return (
+                                            <div className="list-item" key={attendee.username}>
+                                              { attendee.username }
+                                            </div>
+                                          )
+                                        })
+                                      }
+                                    </div>
+                                  ) : (
+                                    <div id="no-attendees">
+                                      No users are currently checked in at this venue. Why not be the first to start playing?
+                                    </div>
+                                  )
+                              }
+                            </div>
+                          )
+                        }
+
+                        {
+                          editMode
+                            ? (
+                              <>
+                                <button onClick={handleUpdateVenueDetails}>
+                                  {
+                                    dataChanged
+                                      ? (
+                                        'Save Changes'
+                                      ) : (
+                                        'Cancel'
+                                      )
+                                  }
+                                </button>
+
+                                <button className="mt-3" onClick={showDeleteConfirmation ? handleDeleteVenue : handleToggleShowDeleteConfirmation}>
+                                  {
+                                    showDeleteConfirmation
+                                      ? 'Confirm Venue Deletion'
+                                      : 'Delete Venue'
+                                  }
+                                </button>
+                              </>
+                            ) : (
+                              <>
+                                {
+                                  (venueInfo.attendees.length > 0 && venueInfo.attendees.find((attendee) => attendee.username === tokensRef.current.wave.user.username))
+                                    ? (
+                                      <button onClick={handleCheckOut}>
+                                        Check Out
+                                      </button>
+                                    ) : (
+                                      <button onClick={handleCheckIn}>
+                                        Check In
+                                      </button>
+                                    )
+                                }
+                              </>
+                            )
+                        }
+                      </div>
+                    </>
+                  )
+                }
               </>
             )
         }

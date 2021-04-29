@@ -6,7 +6,7 @@ import ScreenHeader from '../ScreenHeader/ScreenHeader';
 import VenueList from '../VenueList/VenueList';
 
 import { refreshExpiredTokens } from '../../util';
-import { TOKENS_EXPIRED } from '../../constants';
+import { MAX_RETRIES, TOKENS_EXPIRED } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getVenueRecommendations } from '../../actions/spotify/spotifyActions';
 
@@ -15,9 +15,7 @@ const Recommendations = () => {
   const { recommendations, tokens } = useAppState();
 
   const [ loading, setLoading ] = useState(false);
-
   const [ retries, setRetries ] = useState(0);
-  const MAX_RETRIES = 3;
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;

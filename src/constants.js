@@ -3,6 +3,8 @@ export const CLEAR = 'CLEAR';
 export const CLEAR_HISTORY = 'CLEAR_HISTORY';
 export const SET_HISTORY = 'SET_HISTORY';
 
+export const MAX_RETRIES = 3;
+
 export const SET_ACCOUNT_INFO = 'SET_ACCOUNT_INFO';
 export const SET_ALBUM_INFO = 'SET_ALBUM_INFO';
 export const SET_ARTIST_INFO = 'SET_ARTIST_INFO';

@@ -154,6 +154,8 @@ export const getVenueSearchResults = async (dispatch, accessToken, query) => {
         type: SET_VENUE_SEARCH_RESULTS,
         payload: response.data
       });
+
+      return 1;
     } else if (response.status === 401) {
       return TOKENS_EXPIRED;
     } else {
