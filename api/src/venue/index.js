@@ -7,6 +7,11 @@ import { authenticate, getUserByAccessToken, getUsersByIds } from '../util';
 
 const router = Router();
 
+// Specify the allowed methods for this subroute.
+router.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Methods', 'PATCH, POST, DELETE, GET').send();
+});
+
 router.delete('/', authenticate, async (req, res) => {
   const { venueId } = req.query;
   const accessToken = req.headers.authorization.split('Bearer ')[1];

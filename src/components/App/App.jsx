@@ -18,8 +18,6 @@ const App = (props) => {
     }
   }, [props.history, window.location.pathname]);
 
-  console.log(tokens.wave)
-
   return (
     <div id="app">
       <Header />

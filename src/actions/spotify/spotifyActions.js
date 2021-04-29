@@ -22,9 +22,9 @@ import {
  */
 export const getSpotifyAuthTokens = async (dispatch, authCode) => {
   try {
-    const response = await axios.post('http://192.168.86.214:8081/spotify/tokens', {
+    const response = await axios.post('https://192.168.86.214:8081/spotify/tokens', {
       authCode
-    });
+    }).catch((error) => error.response);
 
     if (response.status === 200) {
       const accessToken = response.data.access_token;
@@ -62,7 +62,7 @@ export const getSpotifyAuthTokens = async (dispatch, authCode) => {
  */
 export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
   try {
-    const response = await axios.post('http://192.168.86.214:8081/spotify/refresh', {
+    const response = await axios.post('https://192.168.86.214:8081/spotify/refresh', {
       refreshToken
     });
 
@@ -99,7 +99,7 @@ export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
  * @returns 1 if successful, 0 if failed
  */
 export const getUserDevices = async (dispatch, accessToken, venueId) => {
-  const response = await axios.get(`http://192.168.86.214:8081/spotify/devices?venueId=${venueId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/devices?venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -128,7 +128,7 @@ export const getUserDevices = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed
  */
 export const selectUserDevice = async (dispatch, accessToken, venueId, device) => {
-  const response = await axios.put(`http://192.168.86.214:8081/spotify/devices`, {
+  const response = await axios.put(`https://192.168.86.214:8081/spotify/devices`, {
     device,
     venueId
   }, {
@@ -162,7 +162,7 @@ export const selectUserDevice = async (dispatch, accessToken, venueId, device) =
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if one of the access tokens have expired.
  */
 export const getAlbumInfo = async (dispatch, accessToken, venueId, albumId) => {
-  const response = await axios.get(`http://192.168.86.214:8081/spotify/album?venueId=${venueId}&albumId=${albumId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/album?venueId=${venueId}&albumId=${albumId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -189,7 +189,7 @@ export const getAlbumInfo = async (dispatch, accessToken, venueId, albumId) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if one of the access tokens have expired.
  */
 export const getArtistInfo = async (dispatch, accessToken, venueId, artistId) => {
-  const response = await axios.get(`http://192.168.86.214:8081/spotify/artist?venueId=${venueId}&artistId=${artistId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/artist?venueId=${venueId}&artistId=${artistId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -212,7 +212,7 @@ export const getArtistInfo = async (dispatch, accessToken, venueId, artistId) =>
 };
 
 export const getVenueRecommendations = async (dispatch, accessToken, spotifyAccessToken) => {
-  const response = await axios.get(`http://192.168.86.214:8081/spotify/recommendations?spotifyAccessToken=${spotifyAccessToken}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/recommendations?spotifyAccessToken=${spotifyAccessToken}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -250,7 +250,7 @@ export const getTrackSearchResults = async (dispatch, accessToken, venueId, quer
     return 0;
   }
 
-  const response = await axios.get(`http://192.168.86.214:8081/spotify/search?query=${query}&venueId=${venueId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/search?query=${query}&venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -276,7 +276,7 @@ export const getTrackSearchResults = async (dispatch, accessToken, venueId, quer
  * @returns 1 if successful, 0 if failed
  */
 export const getCurrentSong = async (dispatch, accessToken, venueId) => {
-  const response = await axios.get(`http://192.168.86.214:8081/spotify/song?venueId=${venueId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/song?venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -322,7 +322,7 @@ export const getCurrentSong = async (dispatch, accessToken, venueId) => {
  * @param venueId {String} - The ID of the target venue.
  */
 export const pauseTrack = async (dispatch, accessToken, venueId) => {
-  const response = await axios.put('http://192.168.86.214:8081/spotify/pause', {
+  const response = await axios.put('https://192.168.86.214:8081/spotify/pause', {
     venueId
   }, {
     headers: {
@@ -348,7 +348,7 @@ export const pauseTrack = async (dispatch, accessToken, venueId) => {
  * @param venueId {String} - The ID of the target venue.
  */
 export const playTrack = async (dispatch, accessToken, venueId) => {
-  const response = await axios.put('http://192.168.86.214:8081/spotify/play', {
+  const response = await axios.put('https://192.168.86.214:8081/spotify/play', {
     venueId
   }, {
     headers: {
@@ -376,7 +376,7 @@ export const playTrack = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed
  */
 export const queueTrack = async (dispatch, accessToken, venueId, trackUri) => {
-  const response = await axios.post(`http://192.168.86.214:8081/spotify/song`, {
+  const response = await axios.post(`https://192.168.86.214:8081/spotify/song`, {
     trackUri,
     venueId
   }, {
@@ -399,7 +399,7 @@ export const queueTrack = async (dispatch, accessToken, venueId, trackUri) => {
  * @param venueId {String} - The ID of the target venue.
  */
 export const skipTrack = async (dispatch, accessToken, venueId) => {
-  const response = await axios.post('http://192.168.86.214:8081/spotify/skip', {
+  const response = await axios.post('https://192.168.86.214:8081/spotify/skip', {
     venueId
   }, {
     headers: {
@@ -426,7 +426,7 @@ export const skipTrack = async (dispatch, accessToken, venueId) => {
  * @param volume {String }- Desired volume (0 - 100)
  */
 export const updateVolume = async (dispatch, accessToken, venueId, volume) => {
-  const response = await axios.put('http://192.168.86.214:8081/spotify/volume', {
+  const response = await axios.put('https://192.168.86.214:8081/spotify/volume', {
     venueId,
     volume
   }, {

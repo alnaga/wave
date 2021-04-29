@@ -3,7 +3,21 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="theme-color" content="#a37cd9" />
         <title> Wave </title>
+        <link rel="canonical" href="https://192.168.86.214:8080/" />
+        <link rel="manifest" href="/manifest.json" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <script>
+            if (navigator.serviceWorker) {
+                navigator.serviceWorker.register('/service-worker.js').then((registration) => {
+                  console.log('Service worker registered', registration);
+                }).catch((error) => {
+                  console.log('Service worker failed during registration', error);
+                });
+            }
+        </script>
     </head>
 
     <div id="root"></div>

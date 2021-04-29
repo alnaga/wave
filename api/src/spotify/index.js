@@ -141,6 +141,11 @@ const skipTrack = async (accessToken) => {
   });
 };
 
+// Specify the allowed methods for this subroute.
+router.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Methods', 'PUT, POST, GET').send();
+});
+
 // Sends the user to the Spotify app authorisation page to get their permission to link their account with Wave.
 // Returns an authorisation code which can be exchanged with an access token later on in the app flow.
 router.get('/authorise', (req, res) => {
@@ -156,7 +161,7 @@ router.get('/authorise', (req, res) => {
     user-read-email
   `;
   // const redirectUri = 'http://localhost:8080';
-  const redirectUri = 'http://192.168.86.214:8080';
+  const redirectUri = 'https://192.168.86.214:8080';
   res.redirect('https://accounts.spotify.com/authorize' +
     '?response_type=code' +
     `&client_id=${CLIENT_ID}` +
@@ -395,6 +400,7 @@ router.put('/pause', authenticate, async (req, res) => {
   })
 });
 
+// Resumes the current track for a venue on Spotify.
 router.put('/play', authenticate, async (req, res) => {
   const { venueId } = req.body;
   const accessToken = req.headers.authorization.split('Bearer ')[1];
@@ -452,7 +458,7 @@ router.post('/tokens', async (req, res) => {
     params: {
       "grant_type": "authorization_code",
       "code": authCode,
-      "redirect_uri": "http://192.168.86.214:8080"
+      "redirect_uri": "https://192.168.86.214:8080"
     }
   }).catch((error) => error.response);
 

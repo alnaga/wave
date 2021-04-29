@@ -121,11 +121,14 @@ const AccountInfo = () => {
 
                   <Link
                     to="/"
+                    className="mb-2"
                     title="Log out"
                     onClick={handleLogout}
                   >
                     Log out
                   </Link>
+
+                  <a href="/wave-ios.p12" download> Download Wave for iOS </a>
                 </div>
               </div>
             )
