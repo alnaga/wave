@@ -18,7 +18,9 @@ const SearchBar = ({ placeholder, resultsPage, searchType, staticContext, ...pro
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    setRedirect(true);
+    if (query.length > 0) {
+      setRedirect(true);
+    }
   };
 
   useEffect(() => {
