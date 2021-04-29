@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { Spinner } from 'react-bootstrap';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
 import ScreenHeader from '../ScreenHeader/ScreenHeader';
@@ -13,17 +14,34 @@ const Recommendations = () => {
   const dispatch = useAppDispatch();
   const { recommendations, tokens } = useAppState();
 
+  const [ loading, setLoading ] = useState(false);
+
+  const [ retries, setRetries ] = useState(0);
+  const MAX_RETRIES = 3;
+
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
   const handleGetVenueRecommendations = async () => {
+    setLoading(true);
+
+    let result = await getVenueRecommendations(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
+
     if (
       tokensRef.current.wave.accessToken
       && tokensRef.current.spotify.accessToken
-      && await getVenueRecommendations(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken) === TOKENS_EXPIRED
+      && result === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await getVenueRecommendations(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
+      result = await getVenueRecommendations(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
+    }
+
+    if (!result && retries < MAX_RETRIES) {
+      setRetries(retries + 1);
+
+      await handleGetVenueRecommendations();
+    } else {
+      setLoading(false);
     }
   };
 
@@ -41,16 +59,27 @@ const Recommendations = () => {
 
       <div id="recommendations">
         {
-          recommendations.length > 0
+          loading
             ? (
-              <VenueList
-                scores={recommendations.map((recommendation) => recommendation.score)}
-                venues={recommendations.map((recommendation) => recommendation.venue)}
-              />
-            ) : (
-              <div className="p-3">
-                No recommendations were found.
+              <div className="d-flex align-items-center justify-content-center p-3">
+                <Spinner animation="border" role="status" />
               </div>
+            ) : (
+              <>
+                {
+                  recommendations.length > 0
+                    ? (
+                      <VenueList
+                        scores={recommendations.map((recommendation) => recommendation.score)}
+                        venues={recommendations.map((recommendation) => recommendation.venue)}
+                      />
+                    ) : (
+                      <div className="p-3">
+                        No recommendations were found.
+                      </div>
+                    )
+                }
+              </>
             )
         }
       </div>

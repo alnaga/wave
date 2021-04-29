@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 
+import CookiesBanner from '../CookiesBanner/CookiesBanner';
 import CurrentlyPlaying from '../CurrentlyPlaying/CurrentlyPlaying';
 import Dashboard from '../Dashboard/Dashboard';
 import Header from '../Header/Header';
@@ -25,6 +26,8 @@ const App = (props) => {
       <div id="app-content" className="d-flex justify-content-center">
         <Dashboard />
       </div>
+
+      <CookiesBanner />
 
       <CurrentlyPlaying />
     </div>

@@ -128,7 +128,7 @@ const AccountInfo = () => {
                     Log out
                   </Link>
 
-                  <a href="/wave-ios.p12" download> Download Wave for iOS </a>
+                  <a href="/wave-ios.p12" download> Download Wave Certificate for iOS </a>
                 </div>
               </div>
             )

@@ -32,16 +32,22 @@ const getArtistInfo = async (res, artistId, accessToken) => {
     }
   }).catch((error) => error.response);
 
-  if (response.status === 200) {
-    return response.data;
-  } else if (
-    response.status === 429
-    || (response.data && response.data.error && response.data.error.status === 429)
-  ) {
-    const waitTime = Number.parseInt(response.headers['retry-after']);
+  if (response) {
+    if (response.status === 200) {
+      return response.data;
+    } else if (
+      response.status === 429
+      || (response.data && response.data.error && response.data.error.status === 429)
+    ) {
+      const waitTime = Number.parseInt(response.headers['retry-after']);
 
-    await wait(waitTime * 1000);
-    return await getArtistInfo(res, artistId, accessToken);
+      await wait(waitTime * 1000);
+      return await getArtistInfo(res, artistId, accessToken);
+    }
+  } else {
+    res.status(500).send({
+      message: 'Internal server error occurred while fetching artist information.'
+    });
   }
 };
 
