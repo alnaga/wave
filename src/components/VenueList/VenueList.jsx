@@ -28,33 +28,35 @@ const VenueList = (props) => {
             }
           }
 
-          return (
-            <Link
-              to={`/venue/${venue._id}`}
-              className="result"
-              key={venue._id}
-              title={`Go to ${venue.name}'s page`}
-            >
-              <div className="venue-name">
-                { venue.name }
-              </div>
+          if (venue) {
+            return (
+              <Link
+                to={`/venue/${venue._id}`}
+                className="result"
+                key={venue._id}
+                title={`Go to ${venue.name}'s page`}
+              >
+                <div className="venue-name">
+                  { venue.name }
+                </div>
 
-              <div className="d-flex justify-content-between align-items-center">
-                {
-                  (scores && matchPercentage !== undefined && matchPercentage !== null)
-                  && (
-                    <div className="venue-score ml-3 mr-3">
-                      Match: {matchPercentage}%
-                    </div>
-                  )
-                }
+                <div className="d-flex justify-content-between align-items-center">
+                  {
+                    (scores && matchPercentage !== undefined && matchPercentage !== null)
+                    && (
+                      <div className="venue-score ml-3 mr-3">
+                        Match: {matchPercentage}%
+                      </div>
+                    )
+                  }
 
-                <FontAwesomeIcon icon={faArrowCircleRight} size="lg" />
-              </div>
+                  <FontAwesomeIcon icon={faArrowCircleRight} size="lg" />
+                </div>
 
 
-            </Link>
-          );
+              </Link>
+            );
+          }
         })
       }
     </div>

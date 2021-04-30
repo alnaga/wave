@@ -155,16 +155,23 @@ router.options('*', (req, res) => {
 // Sends the user to the Spotify app authorisation page to get their permission to link their account with Wave.
 // Returns an authorisation code which can be exchanged with an access token later on in the app flow.
 router.get('/authorise', (req, res) => {
+  // TODO: remove the following unused scopes
+  // user-follow-read
+  // user-follow-modify
+  // user-read-email
+  // streaming
+  // app-remote-control
+  // user-read-currently-playing
   const spotifyScopes = `
-    user-follow-read 
-    user-follow-modify 
     user-top-read 
-    app-remote-control 
-    streaming 
     user-read-playback-state 
     user-modify-playback-state 
-    user-read-currently-playing 
+    user-follow-read 
+    user-follow-modify
     user-read-email
+    streaming 
+    app-remote-control 
+    user-read-currently-playing 
   `;
   // const redirectUri = 'http://localhost:8080';
   const redirectUri = 'https://192.168.86.214:8080';

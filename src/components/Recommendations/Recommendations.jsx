@@ -68,8 +68,16 @@ const Recommendations = () => {
                   recommendations.length > 0
                     ? (
                       <VenueList
-                        scores={recommendations.map((recommendation) => recommendation.score)}
-                        venues={recommendations.map((recommendation) => recommendation.venue)}
+                        scores={recommendations.map((recommendation) => {
+                          if (recommendation) {
+                            return recommendation.score;
+                          }
+                        })}
+                        venues={recommendations.map((recommendation) => {
+                          if (recommendation) {
+                            return recommendation.venue;
+                          }
+                        })}
                       />
                     ) : (
                       <div className="p-3">
