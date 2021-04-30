@@ -3,7 +3,6 @@ import 'regenerator-runtime';
 import bodyParser from 'body-parser';
 import cors from 'cors';
 import fs from 'fs';
-import http from 'http';
 import https from 'https';
 import mongoose from 'mongoose';
 import OAuth2Server from 'oauth2-server';
@@ -32,8 +31,6 @@ const credentials = {
   key: privateKey,
   cert: certificate,
 };
-
-console.log()
 
 const corsOptions = {
   origin: 'http://localhost:8080'
