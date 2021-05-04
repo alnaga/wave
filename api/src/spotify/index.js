@@ -139,6 +139,18 @@ const getVenueSpotifyToken = async (venue, callback) => {
   }
 }
 
+const userIsCheckedIn = (venue, user) => {
+  const attendees = venue.attendees.map((attendee) => attendee.toString());
+
+  return attendees.includes(user._id.toString());
+};
+
+const userIsOwner = (venue, user) => {
+  const owners = venue.owners.map((owner) => owner.toString());
+  
+  return owners.includes(user._id.toString());
+};
+
 const skipTrack = async (accessToken) => {
   const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
     headers: {
@@ -281,36 +293,28 @@ router.get('/devices', authenticate, async (req, res) => {
   const accessToken = req.headers.authorization.split('Bearer ')[1];
 
   await getUserByAccessToken(accessToken, res, async (user) => {
-    await Venue.findOne({ _id: venueId }, async (error, venue) => {
-      if (error) {
-        res.status(500).send({
-          message: 'Internal server error occurred while getting available devices.'
-        });
-      } else if (!venue) {
-        res.status(400).send({
-          message: 'Invalid venue ID.'
-        });
-      } else if (!venue.owners.includes(user._id)) {
-        res.status(401).send({
-          message: 'User making request is not authorised to see playback devices.'
-        });
-      } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
-        const spotifyResponse = await axios.get('https://api.spotify.com/v1/me/player/devices', {
-          headers: {
-            "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
-          }
-        }).catch((error) => error.response);
+    await getVenueById(venueId, res, async (venue) => {
+      if (venue) {
+        if (!userIsOwner(venue, user)) {
+          res.status(401).send({
+            message: 'User making request is not authorised to see playback devices.'
+          });
+        } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
+          const spotifyResponse = await axios.get('https://api.spotify.com/v1/me/player/devices', {
+            headers: {
+              "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
+            }
+          }).catch((error) => error.response);
 
-        res.status(spotifyResponse.status).send(spotifyResponse.data);
-      } else {
-        res.status(400).send({
-          message: 'Venue has not linked their Spotify account.'
-        })
+          res.status(spotifyResponse.status).send(spotifyResponse.data);
+        } else {
+          res.status(400).send({
+            message: 'Venue has not linked their Spotify account.'
+          });
+        }
       }
     });
-  })
-
-
+  });
 });
 
 // Selects a device for playback through Spotify.
@@ -319,49 +323,43 @@ router.put('/devices', authenticate, async (req, res) => {
   const accessToken = req.headers.authorization.split('Bearer ')[1];
 
   await getUserByAccessToken(accessToken, res, async (user) => {
-    await Venue.findOne({ _id: venueId }, async (error, venue) => {
-      if (error) {
-        res.status(500).send({
-          message: 'Internal server error occurred while selecting output device.'
-        });
-      } else if (!venue) {
-        res.status(400).send({
-          message: 'Invalid venue ID.'
-        });
-      } else if (!venue.owners.includes(user._id)) {
-        res.status(401).send({
-          message: 'User making request is not authorised to change playback device.'
-        });
-      } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
-        const spotifyResponse = await axios.put('https://api.spotify.com/v1/me/player', {
-          device_ids: [ device.id ]
-        }, {
-          headers: {
-            "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
-          }
-        });
+    await getVenueById(venueId, res, async (venue) => {
+      if (venue) {
+        if (!userIsOwner(venue, user)) {
+          res.status(401).send({
+            message: 'User making request is not authorised to change playback device.'
+          });
+        } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
+          const spotifyResponse = await axios.put('https://api.spotify.com/v1/me/player', {
+            device_ids: [ device.id ]
+          }, {
+            headers: {
+              "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
+            }
+          });
 
-        if (spotifyResponse) {
-          if (spotifyResponse.status === 204) {
-            await Venue.updateOne({ _id: venueId }, {
-              $set: {
-                outputDeviceId: device.id
-              }
-            }, (error, result) => {
-              if (error) {
-                res.status(500).send({
-                  message: 'Internal server error occurred while selecting output device.'
-                });
-              } else {
-                res.status(spotifyResponse.status).send();
-              }
-            })
+          if (spotifyResponse) {
+            if (spotifyResponse.status === 204) {
+              await Venue.updateOne({ _id: venueId }, {
+                $set: {
+                  outputDeviceId: device.id
+                }
+              }, (error, result) => {
+                if (error) {
+                  res.status(500).send({
+                    message: 'Internal server error occurred while selecting output device.'
+                  });
+                } else {
+                  res.status(spotifyResponse.status).send();
+                }
+              })
+            }
           }
+        } else {
+          res.status(400).send({
+            message: 'Venue has not linked their Spotify account.'
+          });
         }
-      } else {
-        res.status(400).send({
-          message: 'Venue has not linked their Spotify account.'
-        })
       }
     });
   });
@@ -373,40 +371,38 @@ router.put('/pause', authenticate, async (req, res) => {
   const accessToken = req.headers.authorization.split('Bearer ')[1];
 
   await getUserByAccessToken(accessToken, req, async (user) => {
-    await Venue.findOne({ _id: venueId }, async (error, venue) => {
-      if (error) {
-        res.status(500).send({
-          message: 'Internal server error occurred while pausing track.'
-        });
-      } else if (!venue) {
-        res.status(400).send({
-          message: 'Invalid venue ID.'
-        });
-      } else if (!venue.owners.includes(user._id)) {
-        res.status(401).send({
-          message: 'User making request is not authorised to pause playback.'
-        });
-      } else {
-        const spotifyResponse = await axios.put('https://api.spotify.com/v1/me/player/pause', null, {
-          headers: {
-            'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
-          }
-        }).catch((error) => error.response);
+    await getVenueById(venueId, res, async (venue) => {
+      if (venue) {
+        if (!userIsOwner(venue, user)) {
+          res.status(401).send({
+            message: 'User making request is not authorised to pause playback.'
+          });
+        } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
+          const spotifyResponse = await axios.put('https://api.spotify.com/v1/me/player/pause', null, {
+            headers: {
+              'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
+            }
+          }).catch((error) => error.response);
 
-        if (spotifyResponse) {
-          if (spotifyResponse.status === 204) {
-            res.status(200).send({
-              message: 'Track paused successfully.'
-            });
+          if (spotifyResponse) {
+            if (spotifyResponse.status === 204) {
+              res.status(200).send({
+                message: 'Track paused successfully.'
+              });
+            } else {
+              res.status(500).send({
+                message: 'Pause request to Spotify API failed.'
+              });
+            }
           } else {
             res.status(500).send({
               message: 'Pause request to Spotify API failed.'
-            });
+            })
           }
         } else {
-          res.status(500).send({
-            message: 'Pause request to Spotify API failed.'
-          })
+          res.status(400).send({
+            message: 'Venue has not linked their Spotify account.'
+          });
         }
       }
     });
@@ -419,63 +415,38 @@ router.put('/play', authenticate, async (req, res) => {
   const accessToken = req.headers.authorization.split('Bearer ')[1];
 
   await getUserByAccessToken(accessToken, req, async (user) => {
-    await Venue.findOne({ _id: venueId }, async (error, venue) => {
-      if (error) {
-        res.status(500).send({
-          message: 'Internal server error occurred while resuming song.'
-        });
-      } else if (!venue) {
-        res.status(400).send({
-          message: 'Invalid venue ID.'
-        });
-      } else if (!venue.owners.includes(user._id)) {
-        res.status(401).send({
-          message: 'User making request is not authorised to resume playback.'
-        });
-      } else {
-        const spotifyResponse = await axios.put('https://api.spotify.com/v1/me/player/play', null, {
-          headers: {
-            'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
-          }
-        }).catch((error) => error.response);
+    await getVenueById(venueId, res, async (venue) => {
+      if (venue) {
+        if (!userIsOwner(venue, user)) {
+          res.status(401).send({
+            message: 'User making request is not authorised to resume playback.'
+          });
+        } else {
+          const spotifyResponse = await axios.put('https://api.spotify.com/v1/me/player/play', null, {
+            headers: {
+              'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
+            }
+          }).catch((error) => error.response);
 
-        if (spotifyResponse) {
-          if (spotifyResponse.status === 204) {
-            res.status(200).send({
-              message: 'Song resumed successfully.'
-            });
+          if (spotifyResponse) {
+            if (spotifyResponse.status === 204) {
+              res.status(200).send({
+                message: 'Song resumed successfully.'
+              });
+            } else {
+              res.status(500).send({
+                message: 'Resume song request to Spotify API failed.'
+              });
+            }
           } else {
             res.status(500).send({
-              message: 'Resume song request to Spotify API failed.'
-            });
+              message: 'Resume song to Spotify API failed.'
+            })
           }
-        } else {
-          res.status(500).send({
-            message: 'Resume song to Spotify API failed.'
-          })
         }
       }
     });
   })
-});
-
-// Exchanges the authorisation code acquired previously for an access and refresh token.
-router.post('/tokens', async (req, res) => {
-  const { authCode } = req.body;
-
-  const spotifyResponse = await axios.post('https://accounts.spotify.com/api/token', null, {
-    headers: {
-      "Authorization": `Basic ${AUTHORISATION}`,
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    params: {
-      "grant_type": "authorization_code",
-      "code": authCode,
-      "redirect_uri": "https://192.168.86.214:8080"
-    }
-  }).catch((error) => error.response);
-
-  res.status(spotifyResponse.status).send(spotifyResponse.data);
 });
 
 // Calculates and returns the list of recommended venues to the user.
@@ -645,8 +616,6 @@ router.get('/search', async (req, res) => {
       });
     }
   });
-
-
 });
 
 // Skips the currently playing song in a venue.
@@ -655,43 +624,41 @@ router.post('/skip', authenticate, async (req, res) => {
   const accessToken = req.headers.authorization.split('Bearer ')[1];
 
   await getUserByAccessToken(accessToken, res, async (user) => {
-    await Venue.findOne({ _id: venueId }, async (error, venue) => {
-      if (error) {
-        res.status(500).send({
-          message: 'Internal server error occurred while skipping song.'
-        });
-      } else if (!venue) {
-        res.status(400).send({
-          message: 'Invalid venue ID.'
-        });
-      } else if (!venue.owners.includes(user._id)) {
-        res.status(401).send({
-          message: 'User making request is not authorised to skip song.'
-        });
-      } else {
-        const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
-          headers: {
-            'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
-          }
-        }).catch((error) => error.response);
+    await getVenueById(venueId, res, async (venue) => {
+      if (venue) {
+        if (!userIsOwner(venue, user)) {
+          res.status(400).send({
+            message: 'User making request is not authorised to skip song.'
+          });
+        } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
+          const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
+            headers: {
+              'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
+            }
+          }).catch((error) => error.response);
 
-        if (spotifyResponse) {
-          if (spotifyResponse.status === 204) {
-            res.status(200).send({
-              message: 'Song skipped successfully.'
-            });
+          if (spotifyResponse) {
+            if (spotifyResponse.status === 204) {
+              res.status(200).send({
+                message: 'Song skipped successfully.'
+              });
+            } else {
+              res.status(500).send({
+                message: 'Skip song request to Spotify API failed.'
+              });
+            }
           } else {
             res.status(500).send({
               message: 'Skip song request to Spotify API failed.'
             });
           }
         } else {
-          res.status(500).send({
-            message: 'Skip song request to Spotify API failed.'
+          res.status(400).send({
+            message: 'Venue has not linked their Spotify account.'
           });
         }
       }
-    })
+    });
   });
 });
 
@@ -767,38 +734,66 @@ router.get('/song', authenticate, async (req, res) => {
 // Adds a song to the queue on a venue's Spotify account.
 router.post('/song', authenticate, async (req, res) => {
   const { songUri, venueId } = req.body;
+  const accessToken = req.headers.authorization.split('Bearer ')[1];
 
-  await getVenueById(venueId, res, async (venue) => {
-    if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
-      const deviceId = venue.outputDeviceId;
-
-      const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${songUri}&device_id=${deviceId}`, null, {
-        headers: {
-          "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
-        }
-      }).catch((error) => error.response);
-
-      if (spotifyResponse) {
-        if (spotifyResponse.status === 200 || spotifyResponse.status === 204) {
-          res.status(200).send({
-            message: 'Song queued successfully.'
+  await getUserByAccessToken(accessToken, res, async (user) => {
+    await getVenueById(venueId, res, async (venue) => {
+      if (venue) {
+        if (!userIsCheckedIn(venue, user)) {
+          res.status(400).send({
+            message: 'User making the request is not checked into the target venue.'
           });
+        } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
+          const deviceId = venue.outputDeviceId;
+
+          const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${songUri}&device_id=${deviceId}`, null, {
+            headers: {
+              "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
+            }
+          }).catch((error) => error.response);
+
+          if (spotifyResponse) {
+            if (spotifyResponse.status === 200 || spotifyResponse.status === 204) {
+              res.status(200).send({
+                message: 'Song queued successfully.'
+              });
+            } else {
+              res.status(spotifyResponse.status).send({
+                message: 'Queuing request to Spotify API failed.'
+              });
+            }
+          } else {
+            res.status(500).send({
+              message: 'Internal server error occurred while queuing song.'
+            });
+          }
         } else {
-          res.status(spotifyResponse.status).send({
-            message: 'Queuing request to Spotify API failed.'
+          res.status(400).send({
+            message: 'Venue has not linked their Spotify account.'
           });
         }
-      } else {
-        res.status(500).send({
-          message: 'Internal server error occurred while queuing song.'
-        });
       }
-    } else {
-      res.status(400).send({
-        message: 'Venue has not linked their Spotify account.'
-      });
-    }
+    });
   });
+});
+
+// Exchanges the authorisation code acquired previously for an access and refresh token.
+router.post('/tokens', async (req, res) => {
+  const { authCode } = req.body;
+
+  const spotifyResponse = await axios.post('https://accounts.spotify.com/api/token', null, {
+    headers: {
+      "Authorization": `Basic ${AUTHORISATION}`,
+      "Content-Type": "application/x-www-form-urlencoded"
+    },
+    params: {
+      "grant_type": "authorization_code",
+      "code": authCode,
+      "redirect_uri": "https://192.168.86.214:8080"
+    }
+  }).catch((error) => error.response);
+
+  res.status(spotifyResponse.status).send(spotifyResponse.data);
 });
 
 // Updates the output volume in a venue.
@@ -810,28 +805,34 @@ router.put('/volume', authenticate, async (req, res) => {
   if (volumePercent > 100) volumePercent = 100;
 
   await getUserByAccessToken(accessToken, res, async (user) => {
-    await Venue.findOne({ _id: venueId }, async (error, venue) => {
-      if (!venue.owners.includes(user._id)) {
-        res.status(401).send({
-          message: 'User making the request is not authorised to adjust volume.'
-        });
-      } else {
-        const spotifyResponse = await axios.put(`https://api.spotify.com/v1/me/player/volume?volume_percent=${volumePercent}`,  null, {
-          headers: {
-            'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
-          }
-        }).catch((error) => error.response);
+    await getVenueById(venueId, res, async (venue) => {
+      if (venue) {
+        if (!userIsOwner(venue, user)) {
+          res.status(401).send({
+            message: 'User making the request is not authorised to adjust volume.'
+          });
+        } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
+          const spotifyResponse = await axios.put(`https://api.spotify.com/v1/me/player/volume?volume_percent=${volumePercent}`,  null, {
+            headers: {
+              'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
+            }
+          }).catch((error) => error.response);
 
-        if (spotifyResponse) {
-          if (spotifyResponse.status === 204) {
-            res.status(204).send({
-              message: 'Volume changed successfully.'
-            });
+          if (spotifyResponse) {
+            if (spotifyResponse.status === 204) {
+              res.status(204).send({
+                message: 'Volume changed successfully.'
+              });
+            }
+          } else {
+            res.status(500).send({
+              message: 'Volume change request to Spotify API failed.'
+            })
           }
         } else {
-          res.status(500).send({
-            message: 'Volume change request to Spotify API failed.'
-          })
+          res.status(400).send({
+            message: 'Venue has not linked their Spotify account.'
+          });
         }
       }
     });
@@ -852,64 +853,66 @@ router.post('/vote', authenticate, async (req, res) => {
   }
 
   await getUserByAccessToken(accessToken, res, async (user) => {
-    await Venue.findOne({ _id: venueId }, async (error, venue) => {
-      if (!venue.attendees.includes) {
-        res.status(400).send({
-          message: 'User casting vote is not checked into the target venue.'
-        });
-      } else {
-        Venue.updateOne({ _id: venueId }, {
-          $inc: {
-            votes: voteValue
-          }
-        }, async (error, result) => {
-          if (error) {
-            res.status(500).send({
-              message: 'Internal server error.'
-            });
-          } else if (result.nModified === 1) {
-            let skipped = false;
-
-            let newVotes = venue.votes + voteValue;
-
-            // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
-            if (newVotes < (-venue.attendees.length / 2)) {
-              await skipTrack(venue.spotifyTokens.accessToken);
-              await Venue.updateOne({ _id: venueId }, {
-                $set: {
-                  votes: 0
-                }
-              });
-              newVotes = 0;
-              skipped = true;
+    await getVenueById(venueId, res, async (venue) => {
+      if (venue) {
+        if (!userIsCheckedIn(venue, user)) {
+          res.status(400).send({
+            message: 'User casting vote is not checked into the target venue.'
+          });
+        } else {
+          Venue.updateOne({ _id: venueId }, {
+            $inc: {
+              votes: voteValue
             }
+          }, async (error, result) => {
+            if (error) {
+              res.status(500).send({
+                message: 'Internal server error.'
+              });
+            } else if (result.nModified === 1) {
+              let skipped = false;
 
-            await getUsersByIds(venue.attendees, res, async (attendees) => {
-              await getUsersByIds(venue.owners, res, async (owners) => {
-                res.status(200).send({
-                  venue: {
-                    ...venue.toObject(),
-                    _id: undefined,
-                    id: venue._id,
-                    attendees,
-                    currentSong: undefined,
-                    googleMapsLink: undefined,
-                    owners,
-                    spotifyConsent: undefined,
-                    spotifyTokens: undefined,
-                    votes: newVotes
-                  },
-                  skipped
+              let newVotes = venue.votes + voteValue;
+
+              // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
+              if (newVotes < (-venue.attendees.length / 2)) {
+                await skipTrack(venue.spotifyTokens.accessToken);
+                await Venue.updateOne({ _id: venueId }, {
+                  $set: {
+                    votes: 0
+                  }
+                });
+                newVotes = 0;
+                skipped = true;
+              }
+
+              await getUsersByIds(venue.attendees, res, async (attendees) => {
+                await getUsersByIds(venue.owners, res, async (owners) => {
+                  res.status(200).send({
+                    venue: {
+                      ...venue.toObject(),
+                      _id: undefined,
+                      id: venue._id,
+                      attendees,
+                      currentSong: undefined,
+                      googleMapsLink: undefined,
+                      owners,
+                      spotifyConsent: undefined,
+                      spotifyTokens: undefined,
+                      votes: newVotes
+                    },
+                    skipped
+                  });
                 });
               });
-            });
-          } else {
-            console.error('Could not find venue.');
-            res.status(500).send({
-              message: 'Internal server error.'
-            });
-          }
-        });
+            } else {
+              console.error('Could not find venue.');
+              res.status(500).send({
+                message: 'Internal server error.'
+              });
+            }
+          });
+        }
       }
     });
   });
