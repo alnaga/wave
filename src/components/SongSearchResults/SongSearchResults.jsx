@@ -19,6 +19,9 @@ const SongSearchResults = (props) => {
   const [ loading, setLoading ] = useState(false);
   const [ retries, setRetries ] = useState(0);
 
+  const retriesRef = useRef(null);
+  retriesRef.current = retries;
+
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
@@ -37,8 +40,8 @@ const SongSearchResults = (props) => {
       result = await getSongSearchResults(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, query);
     }
 
-    if (!result && retries < MAX_RETRIES) {
-      setRetries(retries + 1);
+    if (!result && retriesRef.current < MAX_RETRIES) {
+      setRetries(retriesRef.current + 1);
 
       await handleSearch();
     } else {

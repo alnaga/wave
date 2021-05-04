@@ -247,7 +247,7 @@ export const updateVenueDetails = async (dispatch, accessToken, venueId, venueDa
  * @returns 1 if successful, 0 if failed
  */
 export const voteSong = async (dispatch, accessToken, venueId, vote) => {
-  const response = await axios.post(`https://192.168.86.214:8081/spotify/vote`, {
+  const response = await axios.post(`https://192.168.86.214:8081/venue/vote`, {
     venueId,
     vote
   }, {

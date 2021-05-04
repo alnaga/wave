@@ -17,6 +17,9 @@ const Recommendations = () => {
   const [ loading, setLoading ] = useState(false);
   const [ retries, setRetries ] = useState(0);
 
+  const retriesRef = useRef(null);
+  retriesRef.current = retries;
+
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
@@ -34,8 +37,8 @@ const Recommendations = () => {
       result = await getVenueRecommendations(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
     }
 
-    if (!result && retries < MAX_RETRIES) {
-      setRetries(retries + 1);
+    if (!result && retriesRef.current < MAX_RETRIES) {
+      setRetries(retriesRef.current + 1);
 
       await handleGetVenueRecommendations();
     } else {

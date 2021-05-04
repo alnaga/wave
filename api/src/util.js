@@ -159,6 +159,18 @@ export const getVenueById = async (venueId, res, callback) => {
   });
 };
 
+export const userIsCheckedIn = (venue, user) => {
+  const attendees = venue.attendees.map((attendee) => attendee.toString());
+
+  return attendees.includes(user._id.toString());
+};
+
+export const userIsOwner = (venue, user) => {
+  const owners = venue.owners.map((owner) => owner.toString());
+
+  return owners.includes(user._id.toString());
+};
+
 /**
  * Method used by OAuth 2 to authenticate a request.
  * @param req {Object} - Request object.

@@ -20,11 +20,14 @@ const SongList = (props) => {
   const dispatch = useAppDispatch();
   const { currentSong, currentVenue, tokens } = useAppState();
 
-  const tokensRef = useRef(null);
-  tokensRef.current = tokens;
-
   const [ loading, setLoading ] = useState(false);
   const [ retries, setRetries ] = useState(0);
+
+  const retriesRef = useRef(null);
+  retriesRef.current = retries;
+
+  const tokensRef = useRef(null);
+  tokensRef.current = tokens;
 
   const handleGetNextPage = async () => {
     setLoading(true);
@@ -40,8 +43,8 @@ const SongList = (props) => {
       result = await getNextSongSearchResultsPage(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, songs.next);
     }
 
-    if (!result && retries < MAX_RETRIES) {
-      setRetries(retries + 1);
+    if (!result && retriesRef.current < MAX_RETRIES) {
+      setRetries(retriesRef.current + 1);
       await handleGetNextPage();
     } else {
       setLoading(false);

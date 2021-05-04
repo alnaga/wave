@@ -18,6 +18,9 @@ const VenueSearchResults = (props) => {
   const [ loading, setLoading ] = useState(false);
   const [ retries, setRetries ] = useState(0);
 
+  const retriesRef = useRef(null);
+  retriesRef.current = retries;
+
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
@@ -35,8 +38,8 @@ const VenueSearchResults = (props) => {
       result = await getVenueSearchResults(dispatch, tokensRef.current.wave.accessToken, query);
     }
 
-    if (!result && retries < MAX_RETRIES) {
-      setRetries(retries + 1);
+    if (!result && retriesRef.current < MAX_RETRIES) {
+      setRetries(retriesRef.current + 1);
 
       await handleVenueSearch();
     } else {

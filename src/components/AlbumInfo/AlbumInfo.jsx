@@ -20,6 +20,9 @@ const AlbumInfo = (props) => {
   const [ loading, setLoading ] = useState(false);
   const [ retries, setRetries ] = useState(0);
 
+  const retriesRef = useRef(null);
+  retriesRef.current = retries;
+
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
@@ -39,8 +42,8 @@ const AlbumInfo = (props) => {
       result = await getAlbumInfo(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, albumId);
     }
 
-    if (!result && retries < MAX_RETRIES) {
-      setRetries(retries + 1);
+    if (!result && retriesRef.current < MAX_RETRIES) {
+      setRetries(retriesRef.current + 1);
 
       await handleGetAlbumInfo();
     } else {

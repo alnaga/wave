@@ -38,7 +38,10 @@ const VenueInfo = (props) => {
     googleMapsLink: ''
   });
   const [ editMode, setEditMode ] = useState(false);
-  
+
+  const retriesRef = useRef(null);
+  retriesRef.current = retries;
+
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
@@ -125,8 +128,8 @@ const VenueInfo = (props) => {
       result = await getVenueData(dispatch, tokensRef.current.wave.accessToken, props.match.params.venueId)
     }
 
-    if (!result && retries < MAX_RETRIES) {
-      setRetries(retries + 1);
+    if (!result && retriesRef.current + 1 < MAX_RETRIES) {
+      setRetries(retriesRef.current + 1);
 
       await handleGetVenueInfo();
     } else {

@@ -6,7 +6,9 @@ import {
   getUserByAccessToken,
   getUsersByIds,
   getVenueById,
-  refreshSpotifyToken
+  refreshSpotifyToken,
+  userIsCheckedIn,
+  userIsOwner
 } from '../util';
 import { Venue } from '../models/venue';
 import {
@@ -139,17 +141,7 @@ const getVenueSpotifyToken = async (venue, callback) => {
   }
 }
 
-const userIsCheckedIn = (venue, user) => {
-  const attendees = venue.attendees.map((attendee) => attendee.toString());
 
-  return attendees.includes(user._id.toString());
-};
-
-const userIsOwner = (venue, user) => {
-  const owners = venue.owners.map((owner) => owner.toString());
-  
-  return owners.includes(user._id.toString());
-};
 
 const skipTrack = async (accessToken) => {
   const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
@@ -858,83 +850,6 @@ router.put('/volume', authenticate, async (req, res) => {
   });
 });
 
-// Casts a vote for the currently playing song in a venue.
-router.post('/vote', authenticate, async (req, res) => {
-  const { venueId, vote } = req.body;
-  const accessToken = req.headers.authorization.split('Bearer ')[1];
 
-  let voteValue = 0;
-
-  if (vote === VOTE_UP) {
-    voteValue = 1;
-  } else if (vote === VOTE_DOWN) {
-    voteValue = -1;
-  }
-
-  await getUserByAccessToken(accessToken, res, async (user) => {
-    await getVenueById(venueId, res, async (venue) => {
-      if (venue) {
-        if (!userIsCheckedIn(venue, user)) {
-          res.status(400).send({
-            message: 'User casting vote is not checked into the target venue.'
-          });
-        } else {
-          Venue.updateOne({ _id: venueId }, {
-            $inc: {
-              votes: voteValue
-            }
-          }, async (error, result) => {
-            if (error) {
-              res.status(500).send({
-                message: 'Internal server error.'
-              });
-            } else if (result.nModified === 1) {
-              let skipped = false;
-
-              let newVotes = venue.votes + voteValue;
-
-              // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
-              if (newVotes < (-venue.attendees.length / 2)) {
-                await skipTrack(venue.spotifyTokens.accessToken);
-                await Venue.updateOne({ _id: venueId }, {
-                  $set: {
-                    votes: 0
-                  }
-                });
-                newVotes = 0;
-                skipped = true;
-              }
-
-              await getUsersByIds(venue.attendees, res, async (attendees) => {
-                await getUsersByIds(venue.owners, res, async (owners) => {
-                  res.status(200).send({
-                    venue: {
-                      ...venue.toObject(),
-                      _id: undefined,
-                      id: venue._id,
-                      attendees,
-                      currentSong: undefined,
-                      googleMapsLink: undefined,
-                      owners,
-                      spotifyConsent: undefined,
-                      spotifyTokens: undefined,
-                      votes: newVotes
-                    },
-                    skipped
-                  });
-                });
-              });
-            } else {
-              console.error('Could not find venue.');
-              res.status(500).send({
-                message: 'Internal server error.'
-              });
-            }
-          });
-        }
-      }
-    });
-  });
-});
 
 module.exports = router;
