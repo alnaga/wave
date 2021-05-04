@@ -159,6 +159,14 @@ export const getVenueById = async (venueId, res, callback) => {
   });
 };
 
+export const skipSong = async (accessToken) => {
+  return await axios.post('https://api.spotify.com/v1/me/player/next', null, {
+    headers: {
+      "Authorization": `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+};
+
 export const userHasVoted = (venue, user) => {
   const voters = venue.votedUsers.map((voter) => voter.toString());
 

@@ -7,6 +7,7 @@ import {
   getUsersByIds,
   getVenueById,
   refreshSpotifyToken,
+  skipSong,
   userIsCheckedIn,
   userIsOwner
 } from '../util';
@@ -140,14 +141,6 @@ const getVenueSpotifyToken = async (venue, callback) => {
     return callback(venue.spotifyTokens.accessToken);
   }
 }
-
-const skipTrack = async (accessToken) => {
-  const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
-    headers: {
-      "Authorization": `Bearer ${accessToken}`
-    }
-  });
-};
 
 // Specify the allowed methods for this subroute.
 router.options('*', (req, res) => {
@@ -626,11 +619,7 @@ router.post('/skip', authenticate, async (req, res) => {
             message: 'User making request is not authorised to skip song.'
           });
         } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
-          const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
-            headers: {
-              'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
-            }
-          }).catch((error) => error.response);
+          const spotifyResponse = await skipSong(venue.spotifyTokens.accessToken);
 
           if (spotifyResponse) {
             if (spotifyResponse.status === 204) {

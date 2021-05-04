@@ -8,6 +8,7 @@ import {
   getUserByAccessToken,
   getUsersByIds,
   getVenueById,
+  skipSong,
   userHasVoted,
   userIsCheckedIn
 } from '../util';
@@ -505,7 +506,7 @@ router.post('/vote', authenticate, async (req, res) => {
 
               // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
               if (newVotes < (-venue.attendees.length / 2)) {
-                await skipTrack(venue.spotifyTokens.accessToken);
+                await skipSong(venue.spotifyTokens.accessToken);
                 await Venue.updateOne({ _id: venueId }, {
                   $set: {
                     votedUsers: [],
