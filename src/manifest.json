@@ -1,0 +1,20 @@
+{
+  "name": "Wave",
+  "icons": [
+    {
+      "src": "./wave-icon.png",
+      "type": "image/png",
+      "sizes": "256x256",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./wave-splashscreen.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "start_url": "../",
+  "display": "fullscreen",
+  "background_color": "#2f2f2f",
+  "theme_color": "#a37cd9"
+}

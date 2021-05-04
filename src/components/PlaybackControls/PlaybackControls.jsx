@@ -8,11 +8,11 @@ import VolumeSlider from '../VolumeSlider/VolumeSlider';
 import { TOKENS_EXPIRED } from '../../constants';
 import { refreshExpiredTokens } from '../../util';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { getUserDevices, pauseTrack, playTrack, selectUserDevice, skipTrack } from '../../actions/spotify/spotifyActions';
+import { getUserDevices, pauseSong, resumeSong, selectUserDevice, skipSong } from '../../actions/spotify/spotifyActions';
 
-import './DeviceSelection.scss';
+import './PlaybackControls.scss';
 
-const DeviceSelection = (props) => {
+const PlaybackControls = (props) => {
   const { handleFetchCurrentSong } = props;
 
   const dispatch = useAppDispatch();
@@ -54,8 +54,8 @@ const DeviceSelection = (props) => {
     }
   };
 
-  const handlePauseTrack = async () => {
-    let pauseResult = await pauseTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
+  const handlePauseSong = async () => {
+    let pauseResult = await pauseSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
 
     if (
       tokensRef.current.wave.accessToken
@@ -64,7 +64,7 @@ const DeviceSelection = (props) => {
       && pauseResult === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      pauseResult = await pauseTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
+      pauseResult = await pauseSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
     }
 
     // If pausing was successful, wait for Spotify to carry out the skip and then fetch the new song.
@@ -75,8 +75,8 @@ const DeviceSelection = (props) => {
     }
   }
 
-  const handlePlayTrack = async () => {
-    let playResult = await playTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
+  const handleResumeSong = async () => {
+    let playResult = await resumeSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
 
     if (
       tokensRef.current.wave.accessToken
@@ -85,7 +85,7 @@ const DeviceSelection = (props) => {
       && playResult === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      playResult = await playTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
+      playResult = await resumeSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
     }
 
     // If playing was successful, wait for Spotify to carry out the skip and then fetch the new song.
@@ -96,8 +96,8 @@ const DeviceSelection = (props) => {
     }
   }
 
-  const handleSkipTrack = async () => {
-    let skipResult = await skipTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
+  const handleSkipSong = async () => {
+    let skipResult = await skipSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
 
     if (
       tokensRef.current.wave.accessToken
@@ -106,7 +106,7 @@ const DeviceSelection = (props) => {
       && skipResult === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      skipResult = await skipTrack(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
+      skipResult = await skipSong(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id);
     }
 
     // If skipping was successful, wait for Spotify to carry out the skip and then fetch the new song.
@@ -120,7 +120,6 @@ const DeviceSelection = (props) => {
   const handleSelectDevice = (device) => async () => {
     if (
       tokensRef.current.wave.accessToken
-      && tokensRef.current.spotify.accessToken
       && currentVenueRef.current
       && currentVenueRef.current.id
       && await selectUserDevice(dispatch, tokensRef.current.wave.accessToken, currentVenueRef.current.id, device) === TOKENS_EXPIRED
@@ -155,7 +154,7 @@ const DeviceSelection = (props) => {
   }, []);
 
   return (
-    <div id="device-selection" className="ml-3">
+    <div id="playback-controls" className="ml-3">
       <span className="ui-button" id="show-device-list" onClick={handleToggleShowList} title="View list of available playback devices.">
         <FontAwesomeIcon id="show-device-list-icon" icon={faHeadphones} size="lg" />
       </span>
@@ -212,16 +211,16 @@ const DeviceSelection = (props) => {
                           className="mr-3 ui-button"
                           icon={faPause}
                           size="lg"
-                          onClick={handlePauseTrack}
-                          title="Pause the current track"
+                          onClick={handlePauseSong}
+                          title="Pause the current song"
                         />
                       ) : (
                         <FontAwesomeIcon
                           className="mr-3 ui-button"
                           icon={faPlay}
                           size="lg"
-                          onClick={handlePlayTrack}
-                          title="Resume the current track"
+                          onClick={handleResumeSong}
+                          title="Resume the current song"
                         />
                       )
                   }
@@ -230,8 +229,8 @@ const DeviceSelection = (props) => {
                     className="ml-3 ui-button"
                     icon={faStepForward}
                     size="lg"
-                    onClick={handleSkipTrack}
-                    title="Skip the current track"
+                    onClick={handleSkipSong}
+                    title="Skip the current song"
                   />
                 </div>
 
@@ -247,5 +246,5 @@ const DeviceSelection = (props) => {
   );
 };
 
-export default DeviceSelection;
+export default PlaybackControls;
 

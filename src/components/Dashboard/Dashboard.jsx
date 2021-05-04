@@ -10,7 +10,7 @@ import LoginRegister from '../LoginRegister/LoginRegister';
 import NotFound from '../NotFound/NotFound';
 import Recommendations from '../Recommendations/Recommendations';
 import Settings from '../Settings/Settings';
-import TrackSearchResults from '../TrackSearchResults/TrackSearchResults';
+import SongSearchResults from '../SongSearchResults/SongSearchResults';
 import VenueInfo from '../VenueInfo/VenueInfo';
 import VenueRegistration from '../VenueRegistration/VenueRegistration';
 import VenueSearchResults from '../VenueSearchResults/VenueSearchResults';
@@ -32,7 +32,7 @@ const Dashboard = () => {
           <Route exact path="/register" component={LoginRegister} />
           <Route exact path="/register-venue" component={VenueRegistration} />
           <Route exact path="/settings" component={Settings} />
-          <Route exact path="/tracks/search/:query" component={TrackSearchResults} />
+          <Route exact path="/tracks/search/:query" component={SongSearchResults} />
           <Route exact path="/venues/search/:query" component={VenueSearchResults} />
           <Route exact path="/venue/:venueId" component={VenueInfo} />
           <Route exact path="/" component={Home} />

@@ -3,10 +3,12 @@ import Cookies from 'js-cookie';
 
 import {
   SET_ALBUM_INFO,
+  ADD_ARTIST_INFO_ALBUMS,
   SET_ARTIST_INFO,
   SET_CURRENT_SONG,
   SET_DEVICES,
-  SET_TRACK_SEARCH_RESULTS,
+  ADD_SONG_SEARCH_RESULTS,
+  SET_SONG_SEARCH_RESULTS,
   SET_RECOMMENDATIONS,
   SET_SPOTIFY_TOKENS,
   SET_VOTES,
@@ -22,9 +24,9 @@ import {
  */
 export const getSpotifyAuthTokens = async (dispatch, authCode) => {
   try {
-    const response = await axios.post('http://localhost:8081/spotify/tokens', {
+    const response = await axios.post('https://192.168.86.214:8081/spotify/tokens', {
       authCode
-    });
+    }).catch((error) => error.response);
 
     if (response.status === 200) {
       const accessToken = response.data.access_token;
@@ -62,7 +64,7 @@ export const getSpotifyAuthTokens = async (dispatch, authCode) => {
  */
 export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
   try {
-    const response = await axios.post('http://localhost:8081/spotify/refresh', {
+    const response = await axios.post('https://192.168.86.214:8081/spotify/refresh', {
       refreshToken
     });
 
@@ -99,7 +101,7 @@ export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
  * @returns 1 if successful, 0 if failed
  */
 export const getUserDevices = async (dispatch, accessToken, venueId) => {
-  const response = await axios.get(`http://localhost:8081/spotify/devices?venueId=${venueId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/devices?venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -128,7 +130,7 @@ export const getUserDevices = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed
  */
 export const selectUserDevice = async (dispatch, accessToken, venueId, device) => {
-  const response = await axios.put(`http://localhost:8081/spotify/devices`, {
+  const response = await axios.put(`https://192.168.86.214:8081/spotify/devices`, {
     device,
     venueId
   }, {
@@ -162,7 +164,7 @@ export const selectUserDevice = async (dispatch, accessToken, venueId, device) =
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if one of the access tokens have expired.
  */
 export const getAlbumInfo = async (dispatch, accessToken, venueId, albumId) => {
-  const response = await axios.get(`http://localhost:8081/spotify/album?venueId=${venueId}&albumId=${albumId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/album?venueId=${venueId}&albumId=${albumId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -189,7 +191,7 @@ export const getAlbumInfo = async (dispatch, accessToken, venueId, albumId) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if one of the access tokens have expired.
  */
 export const getArtistInfo = async (dispatch, accessToken, venueId, artistId) => {
-  const response = await axios.get(`http://localhost:8081/spotify/artist?venueId=${venueId}&artistId=${artistId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/artist?venueId=${venueId}&artistId=${artistId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -211,8 +213,8 @@ export const getArtistInfo = async (dispatch, accessToken, venueId, artistId) =>
   }
 };
 
-export const getVenueRecommendations = async (dispatch, accessToken, spotifyAccessToken) => {
-  const response = await axios.get(`http://localhost:8081/spotify/recommendations?spotifyAccessToken=${spotifyAccessToken}`, {
+export const getNextArtistAlbumsPage = async (dispatch, accessToken, venueId, nextPageUrl) => {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -220,7 +222,39 @@ export const getVenueRecommendations = async (dispatch, accessToken, spotifyAcce
 
   if (response) {
     if (response.status === 200) {
-      const recommendations = response.data.recommendations.sort((a, b) => b.score - a.score);
+      dispatch({
+        type: ADD_ARTIST_INFO_ALBUMS,
+        payload: {
+          items: response.data.items,
+          next: response.data.next
+        }
+      });
+
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
+};
+
+export const getVenueRecommendations = async (dispatch, accessToken, spotifyAccessToken) => {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/recommendations?spotifyAccessToken=${spotifyAccessToken}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      const recommendations = response.data.recommendations.sort((a, b) => {
+        if (a && b) {
+          return b.score - a.score;
+        }
+      });
 
       dispatch({
         type: SET_RECOMMENDATIONS,
@@ -244,28 +278,62 @@ export const getVenueRecommendations = async (dispatch, accessToken, spotifyAcce
  * @param query {String} - Search query
  * @returns 1 if successful, 0 if failed
  */
-export const getTrackSearchResults = async (dispatch, accessToken, venueId, query) => {
+export const getSongSearchResults = async (dispatch, accessToken, venueId, query) => {
   // If the user has not input a query, the request to the API is not made.
   if (!query) {
     return 0;
   }
 
-  const response = await axios.get(`http://localhost:8081/spotify/search?query=${query}&venueId=${venueId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/search?query=${query}&venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
   }).catch((error) => error.response);
 
-  if (response && response.status === 200) {
-    dispatch({
-      type: SET_TRACK_SEARCH_RESULTS,
-      payload: response.data.tracks.items
-    });
+  if (response) {
+    if (response.status === 200) {
+      dispatch({
+        type: SET_SONG_SEARCH_RESULTS,
+        payload: response.data.tracks
+      });
 
-    return 1;
-  } else if (response && response.status === 401) {
-    return TOKENS_EXPIRED;
-  } else return 0;
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
+};
+
+export const getNextSongSearchResultsPage = async (dispatch, accessToken, venueId, nextPageUrl) => {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      dispatch({
+        type: ADD_SONG_SEARCH_RESULTS,
+        payload: {
+          items: response.data.tracks.items,
+          next: response.data.tracks.next
+        }
+      });
+
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
 };
 
 /**
@@ -276,7 +344,7 @@ export const getTrackSearchResults = async (dispatch, accessToken, venueId, quer
  * @returns 1 if successful, 0 if failed
  */
 export const getCurrentSong = async (dispatch, accessToken, venueId) => {
-  const response = await axios.get(`http://localhost:8081/spotify/song?venueId=${venueId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/song?venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -316,13 +384,13 @@ export const getCurrentSong = async (dispatch, accessToken, venueId) => {
 };
 
 /**
- * Attempts to pause the currently playing track on the Spotify API.
+ * Attempts to pause the currently playing song on the Spotify API.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API access Token
  * @param venueId {String} - The ID of the target venue.
  */
-export const pauseTrack = async (dispatch, accessToken, venueId) => {
-  const response = await axios.put('http://localhost:8081/spotify/pause', {
+export const pauseSong = async (dispatch, accessToken, venueId) => {
+  const response = await axios.put('https://192.168.86.214:8081/spotify/pause', {
     venueId
   }, {
     headers: {
@@ -342,13 +410,13 @@ export const pauseTrack = async (dispatch, accessToken, venueId) => {
 }
 
 /**
- * Attempts to resume the currently playing track on the Spotify API.
+ * Attempts to resume the currently playing song on the Spotify API.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API access Token
  * @param venueId {String} - The ID of the target venue.
  */
-export const playTrack = async (dispatch, accessToken, venueId) => {
-  const response = await axios.put('http://localhost:8081/spotify/play', {
+export const resumeSong = async (dispatch, accessToken, venueId) => {
+  const response = await axios.put('https://192.168.86.214:8081/spotify/play', {
     venueId
   }, {
     headers: {
@@ -372,12 +440,12 @@ export const playTrack = async (dispatch, accessToken, venueId) => {
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API Access Token
  * @param venueId {String} - The ID of the target venue.
- * @param trackUri {String} - The URI of the track to be queued.
+ * @param songUri {String} - The URI of the song to be queued.
  * @returns 1 if successful, 0 if failed
  */
-export const queueTrack = async (dispatch, accessToken, venueId, trackUri) => {
-  const response = await axios.post(`http://localhost:8081/spotify/song`, {
-    trackUri,
+export const queueSong = async (dispatch, accessToken, venueId, songUri) => {
+  const response = await axios.post(`https://192.168.86.214:8081/spotify/song`, {
+    songUri,
     venueId
   }, {
     headers: {
@@ -393,13 +461,13 @@ export const queueTrack = async (dispatch, accessToken, venueId, trackUri) => {
 };
 
 /**
- * Attempts to skip the currently playing track on the Spotify API.
+ * Attempts to skip the currently playing song on the Spotify API.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API access Token
  * @param venueId {String} - The ID of the target venue.
  */
-export const skipTrack = async (dispatch, accessToken, venueId) => {
-  const response = await axios.post('http://localhost:8081/spotify/skip', {
+export const skipSong = async (dispatch, accessToken, venueId) => {
+  const response = await axios.post('https://192.168.86.214:8081/spotify/skip', {
     venueId
   }, {
     headers: {
@@ -426,7 +494,7 @@ export const skipTrack = async (dispatch, accessToken, venueId) => {
  * @param volume {String }- Desired volume (0 - 100)
  */
 export const updateVolume = async (dispatch, accessToken, venueId, volume) => {
-  const response = await axios.put('http://localhost:8081/spotify/volume', {
+  const response = await axios.put('https://192.168.86.214:8081/spotify/volume', {
     venueId,
     volume
   }, {

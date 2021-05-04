@@ -1,5 +1,7 @@
 const path = require('path');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const WorkboxPlugin = require('workbox-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 const precss = require('precss');
 
@@ -65,6 +67,38 @@ module.exports = {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src', 'index.html')
+    }),
+    new CopyWebpackPlugin({
+      patterns: [
+        {
+          from: './src/manifest.json',
+          to: './manifest.json'
+        },
+        {
+          from: './src/wave-icon.png',
+          to: './wave-icon.png'
+        },
+        {
+          from: './src/wave-splashscreen.png',
+          to: './wave-splashscreen.png'
+        },
+        {
+          from: './src/favicon.ico',
+          to: './favicon.ico'
+        },
+        {
+          from: './src/apple-touch-icon.png',
+          to: './apple-touch-icon.png'
+        },
+        {
+          from: './src/wave-ios.p12',
+          to: './wave-ios.p12'
+        }
+      ]
+    }),
+    new WorkboxPlugin.GenerateSW({
+      clientsClaim: true,
+      skipWaiting: true
     })
   ],
   resolve: {

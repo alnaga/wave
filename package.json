@@ -9,7 +9,7 @@
     "build:prod": "npm run clean && cross-env NODE_ENV=production npm run build -- --mode=production",
     "clean": "rimraf build",
     "start:dev": "cross-env NODE_ENV=development webpack serve",
-    "start:lan": "cross-env NODE_ENV=development webpack serve --host 0.0.0.0",
+    "start:lan": "HTTPS=true cross-env NODE_ENV=development webpack serve --host 0.0.0.0 --https --key cert-key.pem --cert cert.pem",
     "start:prod": "cross-env NODE_ENV=production webpack serve",
     "test": "jest"
   },
@@ -36,6 +36,7 @@
     "js-cookie": "^2.2.1",
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
+    "react-bootstrap": "^1.5.2",
     "react-dom": "^17.0.1",
     "react-router": "^5.2.0",
     "react-router-dom": "^5.2.0",
@@ -54,12 +55,14 @@
     "babel-jest": "^26.6.3",
     "babel-loader": "^8.2.2",
     "babel-plugin-styled-components": "^1.12.0",
+    "copy-webpack-plugin": "^8.1.1",
     "cross-env": "^7.0.3",
     "css-loader": "^5.2.0",
     "fast-sass-loader": "^2.0.0",
     "html-webpack-plugin": "^5.3.1",
     "jest": "^26.6.3",
     "mini-css-extract-plugin": "^1.4.1",
+    "mkcert": "^1.4.0",
     "node-sass": "^5.0.0",
     "path": "^0.12.7",
     "postcss-loader": "^5.2.0",
@@ -69,6 +72,7 @@
     "style-loader": "^2.0.0",
     "webpack": "^5.24.4",
     "webpack-cli": "^4.5.0",
-    "webpack-dev-server": "^3.11.2"
+    "webpack-dev-server": "^3.11.2",
+    "workbox-webpack-plugin": "^6.1.5"
   }
 }

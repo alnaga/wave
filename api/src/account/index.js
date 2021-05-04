@@ -27,6 +27,11 @@ const getVenuesByIds = async (venueIds, res, callback) => {
   callback(await Promise.all(venues));
 };
 
+// Specify the allowed methods for this subroute.
+router.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Methods', 'POST, DELETE, GET').send();
+});
+
 router.delete('/', authenticate, async (req, res) => {
   const accessToken = req.headers.authorization.split('Bearer ')[1];
 
@@ -105,6 +110,7 @@ router.delete('/', authenticate, async (req, res) => {
   }
 });
 
+// Fetches details about a specific account.
 router.get('/', authenticate, async (req, res) => {
   const { username } = req.query;
 
@@ -131,6 +137,7 @@ router.get('/', authenticate, async (req, res) => {
   });
 });
 
+// Attempts to log the user in and return the authorisation tokens needed for all subsequent requests.
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -150,7 +157,7 @@ router.post('/login', async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
 
         if (match) {
-          const tokenResponse = await axios.post('http://localhost:8081/oauth/token', null, {
+          const tokenResponse = await axios.post('https://192.168.86.214:8081/oauth/token', null, {
             headers: {
               'Authorization': `Basic ${AUTHORISATION}`,
               'Content-Type': 'application/x-www-form-urlencoded'
@@ -183,10 +190,11 @@ router.post('/login', async (req, res) => {
   });
 });
 
+// Gets a new set of authorisation tokens from the OAuth 2 server and returns them to the client.
 router.post('/refresh', async (req, res) => {
   const { refresh_token } = req.query;
 
-  const refreshResponse = await axios.post('http://localhost:8081/oauth/token', null, {
+  const refreshResponse = await axios.post('https://192.168.86.214:8081/oauth/token', null, {
     headers: {
       'Authorization': `Basic ${AUTHORISATION}`,
       'Content-Type': 'application/x-www-form-urlencoded'
@@ -195,10 +203,8 @@ router.post('/refresh', async (req, res) => {
       grant_type: 'refresh_token',
       refresh_token
     }
-  }).catch((error) => {
-    console.error(error.message);
-  });
-  
+  }).catch((error) => error.response);
+
   if (refreshResponse && refreshResponse.status === 200) {
     res.status(200).send(refreshResponse.data);
   } else if (refreshResponse && refreshResponse.status === 400) {
@@ -212,6 +218,7 @@ router.post('/refresh', async (req, res) => {
   }
 });
 
+// Attempts to add a new user to the database.
 router.post('/register', async (req, res) => {
   const {
     firstName,
@@ -243,7 +250,7 @@ router.post('/register', async (req, res) => {
     } else {
       if (user) {
         res.status(400).send({
-          message: 'That username is already taken. Please select a different one.'
+          message: 'That username is already taken. Please enter a different one.'
         });
       } else {
         const newUser = new User({

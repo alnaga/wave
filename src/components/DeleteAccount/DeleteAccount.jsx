@@ -20,16 +20,17 @@ const DeleteAccount = () => {
   tokensRef.current = tokens;
 
   const handleDeleteAccount = async () => {
-    const firstDeleteAttempt = await deleteAccount(dispatch, tokensRef.current.wave.accessToken);
-    let secondDeleteAttempt = 0;
+    let result = await deleteAccount(dispatch, tokensRef.current.wave.accessToken);
 
     if (
       tokensRef.current.wave.accessToken
-      && firstDeleteAttempt === TOKENS_EXPIRED
+      && result === TOKENS_EXPIRED
     ) {
-      secondDeleteAttempt = await refreshExpiredTokens(dispatch, tokensRef.current.wave.accessToken);
+      result = await refreshExpiredTokens(dispatch, tokensRef.current.wave.accessToken);
       await deleteAccount(dispatch, tokensRef.current.wave.accessToken);
-    } else if (firstDeleteAttempt === 1 || secondDeleteAttempt === 1) {
+    }
+
+    if (result) {
       setDeleteSuccess(true);
     }
   };

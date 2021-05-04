@@ -17,8 +17,7 @@ import {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
 export const checkIn = async (dispatch, accessToken, venueId) => {
-  const response = await axios.post(`http://localhost:8081/venue/check-in`, {
-    accessToken,
+  const response = await axios.post(`https://192.168.86.214:8081/venue/check-in`, {
     venueId
   }, {
     headers: {
@@ -51,8 +50,7 @@ export const checkIn = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
 export const checkOut = async (dispatch, accessToken, venueId, venueDeleted) => {
-  const response = await axios.post(`http://localhost:8081/venue/check-out`, {
-    accessToken,
+  const response = await axios.post(`https://192.168.86.214:8081/venue/check-out`, {
     venueId
   }, {
     headers: {
@@ -90,7 +88,7 @@ export const checkOut = async (dispatch, accessToken, venueId, venueDeleted) => 
  * @param venueId - The ID of the target venue.
  */
 export const deleteVenue = async (dispatch, accessToken, venueId) => {
-  const response = await axios.delete(`http://localhost:8081/venue?venueId=${venueId}`, {
+  const response = await axios.delete(`https://192.168.86.214:8081/venue?venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -98,6 +96,18 @@ export const deleteVenue = async (dispatch, accessToken, venueId) => {
 
   if (response) {
     if (response.status === 200) {
+      Cookies.remove('currentVenue');
+
+      dispatch({
+        type: SET_CURRENT_SONG,
+        payload: undefined
+      });
+
+      dispatch({
+        type: SET_CURRENT_VENUE,
+        payload: undefined
+      });
+
       return 1;
     } else if (response.status === 401) {
       return TOKENS_EXPIRED;
@@ -115,7 +125,7 @@ export const deleteVenue = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
 export const getVenueData = async (dispatch, accessToken, venueId) => {
-  const response = await axios.get(`http://localhost:8081/venue?id=${venueId}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/venue?id=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -142,7 +152,7 @@ export const getVenueData = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
 export const getVenueSearchResults = async (dispatch, accessToken, query) => {
-  const response = await axios.get(`http://localhost:8081/venue/search?q=${query}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/venue/search/?q=${query}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -154,8 +164,12 @@ export const getVenueSearchResults = async (dispatch, accessToken, query) => {
         type: SET_VENUE_SEARCH_RESULTS,
         payload: response.data
       });
+
+      return 1;
     } else if (response.status === 401) {
       return TOKENS_EXPIRED;
+    } else {
+      return 0;
     }
   } else {
     return 0;
@@ -172,7 +186,7 @@ export const getVenueSearchResults = async (dispatch, accessToken, query) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
 export const registerVenue = async (dispatch, accessToken, venueData, ownerUsername, spotifyTokens) => {
-  const response = await axios.post('http://localhost:8081/venue', {
+  const response = await axios.post('https://192.168.86.214:8081/venue', {
     ownerUsername,
     spotifyTokens,
     ...venueData
@@ -204,7 +218,7 @@ export const registerVenue = async (dispatch, accessToken, venueData, ownerUsern
  * @param venueData - The new details of the venue.
  */
 export const updateVenueDetails = async (dispatch, accessToken, venueId, venueData) => {
-  const response = await axios.patch('http://localhost:8081/venue', {
+  const response = await axios.patch('https://192.168.86.214:8081/venue', {
     venueData,
     venueId
   }, {
@@ -232,8 +246,8 @@ export const updateVenueDetails = async (dispatch, accessToken, venueId, venueDa
  * @param vote {String} - The vote value (VOTE_UP or VOTE_DOWN).
  * @returns 1 if successful, 0 if failed
  */
-export const voteTrack = async (dispatch, accessToken, venueId, vote) => {
-  const response = await axios.post(`http://localhost:8081/spotify/vote`, {
+export const voteSong = async (dispatch, accessToken, venueId, vote) => {
+  const response = await axios.post(`https://192.168.86.214:8081/venue/vote`, {
     venueId,
     vote
   }, {

@@ -3,10 +3,24 @@ import { User } from '../models/user';
 import { Token } from '../models/token';
 import { Venue } from '../models/venue';
 
-import { authenticate, getUserByAccessToken, getUsersByIds } from '../util';
+import {
+  authenticate,
+  getUserByAccessToken,
+  getUsersByIds,
+  getVenueById,
+  userHasVoted,
+  userIsCheckedIn
+} from '../util';
+import {VOTE_DOWN, VOTE_UP} from '../constants';
 
 const router = Router();
 
+// Specify the allowed methods for this subroute.
+router.options('*', (req, res) => {
+  res.header('Access-Control-Allow-Methods', 'PATCH, POST, DELETE, GET').send();
+});
+
+// Attempts to delete a venue from the database. Only venue owners are authorised to successfully submit this request.
 router.delete('/', authenticate, async (req, res) => {
   const { venueId } = req.query;
   const accessToken = req.headers.authorization.split('Bearer ')[1];
@@ -55,6 +69,7 @@ router.delete('/', authenticate, async (req, res) => {
   }
 });
 
+// Fetches information about a venue and returns it to the client.
 router.get('/', authenticate, async (req, res) => {
   const { id } = req.query;
 
@@ -76,7 +91,6 @@ router.get('/', authenticate, async (req, res) => {
               name: venue.name,
               outputDeviceId: venue.outputDeviceId,
               owners,
-              songHistory: venue.songHistory,
               votes: venue.votes || 0
             }
           });
@@ -90,6 +104,7 @@ router.get('/', authenticate, async (req, res) => {
   });
 });
 
+// Attempts to update venue information in the database.
 router.patch('/', authenticate, async (req, res) => {
   const { venueData, venueId } = req.body;
   const accessToken = req.headers.authorization.split('Bearer ')[1];
@@ -164,6 +179,7 @@ router.patch('/', authenticate, async (req, res) => {
   }
 });
 
+// Attempts to add a new venue to the database.
 router.post('/', authenticate, async (req, res) => {
   const {
     addressLine1,
@@ -178,8 +194,6 @@ router.post('/', authenticate, async (req, res) => {
     postcode,
     spotifyTokens
   } = req.body;
-
-
 
   const address = {
     addressLine1,
@@ -199,7 +213,7 @@ router.post('/', authenticate, async (req, res) => {
     }, async (error, user) => {
       if (error) {
         res.status(500).send({
-          message: 'Internal server error during business registration.'
+          message: 'Internal server error during venue registration.'
         });
       } else {
         const newVenue = new Venue({
@@ -211,13 +225,14 @@ router.post('/', authenticate, async (req, res) => {
           owners: [ user._id ],
           spotifyConsent,
           spotifyTokens,
+          votedUsers: [],
           votes: 0
         });
 
         await newVenue.save(async (error, venue) => {
           if (error) {
             res.status(500).send({
-              message: 'Internal server error during business registration.'
+              message: 'Internal server error during venue registration.'
             });
           } else {
             await User.updateOne({ _id: user._id }, {
@@ -235,10 +250,9 @@ router.post('/', authenticate, async (req, res) => {
                 googleMapsLink: venue.googleMapsLink,
                 name: venue.name,
                 owners: [ user ],
-                songHistory: venue.songHistory,
                 votes: venue.votes
               },
-              message: 'Business registration successful!'
+              message: 'Venue registration successful!'
             });
           }
         });
@@ -247,8 +261,10 @@ router.post('/', authenticate, async (req, res) => {
   }
 });
 
+// Attempts to check a user into a venue.
 router.post('/check-in', authenticate, async (req, res) => {
-  const { accessToken, venueId } = req.body;
+  const { venueId } = req.body;
+  const accessToken = req.headers.authorization.split('Bearer ')[1];
 
   // Find the user from the access token the request was made with.
   await Token.findOne({ accessToken }, async (error, token) => {
@@ -339,8 +355,10 @@ router.post('/check-in', authenticate, async (req, res) => {
   });
 });
 
+// Attempts to check a user out of a venue.
 router.post('/check-out', authenticate, async (req, res) => {
-  const { accessToken, venueId } = req.body;
+  const { venueId } = req.body;
+  const accessToken = req.headers.authorization.split('Bearer ')[1];
 
   await Token.findOne({ accessToken }, async (error, token) => {
     if (error) {
@@ -405,6 +423,7 @@ router.post('/check-out', authenticate, async (req, res) => {
   });
 });
 
+// Searches the venues in the database to find the list of venues whose names contain a full or partial match for the search query.
 router.get('/search', authenticate, async (req, res) => {
   const query = req.query.q;
 
@@ -424,10 +443,10 @@ router.get('/search', authenticate, async (req, res) => {
       for (let result of results) {
         result = result.toObject();
         delete result.attendees;
+        delete result.description;
         delete result.address;
         delete result.googleMapsLink;
         delete result.owners;
-        delete result.songHistory;
         delete result.spotifyConsent;
         delete result.spotifyTokens;
         delete result.votes;
@@ -440,6 +459,93 @@ router.get('/search', authenticate, async (req, res) => {
       ]);
     }
   })
+});
+
+// Casts a vote for the currently playing song in a venue.
+router.post('/vote', authenticate, async (req, res) => {
+  const { venueId, vote } = req.body;
+  const accessToken = req.headers.authorization.split('Bearer ')[1];
+
+  let voteValue = 0;
+
+  if (vote === VOTE_UP) {
+    voteValue = 1;
+  } else if (vote === VOTE_DOWN) {
+    voteValue = -1;
+  }
+
+  await getUserByAccessToken(accessToken, res, async (user) => {
+    await getVenueById(venueId, res, async (venue) => {
+      if (venue) {
+        if (!userIsCheckedIn(venue, user)) {
+          res.status(400).send({
+            message: 'User casting vote is not checked into the target venue.'
+          });
+        } else if (venue.votedUsers && userHasVoted(venue, user)) {
+          res.status(400).send({
+            message: 'User casting vote has already voted this round.'
+          });
+        } else {
+          Venue.updateOne({ _id: venueId }, {
+            $addToSet: {
+              votedUsers: user._id
+            },
+            $inc: {
+              votes: voteValue
+            }
+          }, async (error, result) => {
+            if (error) {
+              res.status(500).send({
+                message: 'Internal server error.'
+              });
+            } else if (result.nModified === 1) {
+              let skipped = false;
+
+              let newVotes = venue.votes + voteValue;
+
+              // If the number of negative votes exceeds the threshold, skip the song and reset the votes value.
+              if (newVotes < (-venue.attendees.length / 2)) {
+                await skipTrack(venue.spotifyTokens.accessToken);
+                await Venue.updateOne({ _id: venueId }, {
+                  $set: {
+                    votedUsers: [],
+                    votes: 0
+                  }
+                });
+                newVotes = 0;
+                skipped = true;
+              }
+
+              await getUsersByIds(venue.attendees, res, async (attendees) => {
+                await getUsersByIds(venue.owners, res, async (owners) => {
+                  res.status(200).send({
+                    venue: {
+                      ...venue.toObject(),
+                      _id: undefined,
+                      id: venue._id,
+                      attendees,
+                      currentSong: undefined,
+                      googleMapsLink: undefined,
+                      owners,
+                      spotifyConsent: undefined,
+                      spotifyTokens: undefined,
+                      votes: newVotes
+                    },
+                    skipped
+                  });
+                });
+              });
+            } else {
+              console.error('Could not find venue.');
+              res.status(500).send({
+                message: 'Internal server error.'
+              });
+            }
+          });
+        }
+      }
+    });
+  });
 });
 
 module.exports = router;

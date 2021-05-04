@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStoreAlt } from '@fortawesome/free-solid-svg-icons';
 
-import DeviceSelection from '../DeviceSelection/DeviceSelection';
+import PlaybackControls from '../PlaybackControls/PlaybackControls';
 import Vote from '../Vote/Vote';
 
 import { refreshExpiredTokens } from '../../util';
@@ -12,9 +12,9 @@ import { TOKENS_EXPIRED, WAVE_COLOUR_DARK } from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getCurrentSong } from '../../actions/spotify/spotifyActions';
 
-import './CurrentlyPlaying.scss';
+import './StatusBar.scss';
 
-const CurrentlyPlaying = () => {
+const StatusBar = () => {
   const dispatch = useAppDispatch();
   const { currentSong, currentVenue, tokens } = useAppState();
   const [ songProgress, setSongProgress ] = useState(0);
@@ -95,7 +95,7 @@ const CurrentlyPlaying = () => {
         transitionTimingFunction="linear"
       />
 
-      <div id="currently-playing">
+      <div id="status-bar">
         {
           currentVenue
             ? (
@@ -139,7 +139,7 @@ const CurrentlyPlaying = () => {
                   {
                     (tokens.wave.user && currentVenue.owners && currentVenue.owners.find((owner) => owner.username === tokens.wave.user.username))
                     && (
-                      <DeviceSelection handleFetchCurrentSong={handleFetchCurrentSong} />
+                      <PlaybackControls handleFetchCurrentSong={handleFetchCurrentSong} />
                     )
                   }
                 </div>
@@ -155,4 +155,4 @@ const CurrentlyPlaying = () => {
   );
 };
 
-export default CurrentlyPlaying;
+export default StatusBar;

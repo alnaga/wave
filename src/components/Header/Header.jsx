@@ -66,14 +66,14 @@ const Header = () => {
 
           <Link
             to={wave.accessToken ? '/account' : '/login'}
-            className="mr-3"
+            // className="mr-3"
           >
             <FontAwesomeIcon icon={faUserCircle} size="lg" />
           </Link>
 
-          <Link to="/settings">
-            <FontAwesomeIcon icon={faCog} size="lg" />
-          </Link>
+          {/*<Link to="/settings">*/}
+          {/*  <FontAwesomeIcon icon={faCog} size="lg" />*/}
+          {/*</Link>*/}
         </div>
       </div>
     </div>

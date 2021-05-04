@@ -1,19 +1,20 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import { withRouter } from 'react-router-dom';
 import { Spinner } from 'react-bootstrap';
 
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
-import ScreenHeader from '../ScreenHeader/ScreenHeader';
-import VenueList from '../VenueList/VenueList';
+import SongList from '../SongList/SongList';
 
 import { refreshExpiredTokens } from '../../util';
 import { MAX_RETRIES, TOKENS_EXPIRED } from '../../constants';
+import { getSongSearchResults } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
-import { getVenueSearchResults } from '../../actions/venue/venueActions';
 
-const VenueSearchResults = (props) => {
+import './SongSearchResults.scss';
+
+const SongSearchResults = (props) => {
   const dispatch = useAppDispatch();
-  const { searchResults, tokens } = useAppState();
+  const { currentVenue, searchResults, tokens } = useAppState();
 
   const [ loading, setLoading ] = useState(false);
   const [ retries, setRetries ] = useState(0);
@@ -24,33 +25,34 @@ const VenueSearchResults = (props) => {
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
-  const handleVenueSearch = async () => {
+  const handleSearch = async () => {
     setLoading(true);
 
     const query = decodeURIComponent(props.match.params.query);
 
-    let result = await getVenueSearchResults(dispatch, tokensRef.current.wave.accessToken, query);
+    let result = await getSongSearchResults(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, query);
     if (
       tokensRef.current.wave.accessToken
+      && currentVenue
       && result === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      result = await getVenueSearchResults(dispatch, tokensRef.current.wave.accessToken, query);
+      result = await getSongSearchResults(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, query);
     }
 
     if (!result && retriesRef.current < MAX_RETRIES) {
       setRetries(retriesRef.current + 1);
 
-      await handleVenueSearch();
+      await handleSearch();
     } else {
       setLoading(false);
     }
-  };
+  }
 
   useEffect(() => {
     (async () => {
       if (props.match.params.query) {
-        await handleVenueSearch();
+        await handleSearch();
       }
     })();
 
@@ -58,11 +60,6 @@ const VenueSearchResults = (props) => {
 
   return (
     <ScreenContainer>
-      <ScreenHeader
-        title="Venue Search Results"
-        subtitle={`Showing results for '${decodeURIComponent(props.match.params.query)}':`}
-      />
-
       {
         loading
           ? (
@@ -72,12 +69,12 @@ const VenueSearchResults = (props) => {
           ) : (
             <>
               {
-                searchResults.venues.length > 0
+                (searchResults.songs.items && searchResults.songs.items.length > 0)
                   ? (
-                    <VenueList venues={searchResults.venues} />
+                    <SongList songs={searchResults.songs} />
                   ) : (
                     <div className="p-3 text-center">
-                      No venues matched your search.
+                      No songs, albums or artists matched your search.
                     </div>
                   )
               }
@@ -85,7 +82,7 @@ const VenueSearchResults = (props) => {
           )
       }
     </ScreenContainer>
-  )
+  );
 };
 
-export default withRouter(VenueSearchResults);
+export default withRouter(SongSearchResults);

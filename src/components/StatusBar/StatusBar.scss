@@ -1,7 +1,7 @@
 @import "~bootstrap/scss/bootstrap";
 @import '../../variables';
 
-#currently-playing {
+#status-bar {
   a {
     &:hover {
       text-decoration: underline;
@@ -47,7 +47,7 @@
   }
 
   align-items: center;
-  background-color: rgba(0, 0, 0, 0.8);
+  background-color: rgb(51, 51, 51);
   bottom: 0;
   color: #fff;
   display: flex;

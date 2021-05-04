@@ -43,8 +43,21 @@ const LoginRegister = () => {
       setError('Passwords do not match.');
     } else {
       setError('');
-      if (showLogin) await login(dispatch, data);
-      else await registerAccount(dispatch, data);
+
+      if (showLogin) {
+        const result = await login(dispatch, data);
+
+        if (result.error) {
+          setError(result.message);
+        }
+      }
+      else {
+        const result = await registerAccount(dispatch, data);
+
+        if (result.error) {
+          setError(result.message);
+        }
+      }
     }
   };
 

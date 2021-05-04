@@ -3,14 +3,20 @@
 @import url(https://fonts.googleapis.com/css?family=Karla:300,400,500,600,700);
 @import url(https://fonts.googleapis.com/css?family=DM+Sans:300,400,500,600,700);
 
+body {
+  background-color: $screen-background-colour !important;
+}
+
 #app {
   color: white;
+  display: flex;
+  flex-direction: column;
   font-family: Karla;
   min-height: 100vh;
 }
 
 #app-content {
-  background-color: $background-colour;
+  background-color: $screen-background-colour;
   height: $app-content-height;
   padding-top: $header-height;
   overflow-y: auto;

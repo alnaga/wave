@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 
-import CurrentlyPlaying from '../CurrentlyPlaying/CurrentlyPlaying';
+import CookiesBanner from '../CookiesBanner/CookiesBanner';
 import Dashboard from '../Dashboard/Dashboard';
 import Header from '../Header/Header';
+import StatusBar from '../StatusBar/StatusBar';
 
 import { pushToHistory } from '../../actions/history/historyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
@@ -18,8 +19,6 @@ const App = (props) => {
     }
   }, [props.history, window.location.pathname]);
 
-  console.log(tokens.wave)
-
   return (
     <div id="app">
       <Header />
@@ -28,7 +27,9 @@ const App = (props) => {
         <Dashboard />
       </div>
 
-      <CurrentlyPlaying />
+      <CookiesBanner />
+
+      <StatusBar />
     </div>
   );
 };

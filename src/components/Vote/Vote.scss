@@ -7,15 +7,22 @@
   }
 
   .vote-button {
-    &:hover {
-      background-color: $wave-colour-main;
+    &:not(.disabled) {
+      &:hover, &.selected {
+        background-color: $wave-colour-main;
+      }
+
+      cursor: pointer;
+    }
+
+    &.disabled {
+      opacity: 0.5;
     }
 
     background-color: rgba(255, 255, 255, 0.25);
     border-radius: 32px;
-    cursor: pointer;
     padding: 4px 8px;
-    transition: background-color .1s ease-in-out;
+    transition: opacity, background-color .1s ease-in-out;
   }
 
   .vote-count {
