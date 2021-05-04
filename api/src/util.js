@@ -110,7 +110,7 @@ export const refreshSpotifyToken = async (venueId, refreshToken, callback) => {
       const newAccessToken = spotifyResponse.data.access_token;
       const newTokenExpiresAt = Date.now() + (spotifyResponse.data.expires_in * 1000);
 
-      await Venue.updateOne({ _id: venueId }, {
+      await Venue.findOneAndUpdate({ _id: venueId }, {
         $set: {
           spotifyTokens: {
             accessToken: newAccessToken,
@@ -118,9 +118,12 @@ export const refreshSpotifyToken = async (venueId, refreshToken, callback) => {
             refreshToken
           }
         }
+      }, {
+        new: true,
+        useFindAndModify: true,
+      }, (error, updatedVenue) => {
+        callback(updatedVenue);
       });
-
-      callback(newAccessToken);
     }
   }
 };
@@ -146,20 +149,14 @@ export const getVenueById = async (venueId, res, callback) => {
       // If the access token has expired, it is refreshed and then the new access token is fetched and passed
       // to the callback function.
       if (venue.spotifyTokens.accessTokenExpiresAt < Date.now()) {
-        await refreshSpotifyToken(venueId, venue.spotifyTokens.refreshToken, async (refreshedAccessToken) => {
-          callback({
-            ...venue.toObject(),
-            spotifyTokens: {
-              ...venue.toObject().spotifyTokens,
-              accessToken: refreshedAccessToken
-            }
-          });
+        await refreshSpotifyToken(venueId, venue.spotifyTokens.refreshToken, async (refreshedVenue) => {
+          callback(refreshedVenue);
         });
       } else {
-        callback(venue.toObject());
+        callback(venue);
       }
     }
-  })
+  });
 };
 
 /**
