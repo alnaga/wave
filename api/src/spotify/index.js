@@ -141,8 +141,6 @@ const getVenueSpotifyToken = async (venue, callback) => {
   }
 }
 
-
-
 const skipTrack = async (accessToken) => {
   const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
     headers: {
@@ -706,6 +704,7 @@ router.get('/song', authenticate, async (req, res) => {
               await Venue.updateOne({ _id: venueId }, {
                 $set: {
                   currentSong: spotifyResponse.data.item.id,
+                  votedUsers: [],
                   votes: 0
                 }
               });

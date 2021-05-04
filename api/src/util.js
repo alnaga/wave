@@ -159,6 +159,12 @@ export const getVenueById = async (venueId, res, callback) => {
   });
 };
 
+export const userHasVoted = (venue, user) => {
+  const voters = venue.votedUsers.map((voter) => voter.toString());
+
+  return voters.includes(user._id.toString());
+};
+
 export const userIsCheckedIn = (venue, user) => {
   const attendees = venue.attendees.map((attendee) => attendee.toString());
 

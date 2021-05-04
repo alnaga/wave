@@ -8,6 +8,7 @@ import {
   getUserByAccessToken,
   getUsersByIds,
   getVenueById,
+  userHasVoted,
   userIsCheckedIn
 } from '../util';
 import {VOTE_DOWN, VOTE_UP} from '../constants';
@@ -224,6 +225,7 @@ router.post('/', authenticate, async (req, res) => {
           owners: [ user._id ],
           spotifyConsent,
           spotifyTokens,
+          votedUsers: [],
           votes: 0
         });
 
@@ -479,8 +481,15 @@ router.post('/vote', authenticate, async (req, res) => {
           res.status(400).send({
             message: 'User casting vote is not checked into the target venue.'
           });
+        } else if (venue.votedUsers && userHasVoted(venue, user)) {
+          res.status(400).send({
+            message: 'User casting vote has already voted this round.'
+          });
         } else {
           Venue.updateOne({ _id: venueId }, {
+            $addToSet: {
+              votedUsers: user._id
+            },
             $inc: {
               votes: voteValue
             }
@@ -499,6 +508,7 @@ router.post('/vote', authenticate, async (req, res) => {
                 await skipTrack(venue.spotifyTokens.accessToken);
                 await Venue.updateOne({ _id: venueId }, {
                   $set: {
+                    votedUsers: [],
                     votes: 0
                   }
                 });
