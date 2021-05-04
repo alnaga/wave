@@ -135,9 +135,9 @@ const AccountInfo = () => {
                       </div>
 
                       <div id="account-links">
-                        <Link to="/settings" className="mb-2">
-                          App Settings
-                        </Link>
+                        {/*<Link to="/settings" className="mb-2">*/}
+                        {/*  App Settings*/}
+                        {/*</Link>*/}
 
                         <Link to="/account/delete" className="mb-2">
                           Delete account
