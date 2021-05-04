@@ -225,20 +225,6 @@ router.get('/artist', authenticate, async (req, res) => {
         if (artistAlbumsResponse) {
           let { items } = artistAlbumsResponse.data;
 
-          // TODO: Add a next button on the album list to save on performance
-          // If there are multiple pages of albums, keep fetching and adding them to the items list until there are no more.
-          // while (artistAlbumsResponse.data.next !== null) {
-          //   artistAlbumsResponse = await axios.get(artistAlbumsResponse.data.next, {
-          //     headers: {
-          //       'Authorization': `Bearer ${accessToken}`
-          //     }
-          //   }).catch((error) => error.response);
-          //
-          //   if (artistAlbumsResponse) {
-          //     items.push(...artistAlbumsResponse.data.items);
-          //   }
-          // }
-
           res.status(artistResponse.status).send({
             albums: {
               ...artistAlbumsResponse.data,
