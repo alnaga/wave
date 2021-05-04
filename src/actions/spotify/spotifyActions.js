@@ -3,9 +3,11 @@ import Cookies from 'js-cookie';
 
 import {
   SET_ALBUM_INFO,
+  ADD_ARTIST_INFO_ALBUMS,
   SET_ARTIST_INFO,
   SET_CURRENT_SONG,
   SET_DEVICES,
+  ADD_SONG_SEARCH_RESULTS,
   SET_SONG_SEARCH_RESULTS,
   SET_RECOMMENDATIONS,
   SET_SPOTIFY_TOKENS,
@@ -211,6 +213,34 @@ export const getArtistInfo = async (dispatch, accessToken, venueId, artistId) =>
   }
 };
 
+export const getNextArtistAlbumsPage = async (dispatch, accessToken, venueId, nextPageUrl) => {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/search/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      dispatch({
+        type: ADD_ARTIST_INFO_ALBUMS,
+        payload: {
+          items: response.data.items,
+          next: response.data.next
+        }
+      });
+
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
+};
+
 export const getVenueRecommendations = async (dispatch, accessToken, spotifyAccessToken) => {
   const response = await axios.get(`https://192.168.86.214:8081/spotify/recommendations?spotifyAccessToken=${spotifyAccessToken}`, {
     headers: {
@@ -260,16 +290,50 @@ export const getSongSearchResults = async (dispatch, accessToken, venueId, query
     }
   }).catch((error) => error.response);
 
-  if (response && response.status === 200) {
-    dispatch({
-      type: SET_SONG_SEARCH_RESULTS,
-      payload: response.data.tracks.items
-    });
+  if (response) {
+    if (response.status === 200) {
+      dispatch({
+        type: SET_SONG_SEARCH_RESULTS,
+        payload: response.data.tracks
+      });
 
-    return 1;
-  } else if (response && response.status === 401) {
-    return TOKENS_EXPIRED;
-  } else return 0;
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
+};
+
+export const getNextSongSearchResultsPage = async (dispatch, accessToken, venueId, nextPageUrl) => {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/search/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`
+    }
+  }).catch((error) => error.response);
+
+  if (response) {
+    if (response.status === 200) {
+      dispatch({
+        type: ADD_SONG_SEARCH_RESULTS,
+        payload: {
+          items: response.data.tracks.items,
+          next: response.data.tracks.next
+        }
+      });
+
+      return 1;
+    } else if (response.status === 401) {
+      return TOKENS_EXPIRED;
+    } else {
+      return 0;
+    }
+  } else {
+    return 0;
+  }
 };
 
 /**

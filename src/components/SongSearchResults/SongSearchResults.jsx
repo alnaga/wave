@@ -22,7 +22,6 @@ const SongSearchResults = (props) => {
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
-  // TODO: Implement fetching songs from subsequent pages if there are enough results.
   const handleSearch = async () => {
     setLoading(true);
 
@@ -67,7 +66,7 @@ const SongSearchResults = (props) => {
           ) : (
             <>
               {
-                searchResults.songs.length > 0
+                (searchResults.songs.items && searchResults.songs.items.length > 0)
                   ? (
                     <SongList songs={searchResults.songs} />
                   ) : (

@@ -6,11 +6,13 @@ import {
   CLEAR_HISTORY,
   SET_ACCOUNT_INFO,
   SET_ALBUM_INFO,
+  ADD_ARTIST_INFO_ALBUMS,
   SET_ARTIST_INFO,
   SET_CURRENT_SONG,
   SET_CURRENT_VENUE,
   SET_DEVICES,
   SET_HISTORY,
+  ADD_SONG_SEARCH_RESULTS,
   SET_SONG_SEARCH_RESULTS,
   SET_RECOMMENDATIONS,
   SET_SPOTIFY_TOKENS,
@@ -99,6 +101,21 @@ const appReducer = (state, action) => {
         ...state,
         albumInfo: action.payload
       };
+    case ADD_ARTIST_INFO_ALBUMS:
+      return {
+        ...state,
+        artistInfo: {
+          ...state.artistInfo,
+          albums: {
+            ...state.artistInfo.albums,
+            items: [
+              ...state.artistInfo.albums.items,
+              ...action.payload.items
+            ],
+            next: action.payload.next
+          }
+        }
+      }
     case SET_ARTIST_INFO:
       return {
         ...state,
@@ -135,6 +152,21 @@ const appReducer = (state, action) => {
         tokens: {
           spotify: action.payload,
           wave: state.tokens.wave
+        }
+      };
+    case ADD_SONG_SEARCH_RESULTS:
+      return {
+        ...state,
+        searchResults: {
+          songs: {
+            ...state.searchResults.songs,
+            items: [
+              ...state.searchResults.songs.items,
+              ...action.payload.items
+            ],
+            next: action.payload.next
+          },
+          venues: state.searchResults.venues
         }
       };
     case SET_SONG_SEARCH_RESULTS:

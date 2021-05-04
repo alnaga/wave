@@ -92,7 +92,7 @@ const AlbumInfo = (props) => {
                       </div>
                     </div>
 
-                    <SongList showArtist={false} songs={albumInfo.tracks.items} />
+                    <SongList showArtist={false} songs={albumInfo.tracks} />
                   </>
                 )
               }

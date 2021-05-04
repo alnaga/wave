@@ -84,7 +84,7 @@ const ArtistInfo = (props) => {
                     <div id="album-list-container">
                       {
                         (artistInfo.albums && artistInfo.albums.items.length > 0)
-                        && <AlbumList albums={artistInfo.albums.items} />
+                        && <AlbumList albums={artistInfo.albums} />
                       }
                     </div>
                   </>

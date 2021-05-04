@@ -167,23 +167,10 @@ router.options('*', (req, res) => {
 // Sends the user to the Spotify app authorisation page to get their permission to link their account with Wave.
 // Returns an authorisation code which can be exchanged with an access token later on in the app flow.
 router.get('/authorise', (req, res) => {
-  // TODO: remove the following unused scopes
-  // user-follow-read
-  // user-follow-modify
-  // user-read-email
-  // streaming
-  // app-remote-control
-  // user-read-currently-playing
   const spotifyScopes = `
     user-top-read 
     user-read-playback-state 
     user-modify-playback-state 
-    user-follow-read 
-    user-follow-modify
-    user-read-email
-    streaming 
-    app-remote-control 
-    user-read-currently-playing 
   `;
   // const redirectUri = 'http://localhost:8080';
   const redirectUri = 'https://192.168.86.214:8080';
@@ -362,6 +349,38 @@ router.put('/devices', authenticate, async (req, res) => {
         }
       }
     });
+  });
+});
+
+// Gets the next page of results given a Spotify endpoint.
+router.get('/search/next', authenticate, async (req, res) => {
+  const { venueId } = req.query;
+  const nextPageUrl = decodeURIComponent(req.query.nextPageUrl);
+
+  await getVenueById(venueId, res, async (venue) => {
+    if (venue) {
+      if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
+        const spotifyResponse = await axios.get(`${nextPageUrl}`, {
+          headers: {
+            'Authorization': `Bearer ${venue.spotifyTokens.accessToken}`
+          }
+        }).catch((error) => error.response);
+
+        if (spotifyResponse) {
+          if (spotifyResponse.status === 200) {
+            res.status(200).send(spotifyResponse.data);
+          } else {
+            res.status(500).send({
+              message: 'Next results page request to Spotify API failed.'
+            });
+          }
+        }
+      } else {
+        res.status(400).send({
+          message: 'Venue has not linked their Spotify account.'
+        });
+      }
+    }
   });
 });
 
