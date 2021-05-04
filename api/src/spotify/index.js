@@ -353,7 +353,7 @@ router.put('/devices', authenticate, async (req, res) => {
 });
 
 // Gets the next page of results given a Spotify endpoint.
-router.get('/search/next', authenticate, async (req, res) => {
+router.get('/next', authenticate, async (req, res) => {
   const { venueId } = req.query;
   const nextPageUrl = decodeURIComponent(req.query.nextPageUrl);
 

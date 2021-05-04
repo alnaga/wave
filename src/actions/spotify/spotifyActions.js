@@ -214,7 +214,7 @@ export const getArtistInfo = async (dispatch, accessToken, venueId, artistId) =>
 };
 
 export const getNextArtistAlbumsPage = async (dispatch, accessToken, venueId, nextPageUrl) => {
-  const response = await axios.get(`https://192.168.86.214:8081/spotify/search/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -309,7 +309,7 @@ export const getSongSearchResults = async (dispatch, accessToken, venueId, query
 };
 
 export const getNextSongSearchResultsPage = async (dispatch, accessToken, venueId, nextPageUrl) => {
-  const response = await axios.get(`https://192.168.86.214:8081/spotify/search/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
+  const response = await axios.get(`https://192.168.86.214:8081/spotify/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
