@@ -85,10 +85,21 @@ export const login = async (dispatch, userData) => {
     const response = await axios.post('https://192.168.86.214:8081/account/login', userData)
       .catch((error) => error.response);
 
-    if (response.status === 200) {
-      saveTokens(dispatch, response.data);
-      return 1;
-    } else return 0;
+    if (response) {
+      if (response.status === 200) {
+        saveTokens(dispatch, response.data);
+        return 1;
+      } else if (response.status === 400 || response.status === 500) {
+        return {
+          error: true,
+          message: response.data.message
+        };
+      } else {
+        return 0;
+      }
+    } else {
+      return 0;
+    }
   } catch (error) {
     return 0;
   }
@@ -134,12 +145,25 @@ export const refreshAccessToken = async (dispatch, refreshToken) => {
  */
 export const registerAccount = async (dispatch, userData) => {
   try {
-    const response = await axios.post('https://192.168.86.214:8081/account/register', userData);
+    const response = await axios.post('https://192.168.86.214:8081/account/register', userData)
+      .catch((error) => error.response);
 
-    if (response.status === 200) {
-      await login(dispatch, userData);
-      return 1;
-    } else return 0;
+    if (response) {
+      if (response.status === 200) {
+        await login(dispatch, userData);
+        return 1;
+      } else if (response.status === 400 || response.status === 500) {
+        return {
+          error: true,
+          message: response.data.message
+        };
+      } else {
+        return 0;
+      }
+    } else {
+      return 0;
+    }
+
   } catch (error) {
     return 0;
   }

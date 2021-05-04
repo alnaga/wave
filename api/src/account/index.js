@@ -250,7 +250,7 @@ router.post('/register', async (req, res) => {
     } else {
       if (user) {
         res.status(400).send({
-          message: 'That username is already taken. Please select a different one.'
+          message: 'That username is already taken. Please enter a different one.'
         });
       } else {
         const newUser = new User({
