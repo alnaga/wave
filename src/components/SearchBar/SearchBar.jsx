@@ -11,9 +11,20 @@ const SearchBar = ({ placeholder, resultsPage, searchType, staticContext, ...pro
   const [ redirect, setRedirect ] = useState(false);
 
   const handleChangeQuery = (event) => {
+    event.preventDefault();
     const value = event.target.value;
     setRedirect(false);
     setQuery(value);
+
+    return false;
+  };
+
+  const handleCheckEnterKey = (event) => {
+    if (event.key === 'Enter') {
+      handleSubmit(event);
+    }
+
+    return false;
   };
 
   const handleSubmit = (event) => {
@@ -21,6 +32,8 @@ const SearchBar = ({ placeholder, resultsPage, searchType, staticContext, ...pro
     if (query.length > 0) {
       setRedirect(true);
     }
+
+    return false;
   };
 
   useEffect(() => {
@@ -35,10 +48,12 @@ const SearchBar = ({ placeholder, resultsPage, searchType, staticContext, ...pro
   }, [searchType, props.history.location]);
 
   return (
-    <form id="search-bar" {...props}>
+    <div id="search-bar" {...props}>
       <input
+        enterKeyHint="search"
         type="text"
         onChange={handleChangeQuery}
+        onKeyDown={handleCheckEnterKey}
         placeholder={placeholder}
         value={query}
       />
@@ -53,7 +68,7 @@ const SearchBar = ({ placeholder, resultsPage, searchType, staticContext, ...pro
         redirect
           && <Redirect to={`${resultsPage}/${encodeURIComponent(query)}`} />
       }
-    </form>
+    </div>
   );
 };
 

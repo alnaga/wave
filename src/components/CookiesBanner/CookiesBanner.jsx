@@ -31,7 +31,7 @@ const CookiesBanner = () => {
               </div>
 
               <button className="ml-3" onClick={handleGiveConsent}>
-                I Accept
+                Accept
               </button>
             </div>
           )
