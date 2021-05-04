@@ -6,7 +6,7 @@ import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED, VOTE_DOWN, VOTE_UP} from '../../constants';
 import { useAppDispatch, useAppState } from '../../context/context';
 import { getCurrentSong } from '../../actions/spotify/spotifyActions';
-import { voteTrack } from '../../actions/venue/venueActions';
+import { voteSong } from '../../actions/venue/venueActions';
 
 import './Vote.scss';
 
@@ -19,7 +19,7 @@ const Vote = () => {
 
   const handleVote = (vote) => async () => {
     if (tokensRef.current.wave.accessToken) {
-      const firstVoteAttempt = await voteTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, vote);
+      const firstVoteAttempt = await voteSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, vote);
       let { skipped } = firstVoteAttempt;
 
       if (
@@ -27,13 +27,13 @@ const Vote = () => {
         && firstVoteAttempt === TOKENS_EXPIRED
       ) {
         await refreshExpiredTokens(dispatch, tokensRef.current);
-        skipped = await voteTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, vote).skipped;
+        skipped = await voteSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, vote).skipped;
       }
 
       if (skipped) {
         // Spotify has a short delay before skipping, so to avoid getting the same song as pre-skip, we wait.
         setTimeout(async () => {
-          await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, tokensRef.current.spotify.accessToken);
+          await getCurrentSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.id);
         }, 250);
       }
     }

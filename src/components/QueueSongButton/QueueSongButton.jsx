@@ -4,26 +4,26 @@ import { faPlusCircle } from '@fortawesome/free-solid-svg-icons';
 
 import { refreshExpiredTokens } from '../../util';
 import { TOKENS_EXPIRED } from '../../constants';
-import { queueTrack } from '../../actions/spotify/spotifyActions';
+import { queueSong } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
 
-import './QueueTrackButton.scss';
+import './QueueSongButton.scss';
 
-const QueueTrackButton = (props) => {
-  const { track } = props;
+const QueueSongButton = (props) => {
+  const { song } = props;
   const dispatch = useAppDispatch();
   const { currentVenue, tokens } = useAppState();
 
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
-  const handleQueueSong = (track) => async () => {
+  const handleQueueSong = (song) => async () => {
     if (
       tokensRef.current.wave.accessToken
-      && await queueTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, track.uri) === TOKENS_EXPIRED
+      && await queueSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, song.uri) === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      await queueTrack(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, track.uri);
+      await queueSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, song.uri);
     }
   };
   return (
@@ -34,9 +34,9 @@ const QueueTrackButton = (props) => {
             <FontAwesomeIcon
               className="add-to-queue"
               icon={faPlusCircle}
-              onClick={handleQueueSong(track)}
+              onClick={handleQueueSong(song)}
               size="2x"
-              title={`Add '${track.artists[0].name} - ${track.name}' to the queue.`}
+              title={`Add '${song.artists[0].name} - ${song.name}' to the queue.`}
             />
           )
       }
@@ -44,4 +44,4 @@ const QueueTrackButton = (props) => {
   );
 };
 
-export default QueueTrackButton;
+export default QueueSongButton;

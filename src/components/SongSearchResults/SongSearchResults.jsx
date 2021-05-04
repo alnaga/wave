@@ -7,12 +7,12 @@ import SongList from '../SongList/SongList';
 
 import { refreshExpiredTokens } from '../../util';
 import { MAX_RETRIES, TOKENS_EXPIRED } from '../../constants';
-import { getTrackSearchResults } from '../../actions/spotify/spotifyActions';
+import { getSongSearchResults } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
 
-import './TrackSearchResults.scss';
+import './SongSearchResults.scss';
 
-const TrackSearchResults = (props) => {
+const SongSearchResults = (props) => {
   const dispatch = useAppDispatch();
   const { currentVenue, searchResults, tokens } = useAppState();
 
@@ -28,14 +28,14 @@ const TrackSearchResults = (props) => {
 
     const query = decodeURIComponent(props.match.params.query);
 
-    let result = await getTrackSearchResults(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, query);
+    let result = await getSongSearchResults(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, query);
     if (
       tokensRef.current.wave.accessToken
       && currentVenue
       && result === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      result = await getTrackSearchResults(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, query);
+      result = await getSongSearchResults(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, query);
     }
 
     if (!result && retries < MAX_RETRIES) {
@@ -67,9 +67,9 @@ const TrackSearchResults = (props) => {
           ) : (
             <>
               {
-                searchResults.tracks.length > 0
+                searchResults.songs.length > 0
                   ? (
-                    <SongList tracks={searchResults.tracks} />
+                    <SongList songs={searchResults.songs} />
                   ) : (
                     <div className="p-3 text-center">
                       No songs, albums or artists matched your search.
@@ -83,4 +83,4 @@ const TrackSearchResults = (props) => {
   );
 };
 
-export default withRouter(TrackSearchResults);
+export default withRouter(SongSearchResults);

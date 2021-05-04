@@ -18,7 +18,6 @@ import {
  */
 export const checkIn = async (dispatch, accessToken, venueId) => {
   const response = await axios.post(`https://192.168.86.214:8081/venue/check-in`, {
-    accessToken,
     venueId
   }, {
     headers: {
@@ -52,7 +51,6 @@ export const checkIn = async (dispatch, accessToken, venueId) => {
  */
 export const checkOut = async (dispatch, accessToken, venueId, venueDeleted) => {
   const response = await axios.post(`https://192.168.86.214:8081/venue/check-out`, {
-    accessToken,
     venueId
   }, {
     headers: {
@@ -236,7 +234,7 @@ export const updateVenueDetails = async (dispatch, accessToken, venueId, venueDa
  * @param vote {String} - The vote value (VOTE_UP or VOTE_DOWN).
  * @returns 1 if successful, 0 if failed
  */
-export const voteTrack = async (dispatch, accessToken, venueId, vote) => {
+export const voteSong = async (dispatch, accessToken, venueId, vote) => {
   const response = await axios.post(`https://192.168.86.214:8081/spotify/vote`, {
     venueId,
     vote

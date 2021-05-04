@@ -6,7 +6,7 @@ import {
   SET_ARTIST_INFO,
   SET_CURRENT_SONG,
   SET_DEVICES,
-  SET_TRACK_SEARCH_RESULTS,
+  SET_SONG_SEARCH_RESULTS,
   SET_RECOMMENDATIONS,
   SET_SPOTIFY_TOKENS,
   SET_VOTES,
@@ -248,7 +248,7 @@ export const getVenueRecommendations = async (dispatch, accessToken, spotifyAcce
  * @param query {String} - Search query
  * @returns 1 if successful, 0 if failed
  */
-export const getTrackSearchResults = async (dispatch, accessToken, venueId, query) => {
+export const getSongSearchResults = async (dispatch, accessToken, venueId, query) => {
   // If the user has not input a query, the request to the API is not made.
   if (!query) {
     return 0;
@@ -262,7 +262,7 @@ export const getTrackSearchResults = async (dispatch, accessToken, venueId, quer
 
   if (response && response.status === 200) {
     dispatch({
-      type: SET_TRACK_SEARCH_RESULTS,
+      type: SET_SONG_SEARCH_RESULTS,
       payload: response.data.tracks.items
     });
 
@@ -320,12 +320,12 @@ export const getCurrentSong = async (dispatch, accessToken, venueId) => {
 };
 
 /**
- * Attempts to pause the currently playing track on the Spotify API.
+ * Attempts to pause the currently playing song on the Spotify API.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API access Token
  * @param venueId {String} - The ID of the target venue.
  */
-export const pauseTrack = async (dispatch, accessToken, venueId) => {
+export const pauseSong = async (dispatch, accessToken, venueId) => {
   const response = await axios.put('https://192.168.86.214:8081/spotify/pause', {
     venueId
   }, {
@@ -346,12 +346,12 @@ export const pauseTrack = async (dispatch, accessToken, venueId) => {
 }
 
 /**
- * Attempts to resume the currently playing track on the Spotify API.
+ * Attempts to resume the currently playing song on the Spotify API.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API access Token
  * @param venueId {String} - The ID of the target venue.
  */
-export const playTrack = async (dispatch, accessToken, venueId) => {
+export const resumeSong = async (dispatch, accessToken, venueId) => {
   const response = await axios.put('https://192.168.86.214:8081/spotify/play', {
     venueId
   }, {
@@ -376,12 +376,12 @@ export const playTrack = async (dispatch, accessToken, venueId) => {
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API Access Token
  * @param venueId {String} - The ID of the target venue.
- * @param trackUri {String} - The URI of the track to be queued.
+ * @param songUri {String} - The URI of the song to be queued.
  * @returns 1 if successful, 0 if failed
  */
-export const queueTrack = async (dispatch, accessToken, venueId, trackUri) => {
+export const queueSong = async (dispatch, accessToken, venueId, songUri) => {
   const response = await axios.post(`https://192.168.86.214:8081/spotify/song`, {
-    trackUri,
+    songUri,
     venueId
   }, {
     headers: {
@@ -397,12 +397,12 @@ export const queueTrack = async (dispatch, accessToken, venueId, trackUri) => {
 };
 
 /**
- * Attempts to skip the currently playing track on the Spotify API.
+ * Attempts to skip the currently playing song on the Spotify API.
  * @param dispatch {Function} - Application Dispatch
  * @param accessToken {String} - Wave API access Token
  * @param venueId {String} - The ID of the target venue.
  */
-export const skipTrack = async (dispatch, accessToken, venueId) => {
+export const skipSong = async (dispatch, accessToken, venueId) => {
   const response = await axios.post('https://192.168.86.214:8081/spotify/skip', {
     venueId
   }, {

@@ -78,18 +78,17 @@ const VenueInfo = (props) => {
   };
 
   const handleDeleteVenue = async () => {
-    const firstDeleteAttempt = await deleteVenue(dispatch, tokensRef.current.wave.accessToken, venueInfo.id);
-    let secondDeleteAttempt = 0;
+    let result = await deleteVenue(dispatch, tokensRef.current.wave.accessToken, venueInfo.id);
 
     if (
       tokensRef.current.wave.accessToken
-      && firstDeleteAttempt === TOKENS_EXPIRED
+      && result === TOKENS_EXPIRED
     ) {
       await refreshExpiredTokens(dispatch, tokensRef.current);
-      secondDeleteAttempt = await updateVenueDetails(dispatch, tokensRef.current.wave.accessToken, venueInfo.id);
+      result = await updateVenueDetails(dispatch, tokensRef.current.wave.accessToken, venueInfo.id);
     }
 
-    if (firstDeleteAttempt === 1 || secondDeleteAttempt === 1) {
+    if (result === 1) {
       await handleCheckOut(true);
       props.history.goBack();
     }

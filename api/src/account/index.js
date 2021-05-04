@@ -110,6 +110,7 @@ router.delete('/', authenticate, async (req, res) => {
   }
 });
 
+// Fetches details about a specific account.
 router.get('/', authenticate, async (req, res) => {
   const { username } = req.query;
 
@@ -136,6 +137,7 @@ router.get('/', authenticate, async (req, res) => {
   });
 });
 
+// Attempts to log the user in and return the authorisation tokens needed for all subsequent requests.
 router.post('/login', async (req, res) => {
   const { username, password } = req.body;
 
@@ -188,6 +190,7 @@ router.post('/login', async (req, res) => {
   });
 });
 
+// Gets a new set of authorisation tokens from the OAuth 2 server and returns them to the client.
 router.post('/refresh', async (req, res) => {
   const { refresh_token } = req.query;
 
@@ -215,6 +218,7 @@ router.post('/refresh', async (req, res) => {
   }
 });
 
+// Attempts to add a new user to the database.
 router.post('/register', async (req, res) => {
   const {
     firstName,

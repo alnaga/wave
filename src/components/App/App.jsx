@@ -2,9 +2,9 @@ import React, { useEffect } from 'react';
 import { withRouter } from 'react-router-dom';
 
 import CookiesBanner from '../CookiesBanner/CookiesBanner';
-import CurrentlyPlaying from '../CurrentlyPlaying/CurrentlyPlaying';
 import Dashboard from '../Dashboard/Dashboard';
 import Header from '../Header/Header';
+import StatusBar from '../StatusBar/StatusBar';
 
 import { pushToHistory } from '../../actions/history/historyActions';
 import { useAppDispatch, useAppState } from '../../context/context';
@@ -29,7 +29,7 @@ const App = (props) => {
 
       <CookiesBanner />
 
-      <CurrentlyPlaying />
+      <StatusBar />
     </div>
   );
 };

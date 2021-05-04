@@ -15,7 +15,6 @@ export const Venue = mongoose.model('venue', mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'user'
   }],
-  uri: String,
   spotifyConsent: Boolean,
   spotifyTokens: Object,
   votes: Number

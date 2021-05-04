@@ -11,7 +11,7 @@ import {
   SET_CURRENT_VENUE,
   SET_DEVICES,
   SET_HISTORY,
-  SET_TRACK_SEARCH_RESULTS,
+  SET_SONG_SEARCH_RESULTS,
   SET_RECOMMENDATIONS,
   SET_SPOTIFY_TOKENS,
   SET_VENUE_INFO,
@@ -49,7 +49,7 @@ export const initialState = {
   })() || [],
   recommendations: [],
   searchResults: {
-    tracks: [],
+    songs: [],
     venues: []
   },
   tokens: {
@@ -137,11 +137,11 @@ const appReducer = (state, action) => {
           wave: state.tokens.wave
         }
       };
-    case SET_TRACK_SEARCH_RESULTS:
+    case SET_SONG_SEARCH_RESULTS:
       return {
         ...state,
         searchResults: {
-          tracks: action.payload,
+          songs: action.payload,
           venues: state.searchResults.venues
         }
       };
@@ -154,7 +154,7 @@ const appReducer = (state, action) => {
       return {
         ...state,
         searchResults: {
-          tracks: state.searchResults.tracks,
+          songs: state.searchResults.songs,
           venues: action.payload
         }
       };

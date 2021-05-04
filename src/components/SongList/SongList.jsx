@@ -4,7 +4,7 @@ import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlay } from '@fortawesome/free-solid-svg-icons';
 
-import QueueSongButton from '../QueueTrackButton/QueueTrackButton';
+import QueueSongButton from '../QueueSongButton/QueueSongButton';
 
 import { useAppState } from '../../context/context';
 import { formatSongLength } from '../../util';
@@ -13,7 +13,7 @@ import './SongList.scss';
 
 const SongList = (props) => {
   const {
-    tracks,
+    songs,
     showArtist = true,
   } = props;
 
@@ -22,24 +22,24 @@ const SongList = (props) => {
   return (
     <div id="song-list">
       {
-        tracks.map((track) => {
+        songs.map((song) => {
           return (
             <div
               className={classNames({
                 'result': true,
-                'current': currentSong && currentSong.item.id === track.id
+                'current': currentSong && currentSong.item.id === song.id
               })}
-              key={track.id}
+              key={song.id}
             >
               <div className="result-left">
                 {
-                  track.album
+                  song.album
                     && (
-                      <Link to={`/album/${track.album.id}`}>
+                      <Link to={`/album/${song.album.id}`}>
                         <img
-                          alt={`${track.album.name} Album Art`}
-                          src={track.album.images[0].url}
-                          title={track.album.name}
+                          alt={`${song.album.name} Album Art`}
+                          src={song.album.images[0].url}
+                          title={song.album.name}
                           width={64}
                         />
                       </Link>
@@ -48,7 +48,7 @@ const SongList = (props) => {
 
                 <div className="ml-3 d-flex align-items-center">
                   {
-                    currentSong && currentSong.item.id === track.id
+                    currentSong && currentSong.item.id === song.id
                       && (
                         <FontAwesomeIcon icon={faPlay} className="mr-2" />
                       )
@@ -56,16 +56,16 @@ const SongList = (props) => {
 
                   <div>
                     {
-                      track.album
+                      song.album
                         ? (
-                          <Link to={`/album/${track.album.id}`}>
-                            <div className="result-name" title={track.name}>
-                              { track.name }
+                          <Link to={`/album/${song.album.id}`}>
+                            <div className="result-name" title={song.name}>
+                              { song.name }
                             </div>
                           </Link>
                         ) : (
                           <div className="result-name">
-                            { track.name }
+                            { song.name }
                           </div>
                         )
                     }
@@ -74,8 +74,8 @@ const SongList = (props) => {
                       showArtist
                       && (
                         <div className="result-artist">
-                          <Link to={`/artist/${track.artists[0].id}`}>
-                            { track.artists[0].name }
+                          <Link to={`/artist/${song.artists[0].id}`}>
+                            { song.artists[0].name }
                           </Link>
                         </div>
                       )
@@ -87,11 +87,11 @@ const SongList = (props) => {
 
               <div className="align-items-center d-flex ml-3 mr-3">
                 <div>
-                  { formatSongLength(track.duration_ms) }
+                  { formatSongLength(song.duration_ms) }
                 </div>
 
                 <div className="ml-3 d-flex align-items-center">
-                  <QueueSongButton track={track} />
+                  <QueueSongButton song={song} />
                 </div>
               </div>
             </div>

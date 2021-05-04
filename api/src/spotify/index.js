@@ -367,7 +367,7 @@ router.put('/devices', authenticate, async (req, res) => {
   });
 });
 
-// Pause the current track for a venue on Spotify.
+// Pause the current song for a venue on Spotify.
 router.put('/pause', authenticate, async (req, res) => {
   const { venueId } = req.body;
   const accessToken = req.headers.authorization.split('Bearer ')[1];
@@ -413,7 +413,7 @@ router.put('/pause', authenticate, async (req, res) => {
   })
 });
 
-// Resumes the current track for a venue on Spotify.
+// Resumes the current song for a venue on Spotify.
 router.put('/play', authenticate, async (req, res) => {
   const { venueId } = req.body;
   const accessToken = req.headers.authorization.split('Bearer ')[1];
@@ -422,7 +422,7 @@ router.put('/play', authenticate, async (req, res) => {
     await Venue.findOne({ _id: venueId }, async (error, venue) => {
       if (error) {
         res.status(500).send({
-          message: 'Internal server error occurred while resuming track.'
+          message: 'Internal server error occurred while resuming song.'
         });
       } else if (!venue) {
         res.status(400).send({
@@ -442,16 +442,16 @@ router.put('/play', authenticate, async (req, res) => {
         if (spotifyResponse) {
           if (spotifyResponse.status === 204) {
             res.status(200).send({
-              message: 'Track resumed successfully.'
+              message: 'Song resumed successfully.'
             });
           } else {
             res.status(500).send({
-              message: 'Resume track request to Spotify API failed.'
+              message: 'Resume song request to Spotify API failed.'
             });
           }
         } else {
           res.status(500).send({
-            message: 'Resume track to Spotify API failed.'
+            message: 'Resume song to Spotify API failed.'
           })
         }
       }
@@ -502,7 +502,7 @@ router.get('/recommendations', authenticate, async (req, res) => {
         } while (nextPageResults.next);
       }
 
-      // Create a list of genres artists are related to and keep track of the occurrences of each.
+      // Create a list of genres artists are related to and keep song of the occurrences of each.
       let preferredGenres = []
       for (let artist of topArtistResults) {
         for (let genre of artist.genres) {
@@ -649,7 +649,7 @@ router.get('/search', async (req, res) => {
 
 });
 
-// Skips the currently playing track in a venue.
+// Skips the currently playing song in a venue.
 router.post('/skip', authenticate, async (req, res) => {
   const { venueId } = req.body;
   const accessToken = req.headers.authorization.split('Bearer ')[1];
@@ -658,7 +658,7 @@ router.post('/skip', authenticate, async (req, res) => {
     await Venue.findOne({ _id: venueId }, async (error, venue) => {
       if (error) {
         res.status(500).send({
-          message: 'Internal server error occurred while skipping track.'
+          message: 'Internal server error occurred while skipping song.'
         });
       } else if (!venue) {
         res.status(400).send({
@@ -666,7 +666,7 @@ router.post('/skip', authenticate, async (req, res) => {
         });
       } else if (!venue.owners.includes(user._id)) {
         res.status(401).send({
-          message: 'User making request is not authorised to skip track.'
+          message: 'User making request is not authorised to skip song.'
         });
       } else {
         const spotifyResponse = await axios.post('https://api.spotify.com/v1/me/player/next', null, {
@@ -678,7 +678,7 @@ router.post('/skip', authenticate, async (req, res) => {
         if (spotifyResponse) {
           if (spotifyResponse.status === 204) {
             res.status(200).send({
-              message: 'Track skipped successfully.'
+              message: 'Song skipped successfully.'
             });
           } else {
             res.status(500).send({
@@ -766,13 +766,13 @@ router.get('/song', authenticate, async (req, res) => {
 
 // Adds a song to the queue on a venue's Spotify account.
 router.post('/song', authenticate, async (req, res) => {
-  const { trackUri, venueId } = req.body;
+  const { songUri, venueId } = req.body;
 
   await getVenueById(venueId, res, async (venue) => {
     if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
       const deviceId = venue.outputDeviceId;
 
-      const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${trackUri}&device_id=${deviceId}`, null, {
+      const spotifyResponse = await axios.post(`https://api.spotify.com/v1/me/player/queue?uri=${songUri}&device_id=${deviceId}`, null, {
         headers: {
           "Authorization": `Bearer ${venue.spotifyTokens.accessToken}`
         }
@@ -799,57 +799,6 @@ router.post('/song', authenticate, async (req, res) => {
       });
     }
   });
-});
-
-// Gets details about a venue and returns them to the client.
-router.get('/venue', authenticate, async (req, res) => {
-  const { accessToken } = req.query;
-  
-  try {
-    const spotifyResponse = await axios.get('https://api.spotify.com/v1/me', {
-      headers: {
-        "Authorization": `Bearer ${accessToken}`
-      }
-    }).catch((error) => error.response);
-
-    if (spotifyResponse.status === 200) {
-      const { data } = spotifyResponse;
-      Venue.findOne({ uri: data.uri }, (error, venue) => {
-        if (error) {
-          res.status(500).send({
-            message: 'Internal server error.'
-          });
-        } else if (venue) {
-          res.status(200).send(venue);
-        } else {
-          const newVenue = new Venue({
-            attendees: 0,
-            name: data.display_name,
-            uri: data.uri,
-            votes: 0
-          });
-
-          newVenue.save((error) => {
-            if (error) {
-              res.status(500).send({
-                message: 'Error occurred while adding venue. Not added.'
-              });
-            } else {
-              res.status(200).send(newVenue);
-            }
-          })
-        }
-      });
-    } else {
-      console.error('An error occurred fetching venue.', spotifyResponse.status);
-      res.status(500).send({
-        message: 'Internal server error.'
-      });
-    }
-  } catch (error) {
-    console.error('An error occurred fetching venue.', error);
-    res.status(error.status).send(error);
-  }
 });
 
 // Updates the output volume in a venue.
