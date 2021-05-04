@@ -1,4 +1,5 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
+import classNames from 'classnames';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faThumbsDown, faThumbsUp } from '@fortawesome/free-solid-svg-icons';
 
@@ -14,11 +15,15 @@ const Vote = () => {
   const dispatch = useAppDispatch();
   const { currentSong, currentVenue, tokens } = useAppState();
 
+  const [ previousSong, setPreviousSong ] = useState({});
+  const [ voteType, setVoteType ] = useState();
+
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
   const handleVote = (vote) => async () => {
-    if (tokensRef.current.wave.accessToken) {
+    if (!voteType && tokensRef.current.wave.accessToken) {
+      setVoteType(vote);
       const firstVoteAttempt = await voteSong(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, vote);
       let { skipped } = firstVoteAttempt;
 
@@ -39,13 +44,27 @@ const Vote = () => {
     }
   };
 
+  useEffect(() => {
+    if (currentSong && currentSong.item.id !== previousSong) {
+      setVoteType(undefined);
+      setPreviousSong(currentSong.item.id);
+    }
+  }, [currentSong]);
+
   return (
     <>
       {
         (currentVenue && currentSong)
           && (
             <div id="vote">
-              <span className="vote-button" onClick={handleVote(VOTE_DOWN)}>
+              <span
+                className={classNames({
+                  'vote-button': true,
+                  'disabled': voteType === VOTE_UP,
+                  'selected': voteType === VOTE_DOWN
+                })}
+                onClick={handleVote(VOTE_DOWN)}
+              >
                 <FontAwesomeIcon icon={faThumbsDown} />
               </span>
 
@@ -53,7 +72,14 @@ const Vote = () => {
                 { currentVenue.votes }
               </span>
 
-              <span className="vote-button" onClick={handleVote(VOTE_UP)}>
+              <span
+                className={classNames({
+                  'vote-button': true,
+                  'disabled': voteType === VOTE_DOWN,
+                  'selected': voteType === VOTE_UP
+                })}
+                onClick={handleVote(VOTE_UP)}
+              >
                 <FontAwesomeIcon icon={faThumbsUp} />
               </span>
             </div>
