@@ -89,7 +89,6 @@ const VenueInfo = (props) => {
     }
 
     if (result === 1) {
-      await handleCheckOut(true);
       props.history.goBack();
     }
   };

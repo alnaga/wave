@@ -93,7 +93,7 @@ export const getUserByAccessToken = async (accessToken, res, callback) => {
  * @param callback {Function} - The callback function into which the new token will be passed.
  */
 export const refreshSpotifyToken = async (venueId, refreshToken, callback) => {
-  console.log('Refreshing Spotify Access Token', new Date().toISOString());
+  console.log(`Refreshing Spotify Access Token for venue ID: ${venueId}`, new Date().toISOString());
   const spotifyResponse = await axios.post('https://accounts.spotify.com/api/token', null, {
     headers: {
       "Authorization": `Basic ${AUTHORISATION}`,

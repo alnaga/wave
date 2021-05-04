@@ -96,6 +96,18 @@ export const deleteVenue = async (dispatch, accessToken, venueId) => {
 
   if (response) {
     if (response.status === 200) {
+      Cookies.remove('currentVenue');
+
+      dispatch({
+        type: SET_CURRENT_SONG,
+        payload: undefined
+      });
+
+      dispatch({
+        type: SET_CURRENT_VENUE,
+        payload: undefined
+      });
+
       return 1;
     } else if (response.status === 401) {
       return TOKENS_EXPIRED;
