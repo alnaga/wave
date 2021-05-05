@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 
+import { API_URL } from '../../constants';
 import { getSpotifyAuthTokens } from '../../actions/spotify/spotifyActions';
 import { useAppDispatch } from '../../context/context';
 
@@ -9,7 +10,7 @@ const SpotifyAuthorise = (props) => {
   const dispatch = useAppDispatch();
 
   const handleAuthorise = (event) => {
-    window.location.href = 'https://192.168.86.214:8081/spotify/authorise/';
+    window.location.href = `${API_URL}/spotify/authorise/`;
   };
 
   useEffect(() => {
@@ -19,7 +20,7 @@ const SpotifyAuthorise = (props) => {
     (async () => {
       if (authCode && authCode.length) {
         if (await getSpotifyAuthTokens(dispatch, authCode)) {
-          window.location.href = 'https://192.168.86.214:8080';
+          window.location.href = API_URL.slice(0, -1) + '0';
         }
       }
     })();

@@ -12,7 +12,7 @@ import { useAppDispatch, useAppState } from '../../context/context';
 const App = (props) => {
   const dispatch = useAppDispatch();
   const { history, tokens } = useAppState();
-
+  
   useEffect(() => {
     if (props.history.location.pathname !== history[history.length - 1]) {
       pushToHistory(dispatch, history, props.history.location.pathname);

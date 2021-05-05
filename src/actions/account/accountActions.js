@@ -2,6 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import {
+  API_URL,
   CLEAR,
   SET_ACCOUNT_INFO,
   SET_WAVE_TOKENS,
@@ -31,7 +32,7 @@ const saveTokens = async (dispatch, tokens) => {
 }
 
 export const getAccountInfo = async (dispatch, accessToken, username) => {
-  const response = await axios.get(`https://192.168.86.214:8081/account?username=${username}`, {
+  const response = await axios.get(`${API_URL}/account?username=${username}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -52,7 +53,7 @@ export const getAccountInfo = async (dispatch, accessToken, username) => {
 };
 
 export const deleteAccount = async (dispatch, accessToken) => {
-  const response = await axios.delete(`https://192.168.86.214:8081/account`, {
+  const response = await axios.delete(`${API_URL}/account`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -82,7 +83,7 @@ export const deleteAccount = async (dispatch, accessToken) => {
  */
 export const login = async (dispatch, userData) => {
   try {
-    const response = await axios.post('https://192.168.86.214:8081/account/login', userData)
+    const response = await axios.post(`${API_URL}/account/login`, userData)
       .catch((error) => error.response);
 
     if (response) {
@@ -126,7 +127,7 @@ export const logout = async (dispatch) => {
  */
 export const refreshAccessToken = async (dispatch, refreshToken) => {
   try {
-    const response = await axios.post(`https://192.168.86.214:8081/account/refresh?refresh_token=${refreshToken}`);
+    const response = await axios.post(`${API_URL}/account/refresh?refresh_token=${refreshToken}`);
 
     if (response.status === 200) {
       await saveTokens(dispatch, response.data);
@@ -145,7 +146,7 @@ export const refreshAccessToken = async (dispatch, refreshToken) => {
  */
 export const registerAccount = async (dispatch, userData) => {
   try {
-    const response = await axios.post('https://192.168.86.214:8081/account/register', userData)
+    const response = await axios.post(`${API_URL}/account/register`, userData)
       .catch((error) => error.response);
 
     if (response) {

@@ -2,6 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import {
+  API_URL,
   SET_CURRENT_SONG,
   SET_CURRENT_VENUE,
   SET_VENUE_INFO,
@@ -17,7 +18,7 @@ import {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
 export const checkIn = async (dispatch, accessToken, venueId) => {
-  const response = await axios.post(`https://192.168.86.214:8081/venue/check-in`, {
+  const response = await axios.post(`${API_URL}/venue/check-in`, {
     venueId
   }, {
     headers: {
@@ -50,7 +51,7 @@ export const checkIn = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
 export const checkOut = async (dispatch, accessToken, venueId, venueDeleted) => {
-  const response = await axios.post(`https://192.168.86.214:8081/venue/check-out`, {
+  const response = await axios.post(`${API_URL}/venue/check-out`, {
     venueId
   }, {
     headers: {
@@ -88,7 +89,7 @@ export const checkOut = async (dispatch, accessToken, venueId, venueDeleted) => 
  * @param venueId - The ID of the target venue.
  */
 export const deleteVenue = async (dispatch, accessToken, venueId) => {
-  const response = await axios.delete(`https://192.168.86.214:8081/venue?venueId=${venueId}`, {
+  const response = await axios.delete(`${API_URL}/venue?venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -125,7 +126,7 @@ export const deleteVenue = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
 export const getVenueData = async (dispatch, accessToken, venueId) => {
-  const response = await axios.get(`https://192.168.86.214:8081/venue?id=${venueId}`, {
+  const response = await axios.get(`${API_URL}/venue?id=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -152,7 +153,7 @@ export const getVenueData = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
 export const getVenueSearchResults = async (dispatch, accessToken, query) => {
-  const response = await axios.get(`https://192.168.86.214:8081/venue/search/?q=${query}`, {
+  const response = await axios.get(`${API_URL}/venue/search/?q=${query}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -186,7 +187,7 @@ export const getVenueSearchResults = async (dispatch, accessToken, query) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if the Wave API access token has expired.
  */
 export const registerVenue = async (dispatch, accessToken, venueData, ownerUsername, spotifyTokens) => {
-  const response = await axios.post('https://192.168.86.214:8081/venue', {
+  const response = await axios.post(`${API_URL}/venue`, {
     ownerUsername,
     spotifyTokens,
     ...venueData
@@ -218,7 +219,7 @@ export const registerVenue = async (dispatch, accessToken, venueData, ownerUsern
  * @param venueData - The new details of the venue.
  */
 export const updateVenueDetails = async (dispatch, accessToken, venueId, venueData) => {
-  const response = await axios.patch('https://192.168.86.214:8081/venue', {
+  const response = await axios.patch(`${API_URL}/venue`, {
     venueData,
     venueId
   }, {
@@ -247,7 +248,7 @@ export const updateVenueDetails = async (dispatch, accessToken, venueId, venueDa
  * @returns 1 if successful, 0 if failed
  */
 export const voteSong = async (dispatch, accessToken, venueId, vote) => {
-  const response = await axios.post(`https://192.168.86.214:8081/venue/vote`, {
+  const response = await axios.post(`${API_URL}/venue/vote`, {
     venueId,
     vote
   }, {

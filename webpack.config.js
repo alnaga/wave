@@ -4,6 +4,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WorkboxPlugin = require('workbox-webpack-plugin');
 const autoprefixer = require('autoprefixer');
 const precss = require('precss');
+const webpack = require('webpack');
 
 const environment = process.env.NODE_ENV;
 const isProd = environment === 'production';
@@ -65,6 +66,9 @@ module.exports = {
     publicPath: '/'
   },
   plugins: [
+    new webpack.DefinePlugin({
+      LOCALHOST: process.env.HOST_TYPE === 'localhost'
+    }),
     new HtmlWebpackPlugin({
       template: path.resolve(__dirname, 'src', 'index.html')
     }),

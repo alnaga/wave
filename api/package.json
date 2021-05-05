@@ -7,7 +7,8 @@
     "build": "npm run clean && babel ./src --out-dir build/ --ignore ./node_modules",
     "clean": "rimraf build",
     "start:db": "mongod --dbpath=./data/db --port 8082",
-    "start": "nodemon --exec babel-node src",
+    "start:lan": "cross-env HOST_TYPE=lan nodemon --exec babel-node src",
+    "start:localhost": "cross-env HOST_TYPE=localhost nodemon --exec babel-node src",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Alexander Naggar",
@@ -30,6 +31,7 @@
     "@babel/node": "^7.13.13",
     "@babel/preset-env": "^7.13.10",
     "body-parser": "^1.19.0",
+    "cross-env": "^7.0.3",
     "esm": "^3.2.25",
     "nodemon": "^2.0.7",
     "rimraf": "^3.0.2"

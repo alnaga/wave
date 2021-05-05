@@ -32,9 +32,9 @@ const credentials = {
   cert: certificate,
 };
 
-const corsOptions = {
-  origin: 'http://localhost:8080'
-};
+// const corsOptions = {
+//   origin: 'http://localhost:8080'
+// };
 
 app.use(cors({
   origin: true,
@@ -85,12 +85,8 @@ app.use('/spotify', spotify);
 
 app.all('/oauth/token', getToken);
 
-// const insecureApp = http.createServer(app);
 const secureApp = https.createServer(credentials, app);
 
-// insecureApp.listen(8082, () => {
-//   console.log('HTTP Listening on port 8082...');
-// });
 secureApp.listen(port, () => {
   console.log(`HTTPS Listening on port ${port}...`);
 });

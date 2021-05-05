@@ -2,6 +2,7 @@ import axios from 'axios';
 import Cookies from 'js-cookie';
 
 import {
+  API_URL,
   SET_ALBUM_INFO,
   ADD_ARTIST_INFO_ALBUMS,
   SET_ARTIST_INFO,
@@ -24,7 +25,7 @@ import {
  */
 export const getSpotifyAuthTokens = async (dispatch, authCode) => {
   try {
-    const response = await axios.post('https://192.168.86.214:8081/spotify/tokens', {
+    const response = await axios.post(`${API_URL}/spotify/tokens`, {
       authCode
     }).catch((error) => error.response);
 
@@ -64,7 +65,7 @@ export const getSpotifyAuthTokens = async (dispatch, authCode) => {
  */
 export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
   try {
-    const response = await axios.post('https://192.168.86.214:8081/spotify/refresh', {
+    const response = await axios.post(`${API_URL}/spotify/refresh`, {
       refreshToken
     });
 
@@ -101,7 +102,7 @@ export const refreshSpotifyAuthToken = async (dispatch, refreshToken) => {
  * @returns 1 if successful, 0 if failed
  */
 export const getUserDevices = async (dispatch, accessToken, venueId) => {
-  const response = await axios.get(`https://192.168.86.214:8081/spotify/devices?venueId=${venueId}`, {
+  const response = await axios.get(`${API_URL}/spotify/devices?venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -130,7 +131,7 @@ export const getUserDevices = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed
  */
 export const selectUserDevice = async (dispatch, accessToken, venueId, device) => {
-  const response = await axios.put(`https://192.168.86.214:8081/spotify/devices`, {
+  const response = await axios.put(`${API_URL}/spotify/devices`, {
     device,
     venueId
   }, {
@@ -164,7 +165,7 @@ export const selectUserDevice = async (dispatch, accessToken, venueId, device) =
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if one of the access tokens have expired.
  */
 export const getAlbumInfo = async (dispatch, accessToken, venueId, albumId) => {
-  const response = await axios.get(`https://192.168.86.214:8081/spotify/album?venueId=${venueId}&albumId=${albumId}`, {
+  const response = await axios.get(`${API_URL}/spotify/album?venueId=${venueId}&albumId=${albumId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -191,7 +192,7 @@ export const getAlbumInfo = async (dispatch, accessToken, venueId, albumId) => {
  * @returns 1 if successful, 0 if failed, TOKENS_EXPIRED if one of the access tokens have expired.
  */
 export const getArtistInfo = async (dispatch, accessToken, venueId, artistId) => {
-  const response = await axios.get(`https://192.168.86.214:8081/spotify/artist?venueId=${venueId}&artistId=${artistId}`, {
+  const response = await axios.get(`${API_URL}/spotify/artist?venueId=${venueId}&artistId=${artistId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -214,7 +215,7 @@ export const getArtistInfo = async (dispatch, accessToken, venueId, artistId) =>
 };
 
 export const getNextArtistAlbumsPage = async (dispatch, accessToken, venueId, nextPageUrl) => {
-  const response = await axios.get(`https://192.168.86.214:8081/spotify/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
+  const response = await axios.get(`${API_URL}/spotify/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -242,7 +243,7 @@ export const getNextArtistAlbumsPage = async (dispatch, accessToken, venueId, ne
 };
 
 export const getVenueRecommendations = async (dispatch, accessToken, spotifyAccessToken) => {
-  const response = await axios.get(`https://192.168.86.214:8081/spotify/recommendations?spotifyAccessToken=${spotifyAccessToken}`, {
+  const response = await axios.get(`${API_URL}/spotify/recommendations?spotifyAccessToken=${spotifyAccessToken}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -284,7 +285,7 @@ export const getSongSearchResults = async (dispatch, accessToken, venueId, query
     return 0;
   }
 
-  const response = await axios.get(`https://192.168.86.214:8081/spotify/search?query=${query}&venueId=${venueId}`, {
+  const response = await axios.get(`${API_URL}/spotify/search?query=${query}&venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -309,7 +310,7 @@ export const getSongSearchResults = async (dispatch, accessToken, venueId, query
 };
 
 export const getNextSongSearchResultsPage = async (dispatch, accessToken, venueId, nextPageUrl) => {
-  const response = await axios.get(`https://192.168.86.214:8081/spotify/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
+  const response = await axios.get(`${API_URL}/spotify/next?venueId=${venueId}&nextPageUrl=${encodeURIComponent(nextPageUrl)}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -344,7 +345,7 @@ export const getNextSongSearchResultsPage = async (dispatch, accessToken, venueI
  * @returns 1 if successful, 0 if failed
  */
 export const getCurrentSong = async (dispatch, accessToken, venueId) => {
-  const response = await axios.get(`https://192.168.86.214:8081/spotify/song?venueId=${venueId}`, {
+  const response = await axios.get(`${API_URL}/spotify/song?venueId=${venueId}`, {
     headers: {
       'Authorization': `Bearer ${accessToken}`
     }
@@ -390,7 +391,7 @@ export const getCurrentSong = async (dispatch, accessToken, venueId) => {
  * @param venueId {String} - The ID of the target venue.
  */
 export const pauseSong = async (dispatch, accessToken, venueId) => {
-  const response = await axios.put('https://192.168.86.214:8081/spotify/pause', {
+  const response = await axios.put(`${API_URL}/spotify/pause`, {
     venueId
   }, {
     headers: {
@@ -416,7 +417,7 @@ export const pauseSong = async (dispatch, accessToken, venueId) => {
  * @param venueId {String} - The ID of the target venue.
  */
 export const resumeSong = async (dispatch, accessToken, venueId) => {
-  const response = await axios.put('https://192.168.86.214:8081/spotify/play', {
+  const response = await axios.put(`${API_URL}/spotify/play`, {
     venueId
   }, {
     headers: {
@@ -444,7 +445,7 @@ export const resumeSong = async (dispatch, accessToken, venueId) => {
  * @returns 1 if successful, 0 if failed
  */
 export const queueSong = async (dispatch, accessToken, venueId, songUri) => {
-  const response = await axios.post(`https://192.168.86.214:8081/spotify/song`, {
+  const response = await axios.post(`${API_URL}/spotify/song`, {
     songUri,
     venueId
   }, {
@@ -467,7 +468,7 @@ export const queueSong = async (dispatch, accessToken, venueId, songUri) => {
  * @param venueId {String} - The ID of the target venue.
  */
 export const skipSong = async (dispatch, accessToken, venueId) => {
-  const response = await axios.post('https://192.168.86.214:8081/spotify/skip', {
+  const response = await axios.post(`${API_URL}/spotify/skip`, {
     venueId
   }, {
     headers: {
@@ -494,7 +495,7 @@ export const skipSong = async (dispatch, accessToken, venueId) => {
  * @param volume {String }- Desired volume (0 - 100)
  */
 export const updateVolume = async (dispatch, accessToken, venueId, volume) => {
-  const response = await axios.put('https://192.168.86.214:8081/spotify/volume', {
+  const response = await axios.put(`${API_URL}/spotify/volume`, {
     venueId,
     volume
   }, {

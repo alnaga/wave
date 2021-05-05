@@ -30,3 +30,9 @@ export const VOTE_UP = 'VOTE_UP';
 
 export const WAVE_COLOUR_DARK = '#6e5399';
 export const WAVE_COLOUR_MAIN = '#a37cd9';
+
+const localhost = 'https://localhost:8081';
+
+const lan = 'https://192.168.86.214:8081';
+
+export const API_URL = LOCALHOST ? localhost : lan;

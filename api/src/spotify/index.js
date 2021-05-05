@@ -13,6 +13,7 @@ import {
 } from '../util';
 import { Venue } from '../models/venue';
 import {
+  APP_HOMEPAGE_URL,
   AUTHORISATION,
   CLIENT_ID,
   VOTE_DOWN,
@@ -155,13 +156,11 @@ router.get('/authorise', (req, res) => {
     user-read-playback-state 
     user-modify-playback-state 
   `;
-  // const redirectUri = 'http://localhost:8080';
-  const redirectUri = 'https://192.168.86.214:8080';
   res.redirect('https://accounts.spotify.com/authorize' +
     '?response_type=code' +
     `&client_id=${CLIENT_ID}` +
     (spotifyScopes ? `&scope=${encodeURIComponent(spotifyScopes)}` : '') +
-    `&redirect_uri=${redirectUri}`
+    `&redirect_uri=${APP_HOMEPAGE_URL}`
   );
 });
 
@@ -774,7 +773,7 @@ router.post('/tokens', async (req, res) => {
     params: {
       "grant_type": "authorization_code",
       "code": authCode,
-      "redirect_uri": "https://192.168.86.214:8080"
+      "redirect_uri": APP_HOMEPAGE_URL
     }
   }).catch((error) => error.response);
 

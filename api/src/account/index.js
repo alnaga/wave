@@ -6,7 +6,7 @@ import { User } from '../models/user';
 import { Venue } from '../models/venue';
 
 import { authenticate } from '../util';
-import { AUTHORISATION } from '../constants';
+import { API_URL, AUTHORISATION } from '../constants';
 
 const router = Router();
 
@@ -157,7 +157,7 @@ router.post('/login', async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
 
         if (match) {
-          const tokenResponse = await axios.post('https://192.168.86.214:8081/oauth/token', null, {
+          const tokenResponse = await axios.post(`${API_URL}/oauth/token`, null, {
             headers: {
               'Authorization': `Basic ${AUTHORISATION}`,
               'Content-Type': 'application/x-www-form-urlencoded'
@@ -194,7 +194,7 @@ router.post('/login', async (req, res) => {
 router.post('/refresh', async (req, res) => {
   const { refresh_token } = req.query;
 
-  const refreshResponse = await axios.post('https://192.168.86.214:8081/oauth/token', null, {
+  const refreshResponse = await axios.post(`${API_URL}/oauth/token`, null, {
     headers: {
       'Authorization': `Basic ${AUTHORISATION}`,
       'Content-Type': 'application/x-www-form-urlencoded'

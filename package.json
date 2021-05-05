@@ -10,6 +10,7 @@
     "clean": "rimraf build",
     "start:dev": "cross-env NODE_ENV=development webpack serve",
     "start:lan": "HTTPS=true cross-env NODE_ENV=development webpack serve --host 0.0.0.0 --https --key cert-key.pem --cert cert.pem",
+    "start:localhost": "HTTPS=true cross-env NODE_ENV=development HOST_TYPE=localhost webpack serve --https --key cert-key.pem --cert cert.pem",
     "start:prod": "cross-env NODE_ENV=production webpack serve",
     "test": "jest"
   },
