@@ -70,7 +70,7 @@ export const printDatabase = () => {
  */
 export const getAccessToken = async (accessToken, callback) => {
   Token.findOne({ accessToken }, (error, token) => {
-    if (!token) console.error('Access: Token not found.', accessToken);
+    if (!token) console.error('Access Token not found.', accessToken);
     if (error) console.error(error);
 
     callback(error, token);

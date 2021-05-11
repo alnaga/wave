@@ -251,7 +251,7 @@ router.get('/devices', authenticate, async (req, res) => {
     await getVenueById(venueId, res, async (venue) => {
       if (venue) {
         if (!userIsOwner(venue, user)) {
-          res.status(401).send({
+          res.status(403).send({
             message: 'User making request is not authorised to see playback devices.'
           });
         } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
@@ -281,7 +281,7 @@ router.put('/devices', authenticate, async (req, res) => {
     await getVenueById(venueId, res, async (venue) => {
       if (venue) {
         if (!userIsOwner(venue, user)) {
-          res.status(401).send({
+          res.status(403).send({
             message: 'User making request is not authorised to change playback device.'
           });
         } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
@@ -361,7 +361,7 @@ router.put('/pause', authenticate, async (req, res) => {
     await getVenueById(venueId, res, async (venue) => {
       if (venue) {
         if (!userIsOwner(venue, user)) {
-          res.status(401).send({
+          res.status(403).send({
             message: 'User making request is not authorised to pause playback.'
           });
         } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
@@ -405,7 +405,7 @@ router.put('/play', authenticate, async (req, res) => {
     await getVenueById(venueId, res, async (venue) => {
       if (venue) {
         if (!userIsOwner(venue, user)) {
-          res.status(401).send({
+          res.status(403).send({
             message: 'User making request is not authorised to resume playback.'
           });
         } else {
@@ -614,7 +614,7 @@ router.post('/skip', authenticate, async (req, res) => {
     await getVenueById(venueId, res, async (venue) => {
       if (venue) {
         if (!userIsOwner(venue, user)) {
-          res.status(400).send({
+          res.status(403).send({
             message: 'User making request is not authorised to skip song.'
           });
         } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
@@ -792,7 +792,7 @@ router.put('/volume', authenticate, async (req, res) => {
     await getVenueById(venueId, res, async (venue) => {
       if (venue) {
         if (!userIsOwner(venue, user)) {
-          res.status(401).send({
+          res.status(403).send({
             message: 'User making the request is not authorised to adjust volume.'
           });
         } else if (venue.spotifyTokens && venue.spotifyTokens.accessToken) {
