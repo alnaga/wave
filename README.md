@@ -25,7 +25,7 @@ To install it on an iOS device, transfer the file to the device and open Setting
 Install the profile and then navigate to Settings -> General -> About -> Certificate Trust Settings and make sure that
 the newly installed certificate has been granted full trust by tapping the toggle button.
 
-Finally it is time to start the application.
+Finally, it is time to start the application.
 To run the client, enter the following command in the root project directory:
 ```shell
 npm run start:localhost
