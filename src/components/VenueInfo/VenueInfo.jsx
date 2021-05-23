@@ -48,6 +48,8 @@ const VenueInfo = (props) => {
   const displayAddress = () => {
     let output = [];
 
+    // Fetches the value of each of the address fields and adds them to an output array so that it can be
+    // rendered in the UI.
     for (let field in venueInfo.address) {
       output.push(venueInfo.address[field]);
     }
@@ -91,11 +93,13 @@ const VenueInfo = (props) => {
       result = await updateVenueDetails(dispatch, tokensRef.current.wave.accessToken, venueInfo.id);
     }
 
+    // If the venue was deleted, navigate the user back to the previous page.
     if (result === 1) {
       props.history.goBack();
     }
   };
 
+  // Updates the state value for the corresponding form field whenever the user changes their input.
   const handleEditField = (field) => (event) => {
     let value;
 
@@ -163,6 +167,7 @@ const VenueInfo = (props) => {
   };
 
   useEffect(() => {
+    // Whenever the venue data is fetched, the form values are changed to the new values.
     if (venueInfo && venueInfo.name && !dataChanged) {
       setEditData({
         name: venueInfo.name,

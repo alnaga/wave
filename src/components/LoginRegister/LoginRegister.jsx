@@ -24,6 +24,7 @@ const LoginRegister = () => {
   const dispatch = useAppDispatch();
   const { tokens } = useAppState();
 
+  // Clears the error in the UI.
   const handleDismissError = () => {
     setError('');
   };
@@ -31,6 +32,7 @@ const LoginRegister = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
+    // Displays an error in the UI if any of the required fields aren't present.
     if (!showLogin && !data.firstName) {
       setError('Please enter a first name.');
     } else if (!showLogin && !data.lastName) {
@@ -61,6 +63,7 @@ const LoginRegister = () => {
     }
   };
 
+  // Handles changing the state values for a corresponding form field when the user modifies their input.
   const handleFormChange = (field) => (event) => {
     const value = event.target.value;
 

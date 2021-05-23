@@ -16,6 +16,8 @@ const VenueList = (props) => {
     }
   }, [scores]);
 
+  // Renders a Link for each venue in the 'venues' prop array so that the user can navigate to its
+  // corresponding details page.
   return (
     <div id="venue-list">
       {

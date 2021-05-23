@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCog, faHome, faUserCircle } from '@fortawesome/free-solid-svg-icons';
+import { faHome, faUserCircle } from '@fortawesome/free-solid-svg-icons';
 
 import BackButton from '../BackButton/BackButton';
 import SearchBar from '../SearchBar/SearchBar';
@@ -66,14 +66,9 @@ const Header = () => {
 
           <Link
             to={wave.accessToken ? '/account' : '/login'}
-            // className="mr-3"
           >
             <FontAwesomeIcon icon={faUserCircle} size="lg" />
           </Link>
-
-          {/*<Link to="/settings">*/}
-          {/*  <FontAwesomeIcon icon={faCog} size="lg" />*/}
-          {/*</Link>*/}
         </div>
       </div>
     </div>

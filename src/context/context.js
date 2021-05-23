@@ -82,6 +82,8 @@ export const initialState = {
   venueInfo: undefined
 };
 
+// Set up the application reducer so that each of the different action types mutates the correct part of
+// the context data store.
 const appReducer = (state, action) => {
   switch(action.type) {
     case CLEAR:
@@ -225,10 +227,12 @@ const Provider = (props) => {
   );
 };
 
+// Exports a React hook that can be used by components to have access to the context data store when needed.
 export const useAppState = () => {
   return useContext(StateContext);
 };
 
+// Exports a React hook that can be used by components to dispatch actions to mutate the context data store when needed.
 export const useAppDispatch = () => {
   return useContext(DispatchContext);
 };

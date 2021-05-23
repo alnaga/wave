@@ -43,6 +43,8 @@ const StatusBar = () => {
   }
 
   useEffect(() => {
+    // Whenever the current song is polled, the progress is updated on the component state so that the bar
+    // accurately reflects how far through the song the user is.
     if (currentSong) {
       const { item, progress_ms } = currentSong;
       setSongProgress((progress_ms / item.duration_ms) * 100);
@@ -56,7 +58,7 @@ const StatusBar = () => {
       // This checks to see whether there is a venue the user is currently checked into
       // and whether the client is polling the current song.
       // When the user checks out of a venue it will stop polling the current song to save
-      // on performance.
+      // on resource usage.
       if (currentVenue && !pollCurrentSongInterval) {
         setPollCurrentSongInterval(setInterval(async () => {
           await handleFetchCurrentSong();

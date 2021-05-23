@@ -24,6 +24,7 @@ const AlbumList = (props) => {
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
+  // Fetches the next page of results, retrying if necessary.
   const handleGetNextPage = async () => {
     setLoading(true);
     let result = await getNextArtistAlbumsPage(dispatch, tokensRef.current.wave.accessToken, currentVenue.id, albums.next);

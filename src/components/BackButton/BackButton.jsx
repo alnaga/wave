@@ -10,6 +10,8 @@ const BackButton = (props) => {
   const dispatch = useAppDispatch();
   const { history } = useAppState();
 
+  // Redirects the user to the previous page in the application by looking at the 'history' context array.
+  // Following this, the last item in the array is removed.
   const handleGoBack = () => {
     popHistory(dispatch, history);
   };

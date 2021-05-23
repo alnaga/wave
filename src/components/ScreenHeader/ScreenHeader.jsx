@@ -3,6 +3,8 @@ import classNames from 'classnames';
 
 import './ScreenHeader.scss';
 
+// Allows developers to define the title (and subtitle if necessary) of a page.
+// This improves consistency across the application and reduces the amount of duplicate code.
 const ScreenHeader = ({ subtitle, title, className }) => (
   <div
     className={classNames({

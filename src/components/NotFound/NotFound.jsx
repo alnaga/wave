@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import ScreenContainer from '../ScreenContainer/ScreenContainer';
 import ScreenHeader from '../ScreenHeader/ScreenHeader';
 
+// Displayed when the user navigates to a page which does not exist in the application.
 const NotFound = () => {
   return (
     <ScreenContainer>

@@ -28,6 +28,7 @@ const AccountInfo = () => {
   const tokensRef = useRef(null);
   tokensRef.current = tokens;
 
+  // Attempts to fetch the user's account details, retrying if the first attempt results in a 401 status code from the API.
   const handleGetAccountInfo = async () => {
     setLoading(true);
 
@@ -51,6 +52,7 @@ const AccountInfo = () => {
     }
   };
 
+  // Attempts to log the user out, retrying if the first attempt results in a 401 status code from the API.
   const handleLogout = async () => {
     if (
       tokensRef.current.wave.accessToken
@@ -138,10 +140,6 @@ const AccountInfo = () => {
                       </div>
 
                       <div id="account-links">
-                        {/*<Link to="/settings" className="mb-2">*/}
-                        {/*  App Settings*/}
-                        {/*</Link>*/}
-
                         <Link to="/account/delete" className="mb-2">
                           Delete account
                         </Link>

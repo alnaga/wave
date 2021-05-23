@@ -40,6 +40,8 @@ const VolumeSlider = () => {
     }
   }
 
+  // To prevent sending hundreds of volume adjustment requests as the user drags the range slider, the request is only
+  // sent if no more adjustments have been made in the past 0.5 seconds.
   const handleVolumeChange = async (event) => {
     setVolume(event.target.value);
 

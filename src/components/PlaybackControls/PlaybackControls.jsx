@@ -30,6 +30,9 @@ const PlaybackControls = (props) => {
 
   const listRef = useRef(null);
 
+  // When the user clicks, this method checks to see if the click was inside of the PlaybackControls menu.
+  // If not, the menu is hidden.
+  // This allows the user to close it in a natural way i.e. by clicking away from it when they want to close it.
   const handleDetectClick = (event) => {
     if (
       showListRef.current

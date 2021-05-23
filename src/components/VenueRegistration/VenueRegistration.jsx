@@ -42,6 +42,7 @@ const VenueRegistration = (props) => {
     setError('');
   };
 
+  // Whenever the user changes their input, this method updates the corresponding state value for the changed field.
   const handleFormChange = (field) => (event) => {
     let value;
 
@@ -59,7 +60,8 @@ const VenueRegistration = (props) => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
+
+    // Renders an error in the UI if any of the required form fields are missing.
     if (!data.name) {
       setError('Please enter a name for your venue.');
     } else if (!data.description) {
@@ -86,6 +88,7 @@ const VenueRegistration = (props) => {
         await registerVenue(dispatch, tokensRef.current.wave.accessToken, data, tokensRef.current.wave.user.username, tokensRef.current.spotify);
       }
 
+      // Navigates the user to the newly created venue's details page if registration was successful.
       if (venueRef.current) {
         props.history.push(`/venue/${venueRef.current._id}`);
       }

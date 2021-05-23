@@ -17,6 +17,7 @@ import VenueSearchResults from '../VenueSearchResults/VenueSearchResults';
 
 import './Dashboard.scss';
 
+// Handles conditionally rendering different pages of the application based upon the URL the user is on.
 const Dashboard = () => {
   return (
     <div id="dashboard" className="container-fluid d-flex flex-column pl-0 pr-0">

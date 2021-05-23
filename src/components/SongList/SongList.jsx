@@ -51,6 +51,7 @@ const SongList = (props) => {
     }
   };
 
+  // Renders a link for each song in the 'songs' prop array with various details.
   return (
     <div id="song-list">
       {

@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import './CookiesBanner.scss';
 
 const CookiesBanner = () => {
+  // The banner is only shown if the 'cookieConsent' cookie is not present in the browser.
   const [ show, setShow ] = useState(() => {
     try {
       const cookieConsent = JSON.parse(Cookies.get('cookieConsent'));
@@ -15,6 +16,7 @@ const CookiesBanner = () => {
     }
   });
 
+  // Sets the 'cookieConsent' cookie on the browser so that it will no longer be shown on subsequent page visits.
   const handleGiveConsent = () => {
     Cookies.set('cookieConsent', JSON.stringify(true));
     setShow(false);

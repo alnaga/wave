@@ -38,6 +38,7 @@ const SearchBar = ({ placeholder, resultsPage, searchType, staticContext, ...pro
 
   useEffect(() => {
     const urlSegments = window.location.pathname.split('/');
+    // Automatically sets the value of the search query if there is a search query value already in the URL.
     if (urlSegments[1] === searchType && urlSegments[2] === 'search' && urlSegments[3]) {
       setQuery(decodeURIComponent(urlSegments[3]));
     } else {
